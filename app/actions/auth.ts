@@ -1,8 +1,8 @@
 'use server'
 
-import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { getServiceClient, getAnonClient } from '@/lib/supabase/server'
 
 // ─── Role → path mapping ──────────────────────────────────────────────────────
 const ROLE_REDIRECT: Record<string, string> = {
@@ -10,29 +10,6 @@ const ROLE_REDIRECT: Record<string, string> = {
   agency_owner: '/agency',
   employee: '/employee',
   customer: '/customer',
-}
-
-// ─── Supabase Client Helpers ──────────────────────────────────────────────────
-function getServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!url || !key) {
-    throw new Error('Supabase URL veya Service Role Key tanımlanmamış (.env.local kontrol edin).')
-  }
-
-  return createClient(url, key)
-}
-
-function getAnonClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!url || !key) {
-    throw new Error('Supabase URL veya Anon Key tanımlanmamış (.env.local kontrol edin).')
-  }
-
-  return createClient(url, key)
 }
 
 // ─── Cookie Helper ────────────────────────────────────────────────────────────
@@ -236,4 +213,26 @@ export async function registerAction(
   cookieStore.set('agency-id', agency.id, getCookieOptions(7))
 
   redirect('/agency')
+}
+
+/**
+ * Logout Server Action
+ * Çerezleri temizler, Supabase oturumunu sonlandırır ve /login sayfasına yönlendirir.
+ */
+export async function logoutAction() {
+  try {
+    const anonClient = getAnonClient()
+    await anonClient.auth.signOut()
+  } catch {
+    // Oturum zaten geçersizse veya ağ hatası olsa bile çerezleri temizleyip yönlendirmeye devam et
+  }
+
+  const cookieStore = await cookies()
+  cookieStore.delete('sb-access-token')
+  cookieStore.delete('sb-refresh-token')
+  cookieStore.delete('user-role')
+  cookieStore.delete('user-name')
+  cookieStore.delete('agency-id')
+
+  redirect('/login')
 }

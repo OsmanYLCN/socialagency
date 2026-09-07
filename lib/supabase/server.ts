@@ -1,8 +1,38 @@
 import { createClient } from '@supabase/supabase-js'
 
-// For server-side usage (Server Actions, Route Handlers)
-// We use the service role key to bypass RLS for admin operations
-// and the anon key for user-scoped operations.
+/**
+ * Supabase Service Role Client
+ * Admin işlemleri ve RLS bypass gerektiren sunucu tarafı işlemler için kullanılır.
+ */
+export function getServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !key) {
+    throw new Error('Supabase URL veya Service Role Key tanımlanmamış (.env kontrol edin).')
+  }
+
+  return createClient(url, key)
+}
+
+/**
+ * Supabase Anon Client
+ * Kullanıcı yetkilendirmesi (oturum açma, şifre doğrulama vb.) için anon key ile kullanılır.
+ */
+export function getAnonClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key) {
+    throw new Error('Supabase URL veya Anon Key tanımlanmamış (.env kontrol edin).')
+  }
+
+  return createClient(url, key)
+}
+
+/**
+ * Geriye dönük uyumluluk için genel sunucu istemcisi
+ */
 export function createServerClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

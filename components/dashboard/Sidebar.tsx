@@ -9,11 +9,12 @@ import {
   CheckSquare,
   Calendar,
   Settings,
-  ShieldCheck,
   Building2,
   FileImage,
   Zap,
+  LogOut,
 } from 'lucide-react'
+import { logoutAction } from '@/app/actions/auth'
 
 interface NavItem {
   label: string
@@ -118,13 +119,16 @@ export function Sidebar({ role }: SidebarProps) {
 
       {/* Alt bölüm: Auth */}
       <div className="border-t border-slate-100 p-4">
-        <Link
-          href="/login"
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-600"
-        >
-          <ShieldCheck className="h-3.5 w-3.5" />
-          Çıkış Yap
-        </Link>
+        <form action={logoutAction}>
+          <button
+            type="submit"
+            id="sidebar-logout-button"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 cursor-pointer"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Çıkış Yap
+          </button>
+        </form>
       </div>
     </aside>
   )
