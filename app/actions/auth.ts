@@ -14,17 +14,25 @@ const ROLE_REDIRECT: Record<string, string> = {
 
 // ─── Supabase Client Helpers ──────────────────────────────────────────────────
 function getServiceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !key) {
+    throw new Error('Supabase URL veya Service Role Key tanımlanmamış (.env.local kontrol edin).')
+  }
+
+  return createClient(url, key)
 }
 
 function getAnonClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key) {
+    throw new Error('Supabase URL veya Anon Key tanımlanmamış (.env.local kontrol edin).')
+  }
+
+  return createClient(url, key)
 }
 
 // ─── Cookie Helper ────────────────────────────────────────────────────────────
@@ -41,7 +49,7 @@ function getCookieOptions(maxAgeDays: number) {
 
 /**
  * Login Server Action
- * Supabase Auth ile giris yapar, profiles tablosundan role okur, ilgili panele yonlendirir.
+ * Supabase Auth ile giriş yapar, profiles tablosundan role okur, ilgili panele yönlendirir.
  */
 export async function loginAction(
   prevState: { error: string } | null,
@@ -51,10 +59,17 @@ export async function loginAction(
   const password = formData.get('password') as string
 
   if (!email || !password) {
-    return { error: 'E-posta ve sifre zorunludur.' }
+    return { error: 'E-posta ve şifre zorunludur.' }
   }
 
-  const supabase = getAnonClient()
+  let supabase
+  try {
+    supabase = getAnonClient()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Supabase bağlantı hatası.'
+    return { error: message }
+  }
+
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -64,21 +79,28 @@ export async function loginAction(
     return {
       error:
         authError?.message === 'Invalid login credentials'
-          ? 'E-posta veya sifre hatali.'
-          : (authError?.message ?? 'Giris basarisiz. Lutfen tekrar deneyin.'),
+          ? 'E-posta veya şifre hatalı.'
+          : (authError?.message ?? 'Giriş başarısız. Lütfen tekrar deneyin.'),
     }
   }
 
   // Profile'dan rol ve isim bilgisini al (service client ile RLS bypass)
-  const serviceClient = getServiceClient()
-  const { data: profile, error: profileError } = await serviceClient
-    .from('profiles')
-    .select('role, agency_id, first_name, last_name')
-    .eq('id', authData.user.id)
-    .maybeSingle()
+  let profile
+  try {
+    const serviceClient = getServiceClient()
+    const { data, error: profileError } = await serviceClient
+      .from('profiles')
+      .select('role, agency_id, first_name, last_name')
+      .eq('id', authData.user.id)
+      .maybeSingle()
 
-  if (profileError || !profile) {
-    return { error: 'Profil bilgisi bulunamadi. Lutfen yoneticinizle iletisime gecin.' }
+    if (profileError || !data) {
+      return { error: 'Profil bilgisi bulunamadı. Lütfen yöneticinizle iletişime geçin.' }
+    }
+    profile = data
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Profil sorgulama hatası.'
+    return { error: message }
   }
 
   // Session + meta cookie'lerini yaz
@@ -102,11 +124,11 @@ export async function loginAction(
 }
 
 /**
- * Register Server Action — Sadece Ajans Sahipleri icin
- * 1) Supabase Auth kullanicisi olusturur (admin API ile, e-posta onaysiz)
- * 2) agencies tablosuna ajansi kaydeder
- * 3) profiles tablosuna agency_owner rolunde profile olusturur
- * 4) Oturum acar ve /agency'e yonlendirir
+ * Register Server Action — Sadece Ajans Sahipleri için
+ * 1) Supabase Auth kullanıcısı oluşturur (admin API ile, e-posta onaysız)
+ * 2) agencies tablosuna ajansı kaydeder
+ * 3) profiles tablosuna agency_owner rolünde profile oluşturur
+ * 4) Oturum açar ve /agency'e yönlendirir
  */
 export async function registerAction(
   prevState: { error: string } | null,
@@ -118,20 +140,26 @@ export async function registerAction(
   const password = formData.get('password') as string
 
   if (!agencyName || !fullName || !email || !password) {
-    return { error: 'Tum alanlar zorunludur.' }
+    return { error: 'Tüm alanlar zorunludur.' }
   }
 
   if (password.length < 6) {
-    return { error: 'Sifre en az 6 karakter olmalidir.' }
+    return { error: 'Şifre en az 6 karakter olmalıdır.' }
   }
 
   const nameParts = fullName.split(' ')
   const firstName = nameParts[0] ?? fullName
   const lastName = nameParts.slice(1).join(' ') || ''
 
-  const serviceClient = getServiceClient()
+  let serviceClient
+  try {
+    serviceClient = getServiceClient()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Supabase bağlantı hatası.'
+    return { error: message }
+  }
 
-  // 1) Auth kullanicisi olustur (e-posta onaysiz, direkt aktif)
+  // 1) Auth kullanıcısı oluştur (e-posta onaysız, direkt aktif)
   const { data: newUser, error: signUpError } = await serviceClient.auth.admin.createUser({
     email,
     password,
@@ -140,14 +168,14 @@ export async function registerAction(
   })
 
   if (signUpError || !newUser.user) {
-    const msg = signUpError?.message ?? 'Kullanici olusturulamadi.'
+    const msg = signUpError?.message ?? 'Kullanıcı oluşturulamadı.'
     if (msg.includes('already registered') || msg.includes('already exists')) {
-      return { error: 'Bu e-posta adresi zaten kayitli.' }
+      return { error: 'Bu e-posta adresi zaten kayıtlı.' }
     }
     return { error: msg }
   }
 
-  // 2) agencies tablosuna ajansi kaydet
+  // 2) agencies tablosuna ajansı kaydet
   const { data: agency, error: agencyError } = await serviceClient
     .from('agencies')
     .insert({
@@ -160,7 +188,7 @@ export async function registerAction(
 
   if (agencyError || !agency) {
     await serviceClient.auth.admin.deleteUser(newUser.user.id)
-    return { error: `Ajanss kaydedilemedi: ${agencyError?.message ?? 'Bilinmeyen hata'}` }
+    return { error: `Ajans kaydedilemedi: ${agencyError?.message ?? 'Bilinmeyen hata'}` }
   }
 
   // 3) profiles tablosuna agency_owner olarak kaydet
@@ -177,18 +205,25 @@ export async function registerAction(
     // Rollback
     await serviceClient.auth.admin.deleteUser(newUser.user.id)
     await serviceClient.from('agencies').delete().eq('id', agency.id)
-    return { error: `Profil olusturulamadi: ${profileError.message}` }
+    return { error: `Profil oluşturulamadı: ${profileError.message}` }
   }
 
-  // 4) Oturum ac (signInWithPassword ile session al)
-  const anonClient = getAnonClient()
+  // 4) Oturum aç (signInWithPassword ile session al)
+  let anonClient
+  try {
+    anonClient = getAnonClient()
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Supabase bağlantı hatası.'
+    return { error: message }
+  }
+
   const { data: session, error: sessionError } = await anonClient.auth.signInWithPassword({
     email,
     password,
   })
 
   if (sessionError || !session.session) {
-    // Kayit basarili ama oturum acilamadi, login'e yonlendir
+    // Kayıt başarılı ama oturum açılamadı, login'e yönlendir
     redirect('/login')
   }
 
