@@ -8,8 +8,10 @@ import {
   UserCircle,
   CheckSquare,
   Calendar,
-  Bell,
   Settings,
+  ShieldCheck,
+  Building2,
+  FileImage,
   Zap,
 } from 'lucide-react'
 
@@ -19,35 +21,72 @@ interface NavItem {
   icon: React.ElementType
 }
 
-const navItems: NavItem[] = [
-  { label: 'Dashboard', href: '/agency', icon: LayoutDashboard },
-  { label: 'Müşteriler', href: '/agency/customers', icon: Users },
-  { label: 'Çalışanlar', href: '/agency/employees', icon: UserCircle },
-  { label: 'Görev Yönetimi', href: '/agency/tasks', icon: CheckSquare },
-  { label: 'İçerik Planı', href: '/agency/content', icon: Calendar },
-  { label: 'Bildirimler', href: '/agency/notifications', icon: Bell },
-  { label: 'Ayarlar', href: '/agency/settings', icon: Settings },
-]
+// ─── Her role göre menü listesi ───────────────────────────────────────────────
+const NAV_ITEMS: Record<string, NavItem[]> = {
+  super_admin: [
+    { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { label: 'Ajanslar', href: '/admin/agencies', icon: Building2 },
+    { label: 'Kullanıcılar', href: '/admin/users', icon: Users },
+    { label: 'Ayarlar', href: '/admin/settings', icon: Settings },
+  ],
+  agency_owner: [
+    { label: 'Dashboard', href: '/agency', icon: LayoutDashboard },
+    { label: 'Müşteriler', href: '/agency/customers', icon: Users },
+    { label: 'Çalışanlar', href: '/agency/employees', icon: UserCircle },
+    { label: 'Görev Yönetimi', href: '/agency/tasks', icon: CheckSquare },
+    { label: 'İçerik Planı', href: '/agency/content', icon: Calendar },
+    { label: 'Ayarlar', href: '/agency/settings', icon: Settings },
+  ],
+  employee: [
+    { label: 'Dashboard', href: '/employee', icon: LayoutDashboard },
+    { label: 'Görevlerim', href: '/employee/tasks', icon: CheckSquare },
+    { label: 'Ayarlar', href: '/employee/settings', icon: Settings },
+  ],
+  customer: [
+    { label: 'Dashboard', href: '/customer', icon: LayoutDashboard },
+    { label: 'İçeriklerim', href: '/customer/content', icon: FileImage },
+    { label: 'Ayarlar', href: '/customer/settings', icon: Settings },
+  ],
+}
 
-export function Sidebar() {
+// ─── Role label etiketi ───────────────────────────────────────────────────────
+const ROLE_LABELS: Record<string, string> = {
+  super_admin: 'Süper Admin',
+  agency_owner: 'Ajans Sahibi',
+  employee: 'Çalışan',
+  customer: 'Müşteri',
+}
+
+interface SidebarProps {
+  role: string
+}
+
+export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname()
+  const navItems = NAV_ITEMS[role] ?? NAV_ITEMS.agency_owner
+  const roleLabel = ROLE_LABELS[role] ?? role
 
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col bg-red-600 shadow-2xl shadow-red-900/30">
+    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2.5 border-b border-red-500/40 px-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm">
-          <Zap className="h-5 w-5 text-white" />
+      <div className="flex h-16 items-center gap-2.5 border-b border-slate-100 px-5">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+          <Zap className="h-4 w-4 text-white" />
         </div>
         <div>
-          <span className="text-base font-extrabold tracking-wide text-white">Agency</span>
-          <p className="text-[10px] font-medium uppercase tracking-widest text-red-200">Panel v2</p>
+          <span className="text-sm font-extrabold tracking-wide text-slate-900">SMAUP</span>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-slate-400">
+            {roleLabel}
+          </p>
         </div>
       </div>
 
-      {/* Nav */}
-      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4" aria-label="Ana navigasyon">
-        <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-red-300">
+      {/* Navigasyon */}
+      <nav
+        className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4"
+        aria-label="Ana navigasyon"
+      >
+        <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
           Menü
         </p>
         {navItems.map((item) => {
@@ -57,39 +96,35 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              id={`sidebar-nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-              className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+              className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
                 isActive
-                  ? 'bg-white/20 text-white shadow-sm backdrop-blur-sm'
-                  : 'text-red-100 hover:bg-white/10 hover:text-white'
+                  ? 'bg-indigo-50 text-indigo-700'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
               <Icon
-                className={`h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                  isActive ? 'text-white' : 'text-red-200'
+                className={`h-4 w-4 shrink-0 transition-colors duration-150 ${
+                  isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'
                 }`}
               />
-              {item.label}
-              {/* Active indicator dot */}
+              <span>{item.label}</span>
               {isActive && (
-                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
+                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-500" />
               )}
             </Link>
           )
         })}
       </nav>
 
-      {/* Bottom user card */}
-      <div className="border-t border-red-500/40 p-4">
-        <div className="flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5 backdrop-blur-sm">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-xs font-bold text-white">
-            AY
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-semibold text-white">Ajans Yöneticisi</p>
-            <p className="truncate text-[10px] text-red-200">agency_owner</p>
-          </div>
-        </div>
+      {/* Alt bölüm: Auth */}
+      <div className="border-t border-slate-100 p-4">
+        <Link
+          href="/login"
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-600"
+        >
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Çıkış Yap
+        </Link>
       </div>
     </aside>
   )

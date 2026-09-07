@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { LoginForm } from './_components/LoginForm'
-import { ShieldCheck } from 'lucide-react'
+import { RegisterForm } from './_components/RegisterForm'
+import { Building2 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Giris Yap – SMAUP',
-  description: 'SMAUP platformuna giris yapin.',
+  title: 'Kayıt Ol – SMAUP',
+  description: 'Ajansınızı SMAUP platformuna kaydedin.',
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
       {/* Arka plan dekor */}
@@ -22,36 +22,36 @@ export default function LoginPage() {
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-indigo-100 bg-indigo-50 shadow-sm">
-            <ShieldCheck className="h-7 w-7 text-indigo-600" />
+            <Building2 className="h-7 w-7 text-indigo-600" />
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-            Hesabiniza Giris Yapin
+            Ajansınızı Kaydedin
           </h1>
           <p className="mt-2 text-sm text-slate-500">
-            E-posta ve sifrenizle platforma erisebilirsiniz.
+            Ajans sahibi hesabı oluşturun ve platformu yönetmeye başlayın.
           </p>
         </div>
 
         {/* Form */}
-        <LoginForm />
+        <RegisterForm />
 
         {/* Alt linkler */}
         <div className="mt-7 flex flex-col items-center gap-3">
           <div className="h-px w-full bg-slate-100" />
           <p className="text-xs text-slate-400">
-            Ajanss sahibiyseniz?{' '}
+            Zaten hesabınız var mı?{' '}
             <Link
-              href="/register"
+              href="/login"
               className="font-semibold text-indigo-600 transition-colors hover:text-indigo-700 hover:underline"
             >
-              Kayit olun
+              Giriş yapın
             </Link>
           </p>
           <Link
             href="/"
             className="inline-flex items-center gap-1 text-xs text-slate-400 transition-colors hover:text-slate-600"
           >
-            Ana sayfaya don
+            Ana sayfaya dön
           </Link>
         </div>
       </div>
