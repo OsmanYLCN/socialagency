@@ -1,5 +1,6 @@
 import { UserCircle } from 'lucide-react'
 
+// Çalışan karşılama paneli
 export default function EmployeePage() {
   return (
     <div className="flex flex-1 items-center justify-center py-20">

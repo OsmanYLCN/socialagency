@@ -14,13 +14,13 @@ import {
   AlertCircle,
 } from 'lucide-react'
 
+// Ajans sahibi kayıt formu bileşeni
 export function RegisterForm() {
   const [state, formAction, pending] = useActionState(registerAction, null)
   const [showPassword, setShowPassword] = useState(false)
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      {/* Ajans Adı */}
       <div className="group flex flex-col gap-1.5">
         <label htmlFor="reg-agency-name" className="text-sm font-semibold text-slate-700">
           Ajans Adı
@@ -39,7 +39,6 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Ad Soyad */}
       <div className="group flex flex-col gap-1.5">
         <label htmlFor="reg-full-name" className="text-sm font-semibold text-slate-700">
           Ad Soyad
@@ -58,7 +57,6 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* E-posta */}
       <div className="group flex flex-col gap-1.5">
         <label htmlFor="reg-email" className="text-sm font-semibold text-slate-700">
           E-posta Adresi
@@ -77,7 +75,6 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Şifre */}
       <div className="group flex flex-col gap-1.5">
         <label htmlFor="reg-password" className="text-sm font-semibold text-slate-700">
           Şifre
@@ -104,7 +101,6 @@ export function RegisterForm() {
         </div>
       </div>
 
-      {/* Hata mesajı */}
       {state?.error && (
         <div
           role="alert"
@@ -115,7 +111,6 @@ export function RegisterForm() {
         </div>
       )}
 
-      {/* Submit */}
       <button
         id="register-submit-button"
         type="submit"

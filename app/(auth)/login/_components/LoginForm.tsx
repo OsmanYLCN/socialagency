@@ -4,13 +4,13 @@ import { useActionState, useState } from 'react'
 import { loginAction } from '@/app/actions/auth'
 import { Eye, EyeOff, Mail, Lock, Loader2, LogIn, AlertCircle } from 'lucide-react'
 
+// Ortak giriş formu bileşeni
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, null)
   const [showPassword, setShowPassword] = useState(false)
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
-      {/* Email */}
       <div className="group flex flex-col gap-1.5">
         <label htmlFor="login-email" className="text-sm font-semibold text-slate-700">
           E-posta Adresi
@@ -29,7 +29,6 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* Password */}
       <div className="group flex flex-col gap-1.5">
         <label htmlFor="login-password" className="text-sm font-semibold text-slate-700">
           Şifre
@@ -56,7 +55,6 @@ export function LoginForm() {
         </div>
       </div>
 
-      {/* Hata mesajı */}
       {state?.error && (
         <div
           role="alert"
@@ -67,7 +65,6 @@ export function LoginForm() {
         </div>
       )}
 
-      {/* Submit */}
       <button
         id="login-submit-button"
         type="submit"

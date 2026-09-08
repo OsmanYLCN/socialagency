@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { getServiceClient, getAnonClient } from '@/lib/supabase/server'
 
-// ─── Role → path mapping ──────────────────────────────────────────────────────
 const ROLE_REDIRECT: Record<string, string> = {
   super_admin: '/admin',
   agency_owner: '/agency',
@@ -12,7 +11,7 @@ const ROLE_REDIRECT: Record<string, string> = {
   customer: '/customer',
 }
 
-// ─── Cookie Helper ────────────────────────────────────────────────────────────
+// Güvenli çerez yapılandırması
 function getCookieOptions(maxAgeDays: number) {
   const isProd = process.env.NODE_ENV === 'production'
   return {
@@ -24,10 +23,7 @@ function getCookieOptions(maxAgeDays: number) {
   }
 }
 
-/**
- * Login Server Action
- * Supabase Auth ile giriş yapar, profiles tablosundan role okur, ilgili panele yönlendirir.
- */
+// Kullanıcı girişi: kimlik doğrulaması yapar, rolü okur ve ilgili panele yönlendirir
 export async function loginAction(
   prevState: { error: string } | null,
   formData: FormData
@@ -61,7 +57,6 @@ export async function loginAction(
     }
   }
 
-  // Profile'dan rol ve isim bilgisini al (service client ile RLS bypass)
   let profile
   try {
     const serviceClient = getServiceClient()
@@ -80,7 +75,6 @@ export async function loginAction(
     return { error: message }
   }
 
-  // Session + meta cookie'lerini yaz
   const cookieStore = await cookies()
 
   cookieStore.set('sb-access-token', authData.session.access_token, getCookieOptions(7))
@@ -100,13 +94,7 @@ export async function loginAction(
   redirect(destination)
 }
 
-/**
- * Register Server Action — Sadece Ajans Sahipleri için
- * 1) Supabase Auth kullanıcısı oluşturur (admin API ile, e-posta onaysız)
- * 2) agencies tablosuna ajansı kaydeder
- * 3) profiles tablosuna agency_owner rolünde profile oluşturur
- * 4) Oturum açar ve /agency'e yönlendirir
- */
+// Ajans sahibi kaydı: kullanıcı hesabı, ajans ve profil oluşturup oturum açar
 export async function registerAction(
   prevState: { error: string } | null,
   formData: FormData
@@ -136,7 +124,6 @@ export async function registerAction(
     return { error: message }
   }
 
-  // 1) Auth kullanıcısı oluştur (e-posta onaysız, direkt aktif)
   const { data: newUser, error: signUpError } = await serviceClient.auth.admin.createUser({
     email,
     password,
@@ -152,7 +139,6 @@ export async function registerAction(
     return { error: msg }
   }
 
-  // 2) agencies tablosuna ajansı kaydet
   const { data: agency, error: agencyError } = await serviceClient
     .from('agencies')
     .insert({
@@ -168,7 +154,6 @@ export async function registerAction(
     return { error: `Ajans kaydedilemedi: ${agencyError?.message ?? 'Bilinmeyen hata'}` }
   }
 
-  // 3) profiles tablosuna agency_owner olarak kaydet
   const { error: profileError } = await serviceClient.from('profiles').insert({
     id: newUser.user.id,
     agency_id: agency.id,
@@ -179,13 +164,11 @@ export async function registerAction(
   })
 
   if (profileError) {
-    // Rollback
     await serviceClient.auth.admin.deleteUser(newUser.user.id)
     await serviceClient.from('agencies').delete().eq('id', agency.id)
     return { error: `Profil oluşturulamadı: ${profileError.message}` }
   }
 
-  // 4) Oturum aç (signInWithPassword ile session al)
   let anonClient
   try {
     anonClient = getAnonClient()
@@ -200,11 +183,9 @@ export async function registerAction(
   })
 
   if (sessionError || !session.session) {
-    // Kayıt başarılı ama oturum açılamadı, login'e yönlendir
     redirect('/login')
   }
 
-  // 5) Cookie'leri yaz
   const cookieStore = await cookies()
   cookieStore.set('sb-access-token', session.session.access_token, getCookieOptions(7))
   cookieStore.set('sb-refresh-token', session.session.refresh_token, getCookieOptions(30))
@@ -215,16 +196,13 @@ export async function registerAction(
   redirect('/agency')
 }
 
-/**
- * Logout Server Action
- * Çerezleri temizler, Supabase oturumunu sonlandırır ve /login sayfasına yönlendirir.
- */
+// Oturum kapatma: çerezleri temizler ve login sayfasına yönlendirir
 export async function logoutAction() {
   try {
     const anonClient = getAnonClient()
     await anonClient.auth.signOut()
   } catch {
-    // Oturum zaten geçersizse veya ağ hatası olsa bile çerezleri temizleyip yönlendirmeye devam et
+    // Oturum geçersiz veya ağ hatası olsa bile çerezleri temizleyip yönlendirir
   }
 
   const cookieStore = await cookies()

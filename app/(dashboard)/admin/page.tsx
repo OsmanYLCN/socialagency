@@ -1,5 +1,6 @@
 import { ShieldCheck } from 'lucide-react'
 
+// Süper admin karşılama paneli
 export default function AdminPage() {
   return (
     <div className="flex flex-1 items-center justify-center py-20">

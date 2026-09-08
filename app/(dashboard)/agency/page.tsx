@@ -1,5 +1,6 @@
 import { Building2 } from 'lucide-react'
 
+// Ajans sahibi karşılama paneli
 export default function AgencyPage() {
   return (
     <div className="flex flex-1 items-center justify-center py-20">

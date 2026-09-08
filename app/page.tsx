@@ -7,12 +7,11 @@ export const metadata: Metadata = {
   description: 'B2B Sosyal Medya Ajans Yönetim Platformu.',
 }
 
+// Karşılama ve ajans/müşteri yönlendirme ana sayfası
 export default function HomePage() {
   return (
     <main className="flex h-screen w-screen flex-col overflow-hidden md:flex-row select-none">
-      {/* ─────────────────── SOL TARAF – AJANS (MAVİ) ─────────────────── */}
       <section className="group/agency relative flex h-1/2 w-full flex-col items-center justify-center overflow-hidden bg-blue-600 px-8 md:h-full md:w-1/2 md:px-14 lg:px-20 transition-all duration-500 cursor-pointer">
-        {/* Tüm mavi alanı tıklanabilir yapan arka plan linki */}
         <Link
           href="/login"
           className="absolute inset-0 z-0"
@@ -20,26 +19,21 @@ export default function HomePage() {
           tabIndex={-1}
         />
 
-        {/* Zarif ambient ışık kırılmaları */}
         <div className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-blue-400/25 blur-3xl transition-all duration-500 group-hover/agency:scale-110" />
         <div className="pointer-events-none absolute -bottom-32 -right-32 h-[500px] w-[500px] rounded-full bg-blue-900/40 blur-3xl transition-all duration-500 group-hover/agency:scale-110" />
 
-        {/* Minimalist Köşe Markası */}
         <div className="pointer-events-none absolute left-8 top-8 hidden md:block z-10">
           <span className="text-[11px] font-semibold tracking-[0.25em] text-blue-200/80 uppercase">
             SMAUP // AGENCY
           </span>
         </div>
 
-        {/* İçerik */}
         <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center pointer-events-none">
-          {/* Başlık — Mavi alanda imleç gezerken sağ taraf gibi büyür */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight transition-transform duration-300 group-hover/agency:scale-[1.02]">
             AJANS
             <span className="block font-light text-blue-200">GİRİŞİ</span>
           </h1>
 
-          {/* Kenarlıksız, Şeffaf & Ultra Modern Tipografik Yönlendirme */}
           <div className="mt-10 flex items-center justify-center gap-8 pointer-events-auto">
             <Link
               id="agency-login-link"
@@ -67,7 +61,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Alt ince dekoratif çizgiler */}
         <div className="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-1.5 opacity-60 z-10">
           <span className="h-0.5 w-7 rounded-full bg-white/70" />
           <span className="h-0.5 w-3.5 rounded-full bg-white/40" />
@@ -75,37 +68,30 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─────────────────── DİKEY AYIRICI (İNCE ÇİZGİ) ─────────────────── */}
       <div className="relative hidden w-px bg-slate-200 md:flex md:items-center md:justify-center">
         <div className="h-16 w-px bg-slate-300" />
       </div>
 
-      {/* ─────────────────── SAĞ TARAF – MÜŞTERİ & ÇALIŞAN (TÜM ALAN TIKLANABİLİR) ─────────────────── */}
       <Link
         id="customer-portal-link"
         href="/login"
         className="group/client relative flex h-1/2 w-full flex-col items-center justify-center overflow-hidden bg-white px-8 md:h-full md:w-1/2 md:px-14 lg:px-20 transition-colors duration-500 hover:bg-slate-50/60 cursor-pointer"
       >
-        {/* Zarif ambient ışık kırılmaları */}
         <div className="pointer-events-none absolute -right-32 -top-32 h-[500px] w-[500px] rounded-full bg-blue-50/80 blur-3xl transition-all duration-500 group-hover/client:scale-110" />
         <div className="pointer-events-none absolute -bottom-32 -left-32 h-[500px] w-[500px] rounded-full bg-slate-100/80 blur-3xl" />
 
-        {/* Minimalist Köşe Markası */}
         <div className="absolute right-8 top-8 hidden md:block">
           <span className="text-[11px] font-semibold tracking-[0.25em] text-slate-400 uppercase">
             SMAUP // CLIENT
           </span>
         </div>
 
-        {/* İçerik */}
         <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
-          {/* Başlık */}
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 leading-tight transition-transform duration-300 group-hover/client:scale-[1.02]">
             MÜŞTERİ
             <span className="block font-light text-blue-600">& ÇALIŞAN</span>
           </h2>
 
-          {/* Kenarlıksız, Şeffaf & Ultra Modern Yönlendirme */}
           <div className="mt-10 inline-flex items-center gap-2 text-base sm:text-lg font-semibold text-slate-900 transition-colors group-hover/client:text-blue-600">
             <span className="relative pb-0.5 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blue-600 after:transition-all after:duration-300 group-hover/client:after:w-full">
               Giriş Yap
@@ -114,7 +100,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Alt ince dekoratif çizgiler */}
         <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-1.5 opacity-60">
           <span className="h-0.5 w-1.5 rounded-full bg-slate-300" />
           <span className="h-0.5 w-3.5 rounded-full bg-slate-300" />

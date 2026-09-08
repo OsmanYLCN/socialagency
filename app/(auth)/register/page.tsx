@@ -8,18 +8,16 @@ export const metadata: Metadata = {
   description: 'Ajansınızı SMAUP platformuna kaydedin.',
 }
 
+// Ajans sahibi kayıt sayfası
 export default function RegisterPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
-      {/* Arka plan dekor */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-indigo-100/40 blur-3xl" />
         <div className="absolute -bottom-32 -right-32 h-[500px] w-[500px] rounded-full bg-slate-200/50 blur-3xl" />
       </div>
 
-      {/* Kart */}
       <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-200/80 bg-white p-10 shadow-xl shadow-slate-200/60">
-        {/* Header */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-indigo-100 bg-indigo-50 shadow-sm">
             <Building2 className="h-7 w-7 text-indigo-600" />
@@ -32,10 +30,8 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Form */}
         <RegisterForm />
 
-        {/* Alt linkler */}
         <div className="mt-7 flex flex-col items-center gap-3">
           <div className="h-px w-full bg-slate-100" />
           <p className="text-xs text-slate-400">

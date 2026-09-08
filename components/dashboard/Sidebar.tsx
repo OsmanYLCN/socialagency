@@ -22,7 +22,6 @@ interface NavItem {
   icon: React.ElementType
 }
 
-// ─── Her role göre menü listesi ───────────────────────────────────────────────
 const NAV_ITEMS: Record<string, NavItem[]> = {
   super_admin: [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
@@ -50,7 +49,6 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
   ],
 }
 
-// ─── Role label etiketi ───────────────────────────────────────────────────────
 const ROLE_LABELS: Record<string, string> = {
   super_admin: 'Süper Admin',
   agency_owner: 'Ajans Sahibi',
@@ -62,6 +60,7 @@ interface SidebarProps {
   role: string
 }
 
+// Rol bazlı dinamik sol menü bileşeni
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname()
   const navItems = NAV_ITEMS[role] ?? NAV_ITEMS.agency_owner
@@ -69,7 +68,6 @@ export function Sidebar({ role }: SidebarProps) {
 
   return (
     <aside className="flex h-full w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
-      {/* Logo */}
       <div className="flex h-16 items-center gap-2.5 border-b border-slate-100 px-5">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
           <Zap className="h-4 w-4 text-white" />
@@ -82,7 +80,6 @@ export function Sidebar({ role }: SidebarProps) {
         </div>
       </div>
 
-      {/* Navigasyon */}
       <nav
         className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4"
         aria-label="Ana navigasyon"
@@ -117,7 +114,6 @@ export function Sidebar({ role }: SidebarProps) {
         })}
       </nav>
 
-      {/* Alt bölüm: Auth */}
       <div className="border-t border-slate-100 p-4">
         <form action={logoutAction}>
           <button
