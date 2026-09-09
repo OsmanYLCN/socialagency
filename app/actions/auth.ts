@@ -86,6 +86,15 @@ export async function loginAction(
     cookieStore.set('user-name', fullName, getCookieOptions(7))
   }
 
+  cookieStore.set('user-id', authData.user.id, getCookieOptions(7))
+  if (authData.user.email) {
+    cookieStore.set('user-email', authData.user.email, getCookieOptions(7))
+  }
+  const userPhone = authData.user.phone || (authData.user.user_metadata?.phone as string) || ''
+  if (userPhone) {
+    cookieStore.set('user-phone', userPhone, getCookieOptions(7))
+  }
+
   if (profile.agency_id) {
     cookieStore.set('agency-id', profile.agency_id, getCookieOptions(7))
   }
@@ -191,6 +200,8 @@ export async function registerAction(
   cookieStore.set('sb-refresh-token', session.session.refresh_token, getCookieOptions(30))
   cookieStore.set('user-role', 'agency_owner', getCookieOptions(7))
   cookieStore.set('user-name', fullName, getCookieOptions(7))
+  cookieStore.set('user-id', newUser.user.id, getCookieOptions(7))
+  cookieStore.set('user-email', email, getCookieOptions(7))
   cookieStore.set('agency-id', agency.id, getCookieOptions(7))
 
   redirect('/agency')
@@ -210,6 +221,9 @@ export async function logoutAction() {
   cookieStore.delete('sb-refresh-token')
   cookieStore.delete('user-role')
   cookieStore.delete('user-name')
+  cookieStore.delete('user-email')
+  cookieStore.delete('user-phone')
+  cookieStore.delete('user-id')
   cookieStore.delete('agency-id')
 
   redirect('/login')

@@ -17,11 +17,9 @@ import {
   Building2,
   FileImage,
   Zap,
-  LogOut,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
-import { logoutAction } from '@/app/actions/auth'
 
 interface NavItem {
   label: string
@@ -161,21 +159,28 @@ export function Sidebar({ role }: SidebarProps) {
         })}
       </nav>
 
-      {/* Alt Çıkış Alanı */}
+      {/* Alt Platform Marka Alanı */}
       <div className="border-t border-slate-100 p-3">
-        <form action={logoutAction}>
-          <button
-            type="submit"
-            id="sidebar-logout-button"
-            title={isCollapsed ? 'Çıkış Yap' : undefined}
-            className={`flex w-full items-center rounded-xl py-2 text-xs font-medium text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 cursor-pointer ${
-              isCollapsed ? 'justify-center px-2' : 'gap-2 px-3'
-            }`}
-          >
-            <LogOut className="h-4 w-4 shrink-0" />
-            {!isCollapsed && <span>Çıkış Yap</span>}
-          </button>
-        </form>
+        <div
+          title="SMAUP Platform"
+          className={`flex items-center rounded-xl bg-slate-50/80 px-3 py-2.5 transition-all ${
+            isCollapsed ? 'justify-center px-2' : 'gap-2.5'
+          }`}
+        >
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-indigo-600 font-black text-[10px] text-white shadow-xs">
+            S
+          </div>
+          {!isCollapsed && (
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <span className="block truncate text-xs font-black tracking-wider text-slate-800">
+                SMAUP
+              </span>
+              <p className="truncate text-[9px] font-medium text-slate-400">
+                Agency Platform
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </aside>
   )
