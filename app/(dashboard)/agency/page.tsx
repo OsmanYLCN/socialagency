@@ -1,20 +1,331 @@
-import { Building2 } from 'lucide-react'
+import { cookies } from 'next/headers'
+import { prisma } from '@/lib/prisma'
+import { AgencyMetricsRow } from './_components/AgencyMetricsRow'
+import { AgencyChartsRow } from './_components/AgencyChartsRow'
+import { AgencyActionButtons } from './_components/AgencyActionButtons'
+import { AgencyRecentActivities, RecentActivityItem } from './_components/AgencyRecentActivities'
+import { AgencyTaskPipeline, PipelineTaskItem } from './_components/AgencyTaskPipeline'
+import { AgencyContentCalendar } from './_components/AgencyContentCalendar'
+import { AgencyActiveBrands, BrandOverviewItem } from './_components/AgencyActiveBrands'
 
-// Ajans sahibi karşılama paneli
-export default function AgencyPage() {
+// Bugünün Türkçe formatlanmış tarihi
+function getFormattedDate(): string {
+  const now = new Date()
+  const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi']
+  const months = [
+    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+  ]
+  return `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}, ${days[now.getDay()]}`
+}
+
+// Son 6 ayın Türkçe kısaltmalarını ve başlangıç tarihlerini hesaplar
+function getLast6Months() {
+  const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+  const result: { month: string; year: number; monthIndex: number }[] = []
+  const now = new Date()
+
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    result.push({
+      month: monthNames[d.getMonth()],
+      year: d.getFullYear(),
+      monthIndex: d.getMonth(),
+    })
+  }
+  return result
+}
+
+// Zaman farkı formatlayıcı
+function formatTimeAgo(date: Date): string {
+  const diffSec = Math.floor((Date.now() - date.getTime()) / 1000)
+  if (diffSec < 60) return 'Az önce'
+  const diffMin = Math.floor(diffSec / 60)
+  if (diffMin < 60) return `${diffMin} dk önce`
+  const diffHour = Math.floor(diffMin / 60)
+  if (diffHour < 24) return `${diffHour} sa önce`
+  const diffDay = Math.floor(diffHour / 24)
+  return `${diffDay} gün önce`
+}
+
+// Ajans sahibi ana yönetim paneli (Tamamen Gerçek Veritabanı Verileriyle)
+export default async function AgencyPage() {
+  const cookieStore = await cookies()
+  const agencyId = cookieStore.get('agency-id')?.value
+  const userName = cookieStore.get('user-name')?.value ?? 'Ajans Yöneticisi'
+
+  let agencyName = 'Ajansım'
+  let activeBrandsCount = 0
+  let employeeCount = 0
+  let todayTasksCount = 0
+  let pendingApprovalCount = 0
+
+  let brandsList: { id: string; name: string }[] = []
+  let employeesList: { id: string; name: string }[] = []
+  let brandOverviewItems: BrandOverviewItem[] = []
+
+  let monthlyGrowth = getLast6Months().map((m) => ({ month: m.month, count: 0 }))
+  let completionRate = 0
+  let completedTasksCount = 0
+  let totalTasksCount = 0
+  let contentDistribution = { reels: 0, post: 0, story: 0, carousel: 0 }
+
+  let pipeline: {
+    planned: PipelineTaskItem[]
+    inProgress: PipelineTaskItem[]
+    shared: PipelineTaskItem[]
+    pendingApproval: PipelineTaskItem[]
+  } = {
+    planned: [],
+    inProgress: [],
+    shared: [],
+    pendingApproval: [],
+  }
+
+  let weekSchedule: Record<number, string[]> = {
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+    7: [],
+  }
+
+  let recentActivities: RecentActivityItem[] = []
+
+  // Veritabanından ajansın gerçek verilerini sorgula
+  if (agencyId) {
+    try {
+      const [agency, brands, employees, tasks, templates, notifications] = await Promise.all([
+        prisma.agencies.findUnique({
+          where: { id: agencyId },
+          select: { name: true },
+        }),
+        prisma.brands.findMany({
+          where: { agency_id: agencyId },
+          include: {
+            profiles: {
+              where: { role: 'customer' },
+              select: { first_name: true, last_name: true },
+            },
+            tasks: {
+              select: { id: true, status: true },
+            },
+          },
+          orderBy: { created_at: 'desc' },
+        }),
+        prisma.profiles.findMany({
+          where: { agency_id: agencyId, role: 'employee' },
+          select: { id: true, first_name: true, last_name: true, salary: true },
+        }),
+        prisma.tasks.findMany({
+          where: { agency_id: agencyId },
+          include: {
+            brands: { select: { name: true } },
+            profiles: { select: { first_name: true, last_name: true } },
+          },
+          orderBy: { created_at: 'desc' },
+        }),
+        prisma.content_templates.findMany({
+          where: { brands: { agency_id: agencyId }, is_active: true },
+          select: { day_of_week: true, platform: true },
+        }),
+        prisma.notifications.findMany({
+          where: { profiles: { agency_id: agencyId } },
+          take: 6,
+          orderBy: { created_at: 'desc' },
+        }),
+      ])
+
+      if (agency?.name) {
+        agencyName = agency.name
+      }
+
+      // 1. Temel Sayımlar (Gerçek Veri)
+      activeBrandsCount = brands.length
+      employeeCount = employees.length
+
+      const todayStr = new Date().toISOString().split('T')[0]
+      todayTasksCount = tasks.filter((t) => {
+        const dStr = t.due_date ? new Date(t.due_date).toISOString().split('T')[0] : ''
+        return dStr === todayStr
+      }).length
+
+      pendingApprovalCount = tasks.filter((t) => t.status === 'pending_approval').length
+
+      // Modal seçenekleri
+      brandsList = brands.map((b) => ({ id: b.id, name: b.name }))
+      employeesList = employees.map((e) => ({
+        id: e.id,
+        name: [e.first_name, e.last_name].filter(Boolean).join(' ') || 'İsimsiz Çalışan',
+      }))
+
+      // 2. Grafikler İçin Gerçek Hesaplamalar
+      totalTasksCount = tasks.length
+      completedTasksCount = tasks.filter((t) => t.status === 'completed').length
+      completionRate =
+        totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0
+
+      // İçerik dağılımı gerçek adetleri
+      contentDistribution = {
+        reels: tasks.filter((t) => t.content === 'reels').length,
+        post: tasks.filter((t) => t.content === 'post').length,
+        story: tasks.filter((t) => t.content === 'story').length,
+        carousel: tasks.filter((t) => t.content === 'carousel').length,
+      }
+
+      // Aylık marka büyümesi gerçek verisi (Son 6 ay)
+      const last6 = getLast6Months()
+      monthlyGrowth = last6.map((m) => {
+        const countInMonth = brands.filter((b) => {
+          if (!b.created_at) return false
+          const d = new Date(b.created_at)
+          return d.getFullYear() === m.year && d.getMonth() === m.monthIndex
+        }).length
+        return { month: m.month, count: countInMonth }
+      })
+
+
+
+      // 4. Aktif Müşteriler Listesi
+      brandOverviewItems = brands.map((b) => {
+        const customerProfile = b.profiles?.[0]
+        const manager = customerProfile
+          ? [customerProfile.first_name, customerProfile.last_name].filter(Boolean).join(' ')
+          : 'Atanmadı'
+        const activeTasks = b.tasks.filter((t) => t.status !== 'completed').length
+        return {
+          id: b.id,
+          name: b.name,
+          managerName: manager,
+          activeTasksCount: activeTasks,
+        }
+      })
+
+      // 5. Görev Pipeline Gerçek Gruplama
+      const mapTaskItem = (t: (typeof tasks)[number]): PipelineTaskItem => ({
+        id: t.id,
+        platform: t.platform,
+        content: t.content,
+        title: `${t.brands?.name || 'Marka'} – ${t.content}`,
+      })
+
+      pipeline = {
+        planned: tasks.filter((t) => t.status === 'unassigned').map(mapTaskItem),
+        inProgress: tasks.filter((t) => t.status === 'assigned').map(mapTaskItem),
+        shared: tasks.filter((t) => t.status === 'completed').map(mapTaskItem),
+        pendingApproval: tasks.filter((t) => t.status === 'pending_approval').map(mapTaskItem),
+      }
+
+      // 6. Haftalık Takvim Gerçek Verisi
+      // Önce görevlerden gün bazlı platformları ekle
+      tasks.forEach((t) => {
+        if (!t.due_date) return
+        const d = new Date(t.due_date)
+        const jsDay = d.getDay() // 0: Pazar, 1: Pzt ... 6: Cmt
+        const dayKey = jsDay === 0 ? 7 : jsDay // 1: Pzt ... 7: Paz
+        if (weekSchedule[dayKey] && !weekSchedule[dayKey].includes(t.platform)) {
+          weekSchedule[dayKey].push(t.platform)
+        }
+      })
+      // Şablonlardan da planlanmış platformları ekle
+      templates.forEach((tmpl) => {
+        const dayKey = tmpl.day_of_week
+        if (weekSchedule[dayKey] && !weekSchedule[dayKey].includes(tmpl.platform)) {
+          weekSchedule[dayKey].push(tmpl.platform)
+        }
+      })
+
+      // 7. Son Aktiviteler Gerçek Akışı
+      if (notifications && notifications.length > 0) {
+        recentActivities = notifications.map((n) => ({
+          id: n.id,
+          title: n.message,
+          subtitle: n.type,
+          timeAgo: n.created_at ? formatTimeAgo(new Date(n.created_at)) : 'Yakın zamanda',
+          type: (n.type as any) ?? 'task',
+        }))
+      } else {
+        // Bildirim henüz yoksa son eklenen görev ve müşterilerden türet
+        const activityList: RecentActivityItem[] = []
+        tasks.slice(0, 3).forEach((t) => {
+          activityList.push({
+            id: t.id,
+            title: `Yeni görev: ${t.brands?.name || 'Marka'}`,
+            subtitle: `${t.platform} için ${t.content} oluşturuldu`,
+            timeAgo: t.created_at ? formatTimeAgo(new Date(t.created_at)) : 'Yeni',
+            type: 'task',
+          })
+        })
+        brands.slice(0, 2).forEach((b) => {
+          activityList.push({
+            id: b.id,
+            title: `Müşteri eklendi: ${b.name}`,
+            subtitle: 'Ajans portföyüne katıldı',
+            timeAgo: b.created_at ? formatTimeAgo(new Date(b.created_at)) : 'Yeni',
+            type: 'brand',
+          })
+        })
+        recentActivities = activityList
+      }
+    } catch {
+      // Beklenmeyen sorgu aksamasında varsayılan boş yapılar korunur
+    }
+  }
+
+  const currentDateStr = getFormattedDate()
+
   return (
-    <div className="flex flex-1 items-center justify-center py-20">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-200/80 bg-white p-10 text-center shadow-sm">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-indigo-100 bg-indigo-50">
-          <Building2 className="h-8 w-8 text-indigo-600" />
+    <div className="mx-auto max-w-7xl space-y-6 pb-12">
+      {/* Sayfa Üst Başlığı (Açık Tuval) */}
+      <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+            {agencyName} Genel Bakış
+          </h1>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Hoş geldiniz, <span className="font-semibold text-slate-700">{userName}</span>. Günlük ajans operasyonlarınızın anlık durumu:
+          </p>
         </div>
-        <h1 className="mb-2 text-xl font-extrabold tracking-tight text-slate-900">
-          Ajans Paneli
-        </h1>
-        <p className="text-sm leading-relaxed text-slate-500">
-          Hoş Geldiniz, Ajans Paneline giriş yaptınız. İçerikler buraya eklenecektir.
-        </p>
+        <div className="flex items-center gap-2">
+          <span className="rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-2xs">
+            {currentDateStr}
+          </span>
+        </div>
       </div>
+
+      {/* 1. Satır: 4 Temel Metrik Kartı (Gerçek DB Sayımları) */}
+      <AgencyMetricsRow
+        activeBrandsCount={activeBrandsCount}
+        employeeCount={employeeCount}
+        todayTasksCount={todayTasksCount}
+        pendingApprovalCount={pendingApprovalCount}
+      />
+
+      {/* 2. Satır: 3 Analitik Görsel Panel (Gerçek DB Grafikleri) */}
+      <AgencyChartsRow
+        monthlyGrowth={monthlyGrowth}
+        completionRate={completionRate}
+        completedTasksCount={completedTasksCount}
+        totalTasksCount={totalTasksCount}
+        contentDistribution={contentDistribution}
+      />
+
+      {/* 3. Satır: 2 Hızlı Aksiyon Butonu ("Yeni Görev Ata" ve "Yeni İlan Oluştur") */}
+      <AgencyActionButtons brands={brandsList} employees={employeesList} />
+
+      {/* 4. Satır (Tam Genişlik 1): Son Aktiviteler */}
+      <AgencyRecentActivities activities={recentActivities} />
+
+      {/* 5. Satır (Tam Genişlik 2): Görev Durumu (Mini Pipeline) */}
+      <AgencyTaskPipeline pipeline={pipeline} />
+
+      {/* 6. Satır (Tam Genişlik 3): Haftalık İçerik Takvimi */}
+      <AgencyContentCalendar weekSchedule={weekSchedule} />
+
+      {/* 7. Satır (Tam Genişlik 4): Aktif Müşteriler */}
+      <AgencyActiveBrands brands={brandOverviewItems} />
     </div>
   )
 }

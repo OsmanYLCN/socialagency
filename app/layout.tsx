@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
+import { Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 
-const geist = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-plus-jakarta',
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700', '800'],
 })
 
 export const metadata: Metadata = {
@@ -15,8 +17,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" className={`${geist.variable} h-full antialiased`}>
-      <body className="min-h-full bg-gray-50 font-sans">{children}</body>
+    <html lang="tr" className={`${plusJakartaSans.variable} h-full antialiased`}>
+      <body className="min-h-full bg-gray-50 font-sans text-slate-900 antialiased selection:bg-indigo-500 selection:text-white">
+        {children}
+      </body>
     </html>
   )
 }

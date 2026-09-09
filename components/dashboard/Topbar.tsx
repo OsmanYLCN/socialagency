@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Bell, ChevronDown, LogOut } from 'lucide-react'
+import { Bell, ChevronDown, LogOut, Search, Settings } from 'lucide-react'
+import Link from 'next/link'
 import { logoutAction } from '@/app/actions/auth'
 
 const ROLE_BADGE: Record<string, { label: string; colors: string }> = {
@@ -36,7 +37,7 @@ interface TopbarProps {
   role: string
 }
 
-// Dashboard üst bilgi çubuğu ve profil menüsü bileşeni
+// Dashboard üst bilgi çubuğu, arama alanı ve profil menüsü bileşeni
 export function Topbar({ userName, role }: TopbarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -57,17 +58,37 @@ export function Topbar({ userName, role }: TopbarProps) {
   }, [])
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-100 bg-white px-6">
-      <div className="flex-1" />
+    <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white px-6">
+      {/* Sol Arama Çubuğu (Referans Taslak) */}
+      <div className="relative w-72 max-w-sm">
+        <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Ara... (Müşteri, çalışan, görev)"
+          className="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 text-xs text-slate-800 placeholder-slate-400 transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+        />
+      </div>
 
-      <div className="flex items-center gap-2">
+      {/* Sağ İşlem ve Profil Alanı */}
+      <div className="flex items-center gap-2.5">
+        {/* Bildirim Butonu */}
         <button
           id="topbar-notifications"
           aria-label="Bildirimler"
-          className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 cursor-pointer"
+          className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-800 cursor-pointer"
         >
           <Bell className="h-4 w-4" />
+          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
         </button>
+
+        {/* Ayarlar Kısayol Butonu */}
+        <Link
+          href="/agency/settings"
+          aria-label="Ayarlar"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-800"
+        >
+          <Settings className="h-4 w-4" />
+        </Link>
 
         <div className="mx-1 h-5 w-px bg-slate-200" />
 

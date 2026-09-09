@@ -92,11 +92,11 @@ export default function HomePage() {
             <span className="block font-light text-blue-600">& ÇALIŞAN</span>
           </h2>
 
-          <div className="mt-10 inline-flex items-center gap-2 text-base sm:text-lg font-semibold text-slate-900 transition-colors group-hover/client:text-blue-600">
-            <span className="relative pb-0.5 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blue-600 after:transition-all after:duration-300 group-hover/client:after:w-full">
+          <div className="group/link mt-10 inline-flex items-center gap-2 text-base sm:text-lg font-semibold text-slate-900 transition-colors hover:text-blue-600">
+            <span className="relative pb-0.5 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blue-600 after:transition-all after:duration-300 group-hover/link:after:w-full">
               Giriş Yap
             </span>
-            <ArrowRight className="h-4 w-4 text-slate-400 transition-all duration-300 group-hover/client:translate-x-1.5 group-hover/client:text-blue-600" />
+            <ArrowRight className="h-4 w-4 text-slate-400 transition-all duration-300 group-hover/link:translate-x-1.5 group-hover/link:text-blue-600" />
           </div>
         </div>
 
