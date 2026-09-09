@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useActionState, useEffect } from 'react'
+import { useState, useActionState, useEffect, useRef } from 'react'
 import {
   X,
   User,
@@ -15,12 +15,14 @@ import {
   Eye,
   EyeOff,
   ShieldCheck,
+  Camera,
 } from 'lucide-react'
 import {
   updateProfileDetailsAction,
   changePasswordAction,
   getProfileDetailsAction,
 } from '@/app/actions/profile'
+import { ImageCropperModal } from './ImageCropperModal'
 
 interface UserProfileModalProps {
   isOpen: boolean
@@ -31,8 +33,17 @@ interface UserProfileModalProps {
     email: string
     phone: string
     role: string
+    avatarUrl?: string
   }
-  onProfileUpdated?: (name: string, email: string, phone: string) => void
+  onProfileUpdated?: (name: string, email: string, phone: string, avatarUrl?: string) => void
+}
+
+// İsimden baş harfleri türetir
+function getInitials(name: string): string {
+  const parts = name.trim().split(' ').filter(Boolean)
+  if (parts.length === 0) return 'KL'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
 // Başında 0 veya +90 olmadan sadece 10 haneli rakamları zorlar (Örn: 5393594419)
@@ -64,6 +75,14 @@ export function UserProfileModal({
   const [firstName, setFirstName] = useState(initialFirstName)
   const [lastName, setLastName] = useState(initialLastName)
 
+  // Profil fotoğrafı durumları
+  const [avatarUrl, setAvatarUrl] = useState(initialData.avatarUrl || '')
+  const [previewAvatar, setPreviewAvatar] = useState(initialData.avatarUrl || '')
+  const [removeAvatar, setRemoveAvatar] = useState(false)
+  const [cropperOpen, setCropperOpen] = useState(false)
+  const [cropperImageSrc, setCropperImageSrc] = useState<string>('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   // E-posta ve telefon düzenleme durumları
   const [email, setEmail] = useState(initialData.email || '')
   const [isEditingEmail, setIsEditingEmail] = useState(false)
@@ -73,6 +92,56 @@ export function UserProfileModal({
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhone(sanitizeTurkishPhone(e.target.value))
+  }
+
+  // Dosya seçildiğinde doğrudan kırpma modalını açar
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      alert('Lütfen geçerli bir görsel dosyası (PNG, JPG, WEBP) seçin.')
+      return
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      alert('Fotoğraf boyutu en fazla 15MB olabilir.')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setCropperImageSrc(reader.result)
+        setCropperOpen(true)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Kırpma işlemi tamamlandığında görseli forma ve önizlemeye ekler
+  const handleCropComplete = (croppedBlob: Blob, previewUrl: string) => {
+    const file = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' })
+    setPreviewAvatar(previewUrl)
+    setRemoveAvatar(false)
+    setCropperOpen(false)
+
+    if (fileInputRef.current) {
+      try {
+        const dt = new DataTransfer()
+        dt.items.add(file)
+        fileInputRef.current.files = dt.files
+      } catch {
+        // Fallback
+      }
+    }
+  }
+
+  const handleRemoveAvatar = () => {
+    setPreviewAvatar('')
+    setCropperImageSrc('')
+    setRemoveAvatar(true)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   // Şifre sekmesi durumları
@@ -99,18 +168,26 @@ export function UserProfileModal({
       setLastName(p.slice(1).join(' ') || '')
       setEmail(initialData.email || '')
       setPhone(sanitizeTurkishPhone(initialData.phone || ''))
+      setAvatarUrl(initialData.avatarUrl || '')
+      setPreviewAvatar(initialData.avatarUrl || '')
+      setRemoveAvatar(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
       setIsEditingEmail(false)
       setIsEditingPhone(false)
       setNewPassword('')
       setConfirmPassword('')
 
       // Eğer e-posta veya telefon henüz prop olarak aktarılmadıysa veritabanından çek
-      if (!initialData.email || !initialData.phone) {
+      if (!initialData.email || !initialData.phone || !initialData.avatarUrl) {
         getProfileDetailsAction().then((profile) => {
-          if (profile?.email) setEmail(profile.email)
+          if (profile?.email && !initialData.email) setEmail(profile.email)
           if (profile?.phone && !initialData.phone) setPhone(sanitizeTurkishPhone(profile.phone))
           if (profile?.firstName && !p[0]) setFirstName(profile.firstName)
           if (profile?.lastName && !p.slice(1).join(' ')) setLastName(profile.lastName)
+          if (profile?.avatarUrl && !initialData.avatarUrl) {
+            setAvatarUrl(profile.avatarUrl)
+            setPreviewAvatar(profile.avatarUrl)
+          }
         })
       }
     }
@@ -130,11 +207,16 @@ export function UserProfileModal({
   // Profil güncelleme başarılı olduğunda üst bileşeni güncelle
   useEffect(() => {
     if (profileState?.success && profileState.fullName) {
-      onProfileUpdated?.(profileState.fullName, email, phone)
+      const finalAvatar = profileState.avatarUrl !== undefined ? profileState.avatarUrl : (removeAvatar ? '' : avatarUrl)
+      if (profileState.avatarUrl !== undefined) {
+        setAvatarUrl(profileState.avatarUrl)
+        setPreviewAvatar(profileState.avatarUrl)
+      }
+      onProfileUpdated?.(profileState.fullName, email, phone, finalAvatar)
       setIsEditingEmail(false)
       setIsEditingPhone(false)
     }
-  }, [profileState, email, phone, onProfileUpdated])
+  }, [profileState, email, phone, avatarUrl, removeAvatar, onProfileUpdated])
 
   if (!isOpen) return null
 
@@ -211,6 +293,82 @@ export function UserProfileModal({
                   <span>{profileState.error}</span>
                 </div>
               )}
+
+              {/* Profil Fotoğrafı Bölümü */}
+              <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5">
+                <div className="relative group flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-white shadow-sm ring-2 ring-slate-200/80">
+                  {previewAvatar ? (
+                    <img
+                      src={previewAvatar}
+                      alt="Profil"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-base font-black tracking-wide">
+                      {getInitials(`${firstName} ${lastName}`.trim() || initialData.fullName)}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Fotoğrafı Değiştir"
+                    className="absolute inset-0 flex items-center justify-center bg-slate-900/60 text-white opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
+                  >
+                    <Camera className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-slate-800">Profil Fotoğrafı</p>
+                  <p className="mt-0.5 text-[11px] text-slate-400">
+                    PNG, JPG veya WEBP (Maksimum 5MB)
+                  </p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-100 hover:text-slate-900 transition-all cursor-pointer"
+                    >
+                      {previewAvatar ? 'Fotoğrafı Değiştir' : 'Fotoğraf Ekle'}
+                    </button>
+
+                    {cropperImageSrc && (
+                      <button
+                        type="button"
+                        onClick={() => setCropperOpen(true)}
+                        className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-100 transition-all cursor-pointer"
+                      >
+                        Konumlandır
+                      </button>
+                    )}
+
+                    {previewAvatar && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveAvatar}
+                        className="rounded-lg px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                      >
+                        Kaldır
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Gizli Dosya Seçici ve Silme Bayrağı */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  name="avatar"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+                <input
+                  type="hidden"
+                  name="removeAvatar"
+                  value={removeAvatar ? 'true' : 'false'}
+                />
+              </div>
 
               {/* Ad & Soyad */}
               <div className="grid grid-cols-2 gap-3">
@@ -497,6 +655,14 @@ export function UserProfileModal({
           )}
         </div>
       </div>
+
+      {/* Fotoğraf Konumlandırma ve Kırpma Modalı */}
+      <ImageCropperModal
+        isOpen={cropperOpen}
+        imageSrc={cropperImageSrc}
+        onClose={() => setCropperOpen(false)}
+        onCropComplete={handleCropComplete}
+      />
     </div>
   )
 }

@@ -62,7 +62,7 @@ export async function loginAction(
     const serviceClient = getServiceClient()
     const { data, error: profileError } = await serviceClient
       .from('profiles')
-      .select('role, agency_id, first_name, last_name')
+      .select('role, agency_id, first_name, last_name, avatar_url')
       .eq('id', authData.user.id)
       .maybeSingle()
 
@@ -84,6 +84,12 @@ export async function loginAction(
   const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ')
   if (fullName) {
     cookieStore.set('user-name', fullName, getCookieOptions(7))
+  }
+
+  if (profile.avatar_url) {
+    cookieStore.set('user-avatar', profile.avatar_url, getCookieOptions(7))
+  } else {
+    cookieStore.delete('user-avatar')
   }
 
   cookieStore.set('user-id', authData.user.id, getCookieOptions(7))
@@ -224,6 +230,7 @@ export async function logoutAction() {
   cookieStore.delete('user-email')
   cookieStore.delete('user-phone')
   cookieStore.delete('user-id')
+  cookieStore.delete('user-avatar')
   cookieStore.delete('agency-id')
 
   redirect('/login')

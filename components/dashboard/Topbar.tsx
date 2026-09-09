@@ -7,21 +7,25 @@ import { logoutAction } from '@/app/actions/auth'
 import { getProfileDetailsAction } from '@/app/actions/profile'
 import { UserProfileModal } from './UserProfileModal'
 
-const ROLE_BADGE: Record<string, { label: string; colors: string }> = {
+const ROLE_BADGE: Record<string, { label: string; textColor: string; colors: string }> = {
   super_admin: {
     label: 'Süper Admin',
+    textColor: 'text-rose-600',
     colors: 'bg-rose-50 text-rose-600 border border-rose-200/60',
   },
   agency_owner: {
     label: 'Ajans Sahibi',
+    textColor: 'text-indigo-600',
     colors: 'bg-indigo-50 text-indigo-600 border border-indigo-200/60',
   },
   employee: {
     label: 'Çalışan',
+    textColor: 'text-emerald-600',
     colors: 'bg-emerald-50 text-emerald-600 border border-emerald-200/60',
   },
   customer: {
     label: 'Müşteri',
+    textColor: 'text-amber-600',
     colors: 'bg-amber-50 text-amber-600 border border-amber-200/60',
   },
 }
@@ -39,6 +43,7 @@ interface TopbarProps {
   role: string
   initialEmail?: string
   initialPhone?: string
+  initialAvatar?: string
 }
 
 // Dashboard üst bilgi çubuğu, arama alanı ve zenginleştirilmiş kullanıcı mini menüsü
@@ -47,6 +52,7 @@ export function Topbar({
   role,
   initialEmail = '',
   initialPhone = '',
+  initialAvatar = '',
 }: TopbarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -55,6 +61,7 @@ export function Topbar({
   const [currentName, setCurrentName] = useState(userName || 'Ajans Yöneticisi')
   const [currentEmail, setCurrentEmail] = useState(initialEmail)
   const [currentPhone, setCurrentPhone] = useState(initialPhone)
+  const [currentAvatar, setCurrentAvatar] = useState(initialAvatar)
 
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -63,12 +70,17 @@ export function Topbar({
   }, [userName])
 
   useEffect(() => {
+    if (initialAvatar) setCurrentAvatar(initialAvatar)
+  }, [initialAvatar])
+
+  useEffect(() => {
     if (initialEmail) {
       setCurrentEmail(initialEmail)
     } else {
       getProfileDetailsAction().then((p) => {
         if (p?.email) setCurrentEmail(p.email)
         if (p?.phone) setCurrentPhone(p.phone)
+        if (p?.avatarUrl !== undefined) setCurrentAvatar(p.avatarUrl || '')
         if (p?.fullName && (!userName || userName === 'Kullanıcı' || userName === 'Ajans Yöneticisi')) {
           setCurrentName(p.fullName)
         }
@@ -151,12 +163,20 @@ export function Topbar({
               onClick={() => setIsOpen((prev) => !prev)}
               className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 transition-all hover:border-slate-300 hover:bg-slate-100 cursor-pointer"
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-[11px] font-bold text-white shadow-xs">
-                {initials}
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-[11px] font-bold text-white shadow-xs">
+                {currentAvatar ? (
+                  <img
+                    src={currentAvatar}
+                    alt={currentName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  initials
+                )}
               </div>
               <div className="text-left hidden sm:block">
                 <p className="text-xs font-bold leading-none text-slate-900">{currentName}</p>
-                <p className={`mt-0.5 inline-block rounded-sm px-1 py-0.5 text-[9px] font-semibold leading-none ${badge.colors}`}>
+                <p className={`mt-1 text-[11px] font-semibold leading-none ${badge.textColor}`}>
                   {badge.label}
                 </p>
               </div>
@@ -172,10 +192,19 @@ export function Topbar({
               <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200/90 bg-white p-1.5 shadow-xl shadow-slate-900/10 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 {/* 1. Kullanıcı Bilgi Kartı */}
                 <div className="flex items-start gap-3 p-3 border-b border-slate-100 bg-slate-50/50 rounded-xl mb-1">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-xs font-black text-white shadow-xs">
-                    {initials}
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-xs font-bold text-white shadow-xs">
+                    {currentAvatar ? (
+                      <img
+                        src={currentAvatar}
+                        alt={currentName}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      initials
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-slate-900 truncate">{currentName}</p>
                     {currentEmail && (
                       <p className="text-[11px] text-slate-400 truncate">{currentEmail}</p>
                     )}
@@ -191,9 +220,9 @@ export function Topbar({
                   <button
                     type="button"
                     onClick={handleOpenInfoModal}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50/70 hover:text-indigo-700 transition-colors cursor-pointer"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
                   >
-                    <User className="h-4 w-4 text-slate-400 group-hover:text-indigo-600" />
+                    <User className="h-4 w-4 text-slate-400" />
                     <span>Kişisel Bilgiler</span>
                   </button>
 
@@ -201,9 +230,9 @@ export function Topbar({
                   <button
                     type="button"
                     onClick={handleOpenPasswordModal}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50/70 hover:text-indigo-700 transition-colors cursor-pointer"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
                   >
-                    <KeyRound className="h-4 w-4 text-slate-400 group-hover:text-indigo-600" />
+                    <KeyRound className="h-4 w-4 text-slate-400" />
                     <span>Şifreyi Değiştir</span>
                   </button>
                 </div>
@@ -238,11 +267,13 @@ export function Topbar({
           email: currentEmail,
           phone: currentPhone,
           role: role,
+          avatarUrl: currentAvatar,
         }}
-        onProfileUpdated={(newName, newEmail, newPhone) => {
-          setCurrentName(newName)
+        onProfileUpdated={(newName, newEmail, newPhone, newAvatar) => {
+          if (newName) setCurrentName(newName)
           if (newEmail) setCurrentEmail(newEmail)
           if (newPhone) setCurrentPhone(newPhone)
+          if (newAvatar !== undefined) setCurrentAvatar(newAvatar)
         }}
       />
     </>

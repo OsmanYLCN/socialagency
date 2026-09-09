@@ -12,6 +12,7 @@ export interface ProfileDetails {
   email: string
   phone: string
   role: string
+  avatarUrl?: string
 }
 
 // Giriş yapmış kullanıcının profil detaylarını döndürür
@@ -54,15 +55,33 @@ export async function getProfileDetailsAction(): Promise<ProfileDetails | null> 
 
   let email = cookieStore.get('user-email')?.value ?? ''
   let phone = cookieStore.get('user-phone')?.value ?? ''
+  let avatarUrl = cookieStore.get('user-avatar')?.value ?? ''
 
+  let userDataUser: { email?: string; phone?: string; user_metadata?: Record<string, unknown> } | null = null
   try {
     const { data: userData } = await serviceClient.auth.admin.getUserById(userId)
     if (userData?.user) {
       email = userData.user.email ?? email
       phone = userData.user.phone || (userData.user.user_metadata?.phone as string) || phone
+      if (!avatarUrl && userData.user.user_metadata?.avatar_url) {
+        avatarUrl = userData.user.user_metadata.avatar_url as string
+      }
     }
   } catch {
     // fallback
+  }
+
+  try {
+    const { data: profData } = await serviceClient
+      .from('profiles')
+      .select('avatar_url')
+      .eq('id', userId)
+      .maybeSingle()
+    if (profData?.avatar_url) {
+      avatarUrl = profData.avatar_url
+    }
+  } catch {
+    // ignore
   }
 
   const profile = await prisma.profiles.findUnique({
@@ -109,12 +128,13 @@ export async function getProfileDetailsAction(): Promise<ProfileDetails | null> 
     email,
     phone,
     role: profile?.role ?? userRole,
+    avatarUrl,
   }
 }
 
-// Kişisel bilgileri (Ad, Soyad, Telefon, E-posta) günceller
+// Kişisel bilgileri (Ad, Soyad, Telefon, E-posta, Profil Fotoğrafı) günceller
 export async function updateProfileDetailsAction(
-  prevState: { success?: boolean; error?: string; message?: string; fullName?: string } | null,
+  prevState: { success?: boolean; error?: string; message?: string; fullName?: string; avatarUrl?: string } | null,
   formData: FormData
 ) {
   const cookieStore = await cookies()
@@ -155,6 +175,8 @@ export async function updateProfileDetailsAction(
   const lastName = (formData.get('last_name') as string)?.trim() ?? ''
   let phone = (formData.get('phone') as string)?.trim() ?? ''
   const email = (formData.get('email') as string)?.trim() ?? ''
+  const removeAvatar = formData.get('removeAvatar') === 'true'
+  const avatarFile = formData.get('avatar') as File | null
 
   if (phone) {
     phone = phone.replace(/\D/g, '')
@@ -180,22 +202,69 @@ export async function updateProfileDetailsAction(
 
   const fullName = [firstName, lastName].filter(Boolean).join(' ')
 
+  let newAvatarUrl: string | undefined = undefined
+
+  if (removeAvatar) {
+    newAvatarUrl = ''
+  } else if (avatarFile && typeof avatarFile === 'object' && 'size' in avatarFile && avatarFile.size > 0) {
+    if (!avatarFile.type.startsWith('image/')) {
+      return { error: 'Lütfen geçerli bir görsel dosyası (PNG, JPG, WEBP) seçin.' }
+    }
+    if (avatarFile.size > 5 * 1024 * 1024) {
+      return { error: 'Profil fotoğrafı en fazla 5MB boyutunda olabilir.' }
+    }
+
+    try {
+      const ext = (avatarFile.name.split('.').pop() || 'jpg').toLowerCase()
+      const filename = `${userId}-${Date.now()}.${ext}`
+      const buffer = Buffer.from(await avatarFile.arrayBuffer())
+
+      const { error: uploadError } = await serviceClient.storage
+        .from('avatars')
+        .upload(filename, buffer, {
+          contentType: avatarFile.type,
+          upsert: true,
+        })
+
+      if (uploadError) {
+        return { error: `Fotoğraf yüklenemedi: ${uploadError.message}` }
+      }
+
+      const { data: publicUrlData } = serviceClient.storage
+        .from('avatars')
+        .getPublicUrl(filename)
+
+      newAvatarUrl = publicUrlData.publicUrl
+    } catch (uploadErr) {
+      const msg = uploadErr instanceof Error ? uploadErr.message : 'Görsel yüklenirken hata oluştu.'
+      return { error: msg }
+    }
+  }
+
   try {
-    // 1. Prisma profiles tablosunu güncelle
-    await prisma.profiles.update({
-      where: { id: userId },
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-      },
-    })
+    // 1. public.profiles tablosunu güncelle
+    const profileUpdateData: Record<string, unknown> = {
+      first_name: firstName,
+      last_name: lastName,
+    }
+    if (newAvatarUrl !== undefined) {
+      profileUpdateData.avatar_url = newAvatarUrl || null
+    }
+
+    await serviceClient
+      .from('profiles')
+      .update(profileUpdateData)
+      .eq('id', userId)
 
     // 2. Supabase Auth kullanıcısını güncelle
-    const userMetadata = {
+    const userMetadata: Record<string, unknown> = {
       first_name: firstName,
       last_name: lastName,
       full_name: fullName,
       phone: phone,
+    }
+    if (newAvatarUrl !== undefined) {
+      userMetadata.avatar_url = newAvatarUrl || null
     }
 
     const authUpdates: {
@@ -245,10 +314,17 @@ export async function updateProfileDetailsAction(
       cookieStore.set('user-phone', phone, cookieOptions)
     }
 
+    if (newAvatarUrl) {
+      cookieStore.set('user-avatar', newAvatarUrl, cookieOptions)
+    } else if (removeAvatar) {
+      cookieStore.delete('user-avatar')
+    }
+
     return {
       success: true,
       message: 'Kişisel bilgileriniz başarıyla güncellendi.',
       fullName,
+      avatarUrl: newAvatarUrl !== undefined ? newAvatarUrl : undefined,
     }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Güncelleme sırasında hata oluştu.'

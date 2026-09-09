@@ -16,6 +16,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const userName = cookieStore.get('user-name')?.value ?? ''
   let userEmail = cookieStore.get('user-email')?.value ?? ''
   let userPhone = cookieStore.get('user-phone')?.value ?? ''
+  const userAvatar = cookieStore.get('user-avatar')?.value ?? ''
   const agencyId = cookieStore.get('agency-id')?.value
   const userId = cookieStore.get('user-id')?.value
 
@@ -49,6 +50,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           role={userRole}
           initialEmail={userEmail}
           initialPhone={userPhone}
+          initialAvatar={userAvatar}
         />
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
