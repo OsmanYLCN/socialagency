@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useActionState, useEffect, useRef } from 'react'
+import Image, { type ImageLoaderProps } from 'next/image'
 import {
   X,
   User,
@@ -52,10 +53,15 @@ function sanitizeTurkishPhone(raw: string): string {
   if (val.startsWith('90') && val.length > 10) {
     val = val.slice(2)
   }
+
   while (val.startsWith('0')) {
     val = val.slice(1)
   }
   return val.slice(0, 10)
+}
+
+function avatarLoader({ src }: ImageLoaderProps): string {
+  return src
 }
 
 export function UserProfileModal({
@@ -142,46 +148,43 @@ export function UserProfileModal({
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  const [profileState, profileActionRun, isProfilePending] = useActionState(
-    updateProfileDetailsAction,
-    null
-  )
+  const profileAction = async (
+    prevState: Parameters<typeof updateProfileDetailsAction>[0],
+    formData: FormData
+  ) => {
+    const result = await updateProfileDetailsAction(prevState, formData)
+    if (result.success && result.fullName) {
+      const finalAvatar =
+        result.avatarUrl !== undefined ? result.avatarUrl : removeAvatar ? '' : avatarUrl
+      setAvatarUrl(finalAvatar)
+      setPreviewAvatar(finalAvatar)
+      setIsEditingEmail(false)
+      setIsEditingPhone(false)
+      onProfileUpdated?.(result.fullName, email, phone, finalAvatar)
+    }
+    return result
+  }
+
+  const [profileState, profileActionRun, isProfilePending] = useActionState(profileAction, null)
   const [passwordState, passwordActionRun, isPasswordPending] = useActionState(
     changePasswordAction,
     null
   )
 
   useEffect(() => {
-    if (isOpen) {
-      setActiveTab(initialTab)
-      const p = (initialData.fullName || '').trim().split(' ')
-      setFirstName(p[0] || '')
-      setLastName(p.slice(1).join(' ') || '')
-      setEmail(initialData.email || '')
-      setPhone(sanitizeTurkishPhone(initialData.phone || ''))
-      setAvatarUrl(initialData.avatarUrl || '')
-      setPreviewAvatar(initialData.avatarUrl || '')
-      setRemoveAvatar(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
-      setIsEditingEmail(false)
-      setIsEditingPhone(false)
-      setNewPassword('')
-      setConfirmPassword('')
-
-      if (!initialData.email || !initialData.phone || !initialData.avatarUrl) {
-        getProfileDetailsAction().then((profile) => {
-          if (profile?.email && !initialData.email) setEmail(profile.email)
-          if (profile?.phone && !initialData.phone) setPhone(sanitizeTurkishPhone(profile.phone))
-          if (profile?.firstName && !p[0]) setFirstName(profile.firstName)
-          if (profile?.lastName && !p.slice(1).join(' ')) setLastName(profile.lastName)
-          if (profile?.avatarUrl && !initialData.avatarUrl) {
-            setAvatarUrl(profile.avatarUrl)
-            setPreviewAvatar(profile.avatarUrl)
-          }
-        })
-      }
+    if (isOpen && (!initialData.email || !initialData.phone || !initialData.avatarUrl)) {
+      getProfileDetailsAction().then((profile) => {
+        if (profile?.email && !initialData.email) setEmail(profile.email)
+        if (profile?.phone && !initialData.phone) setPhone(sanitizeTurkishPhone(profile.phone))
+        if (profile?.firstName && !firstName) setFirstName(profile.firstName)
+        if (profile?.lastName && !lastName) setLastName(profile.lastName)
+        if (profile?.avatarUrl && !initialData.avatarUrl) {
+          setAvatarUrl(profile.avatarUrl)
+          setPreviewAvatar(profile.avatarUrl)
+        }
+      })
     }
-  }, [isOpen, initialTab, initialData])
+  }, [isOpen, initialData.email, initialData.phone, initialData.avatarUrl, firstName, lastName])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -192,19 +195,6 @@ export function UserProfileModal({
     }
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
-
-  useEffect(() => {
-    if (profileState?.success && profileState.fullName) {
-      const finalAvatar = profileState.avatarUrl !== undefined ? profileState.avatarUrl : (removeAvatar ? '' : avatarUrl)
-      if (profileState.avatarUrl !== undefined) {
-        setAvatarUrl(profileState.avatarUrl)
-        setPreviewAvatar(profileState.avatarUrl)
-      }
-      onProfileUpdated?.(profileState.fullName, email, phone, finalAvatar)
-      setIsEditingEmail(false)
-      setIsEditingPhone(false)
-    }
-  }, [profileState, email, phone, avatarUrl, removeAvatar, onProfileUpdated])
 
   if (!isOpen) return null
 
@@ -279,9 +269,13 @@ export function UserProfileModal({
               <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5">
                 <div className="relative group flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-white shadow-sm ring-2 ring-slate-200/80">
                   {previewAvatar ? (
-                    <img
+                    <Image
+                      loader={avatarLoader}
                       src={previewAvatar}
                       alt="Profil"
+                      width={64}
+                      height={64}
+                      unoptimized
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -628,6 +622,7 @@ export function UserProfileModal({
       </div>
 
       <ImageCropperModal
+        key={`${cropperOpen}-${cropperImageSrc}`}
         isOpen={cropperOpen}
         imageSrc={cropperImageSrc}
         onClose={() => setCropperOpen(false)}

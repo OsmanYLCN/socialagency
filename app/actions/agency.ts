@@ -4,6 +4,15 @@ import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { getServiceClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { content_type, platform_type } from '@prisma/client'
+
+function isPlatform(value: string): value is platform_type {
+  return Object.values(platform_type).includes(value as platform_type)
+}
+
+function isContentType(value: string): value is content_type {
+  return Object.values(content_type).includes(value as content_type)
+}
 
 // Marka ve müşteri kullanıcısı oluşturur
 export async function createCustomerAction(
@@ -167,13 +176,17 @@ export async function createTaskAction(
 ) {
   const brandId = (formData.get('brand_id') as string)?.trim()
   const assigneeId = (formData.get('assignee_id') as string)?.trim() || null
-  const platform = (formData.get('platform') as string)?.trim() as any
-  const content = (formData.get('content') as string)?.trim() as any
+  const platform = (formData.get('platform') as string)?.trim()
+  const content = (formData.get('content') as string)?.trim()
   const dueDateStr = (formData.get('due_date') as string)?.trim()
   const note = (formData.get('note') as string)?.trim()
 
   if (!brandId || !platform || !content || !dueDateStr) {
     return { error: 'Marka, platform, içerik türü ve teslim tarihi zorunludur.' }
+  }
+
+  if (!isPlatform(platform) || !isContentType(content)) {
+    return { error: 'Geçersiz platform veya içerik türü seçildi.' }
   }
 
   const cookieStore = await cookies()

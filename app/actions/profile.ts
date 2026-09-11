@@ -55,7 +55,6 @@ export async function getProfileDetailsAction(): Promise<ProfileDetails | null> 
   let phone = cookieStore.get('user-phone')?.value ?? ''
   let avatarUrl = cookieStore.get('user-avatar')?.value ?? ''
 
-  let userDataUser: { email?: string; phone?: string; user_metadata?: Record<string, unknown> } | null = null
   try {
     const { data: userData } = await serviceClient.auth.admin.getUserById(userId)
     if (userData?.user) {

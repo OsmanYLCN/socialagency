@@ -7,6 +7,11 @@ import { AgencyRecentActivities, RecentActivityItem } from './_components/Agency
 import { AgencyTaskPipeline, PipelineTaskItem } from './_components/AgencyTaskPipeline'
 import { AgencyContentCalendar } from './_components/AgencyContentCalendar'
 import { AgencyActiveBrands, BrandOverviewItem } from './_components/AgencyActiveBrands'
+import { notification_type } from '@prisma/client'
+
+function getActivityType(type: notification_type | null): RecentActivityItem['type'] {
+  return type === notification_type.approval ? 'approval' : 'task'
+}
 
 // Bugünün Türkçe tarihini biçimlendirir
 function getFormattedDate(): string {
@@ -82,7 +87,7 @@ export default async function AgencyPage() {
     pendingApproval: [],
   }
 
-  let weekSchedule: Record<number, string[]> = {
+  const weekSchedule: Record<number, string[]> = {
     1: [],
     2: [],
     3: [],
@@ -232,7 +237,7 @@ export default async function AgencyPage() {
           title: n.message,
           subtitle: n.type,
           timeAgo: n.created_at ? formatTimeAgo(new Date(n.created_at)) : 'Yakın zamanda',
-          type: (n.type as any) ?? 'task',
+          type: getActivityType(n.type),
         }))
       } else {
         const activityList: RecentActivityItem[] = []

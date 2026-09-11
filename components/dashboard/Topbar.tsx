@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Bell, ChevronDown, LogOut, Search, Settings, User, KeyRound } from 'lucide-react'
+import Image, { type ImageLoaderProps } from 'next/image'
 import Link from 'next/link'
 import { logoutAction } from '@/app/actions/auth'
 import { getProfileDetailsAction } from '@/app/actions/profile'
@@ -46,6 +47,10 @@ interface TopbarProps {
   initialAvatar?: string
 }
 
+function avatarLoader({ src }: ImageLoaderProps): string {
+  return src
+}
+
 // Dashboard üst çubuğunu ve kullanıcı menüsünü gösterir
 export function Topbar({
   userName,
@@ -58,39 +63,30 @@ export function Topbar({
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalTab, setModalTab] = useState<'info' | 'password'>('info')
 
-  const [currentName, setCurrentName] = useState(userName || 'Ajans Yöneticisi')
-  const [currentEmail, setCurrentEmail] = useState(initialEmail)
-  const [currentPhone, setCurrentPhone] = useState(initialPhone)
-  const [currentAvatar, setCurrentAvatar] = useState(initialAvatar)
+  const [nameOverride, setNameOverride] = useState<string | null>(null)
+  const [emailOverride, setEmailOverride] = useState<string | null>(null)
+  const [phoneOverride, setPhoneOverride] = useState<string | null>(null)
+  const [avatarOverride, setAvatarOverride] = useState<string | null>(null)
 
   const menuRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (userName) setCurrentName(userName)
-  }, [userName])
+  const currentName = nameOverride ?? (userName || 'Ajans Yöneticisi')
+  const currentEmail = emailOverride ?? initialEmail
+  const currentPhone = phoneOverride ?? initialPhone
+  const currentAvatar = avatarOverride ?? initialAvatar
 
   useEffect(() => {
-    if (initialAvatar) setCurrentAvatar(initialAvatar)
-  }, [initialAvatar])
-
-  useEffect(() => {
-    if (initialEmail) {
-      setCurrentEmail(initialEmail)
-    } else {
+    if (!initialEmail) {
       getProfileDetailsAction().then((p) => {
-        if (p?.email) setCurrentEmail(p.email)
-        if (p?.phone) setCurrentPhone(p.phone)
-        if (p?.avatarUrl !== undefined) setCurrentAvatar(p.avatarUrl || '')
+        if (p?.email) setEmailOverride(p.email)
+        if (p?.phone) setPhoneOverride(p.phone)
+        if (p?.avatarUrl !== undefined) setAvatarOverride(p.avatarUrl || '')
         if (p?.fullName && (!userName || userName === 'Kullanıcı' || userName === 'Ajans Yöneticisi')) {
-          setCurrentName(p.fullName)
+          setNameOverride(p.fullName)
         }
       })
     }
   }, [initialEmail, userName])
-
-  useEffect(() => {
-    if (initialPhone) setCurrentPhone(initialPhone)
-  }, [initialPhone])
 
   const badge = ROLE_BADGE[role] ?? ROLE_BADGE.agency_owner
   const initials = getInitials(currentName)
@@ -159,9 +155,13 @@ export function Topbar({
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-[11px] font-bold text-white shadow-xs">
                 {currentAvatar ? (
-                  <img
+                  <Image
+                    loader={avatarLoader}
                     src={currentAvatar}
                     alt={currentName}
+                    width={32}
+                    height={32}
+                    unoptimized
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -186,9 +186,13 @@ export function Topbar({
                 <div className="flex items-start gap-3 p-3 border-b border-slate-100 bg-slate-50/50 rounded-xl mb-1">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-xs font-bold text-white shadow-xs">
                     {currentAvatar ? (
-                      <img
+                      <Image
+                        loader={avatarLoader}
                         src={currentAvatar}
                         alt={currentName}
+                        width={36}
+                        height={36}
+                        unoptimized
                         className="h-full w-full object-cover"
                       />
                     ) : (
@@ -245,6 +249,7 @@ export function Topbar({
       </header>
 
       <UserProfileModal
+        key={`${isModalOpen}-${modalTab}-${currentName}-${currentEmail}-${currentPhone}-${currentAvatar}`}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         initialTab={modalTab}
@@ -256,10 +261,10 @@ export function Topbar({
           avatarUrl: currentAvatar,
         }}
         onProfileUpdated={(newName, newEmail, newPhone, newAvatar) => {
-          if (newName) setCurrentName(newName)
-          if (newEmail) setCurrentEmail(newEmail)
-          if (newPhone) setCurrentPhone(newPhone)
-          if (newAvatar !== undefined) setCurrentAvatar(newAvatar)
+          if (newName) setNameOverride(newName)
+          if (newEmail) setEmailOverride(newEmail)
+          if (newPhone) setPhoneOverride(newPhone)
+          if (newAvatar !== undefined) setAvatarOverride(newAvatar)
         }}
       />
     </>

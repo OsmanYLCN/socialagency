@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useActionState, useEffect } from 'react'
-import { CheckSquare, Megaphone, X, Loader2, Check, Plus } from 'lucide-react'
+import { useState, useActionState } from 'react'
+import { CheckSquare, Megaphone, X, Loader2, Check } from 'lucide-react'
 import { createTaskAction } from '@/app/actions/agency'
 
 interface BrandOption {
@@ -23,13 +23,16 @@ interface ActionButtonsProps {
 export function AgencyActionButtons({ brands = [], employees = [] }: ActionButtonsProps) {
   const [activeModal, setActiveModal] = useState<'task' | 'announcement' | null>(null)
 
-  const [taskState, taskActionRun, isTaskPending] = useActionState(createTaskAction, null)
-
-  useEffect(() => {
-    if (taskState?.success) {
-      setActiveModal(null)
-    }
-  }, [taskState])
+  const [taskState, taskActionRun, isTaskPending] = useActionState(
+    async (prevState: { success?: boolean; error?: string } | null, formData: FormData) => {
+      const result = await createTaskAction(prevState, formData)
+      if (result.success) {
+        setActiveModal(null)
+      }
+      return result
+    },
+    null
+  )
 
   return (
     <>

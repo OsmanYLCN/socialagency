@@ -39,14 +39,6 @@ export function ImageCropperModal({
   }
 
   useEffect(() => {
-    if (isOpen) {
-      setZoom(1)
-      setRotation(0)
-      setOffset({ x: 0, y: 0 })
-    }
-  }, [isOpen, imageSrc])
-
-  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) onClose()
     }
