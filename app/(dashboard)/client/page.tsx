@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-// Eski müşteri rotasını yeni rotaya yönlendirir
+// Eski müşteri rotasını yönlendirir
 export default function ClientLegacyPage() {
   redirect('/customer')
 }

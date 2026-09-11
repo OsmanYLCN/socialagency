@@ -1,6 +1,6 @@
 import { Users } from 'lucide-react'
 
-// Müşteri karşılama paneli
+// Müşteri panelini gösterir
 export default function CustomerPage() {
   return (
     <div className="flex flex-1 items-center justify-center py-20">

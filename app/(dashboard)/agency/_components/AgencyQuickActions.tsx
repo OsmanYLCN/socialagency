@@ -1,2 +1,2 @@
-// Ajans hızlı işlem bileşenleri (Sonraki aşamada eklenecektir)
+// Ajans hızlı işlemlerini gösterir
 export {}

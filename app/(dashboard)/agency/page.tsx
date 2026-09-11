@@ -8,7 +8,7 @@ import { AgencyTaskPipeline, PipelineTaskItem } from './_components/AgencyTaskPi
 import { AgencyContentCalendar } from './_components/AgencyContentCalendar'
 import { AgencyActiveBrands, BrandOverviewItem } from './_components/AgencyActiveBrands'
 
-// Bugünün Türkçe formatlanmış tarihi
+// Bugünün Türkçe tarihini biçimlendirir
 function getFormattedDate(): string {
   const now = new Date()
   const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi']
@@ -19,7 +19,7 @@ function getFormattedDate(): string {
   return `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}, ${days[now.getDay()]}`
 }
 
-// Son 6 ayın Türkçe kısaltmalarını ve başlangıç tarihlerini hesaplar
+// Son altı ayın bilgilerini hesaplar
 function getLast6Months() {
   const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
   const result: { month: string; year: number; monthIndex: number }[] = []
@@ -36,7 +36,7 @@ function getLast6Months() {
   return result
 }
 
-// Zaman farkı formatlayıcı
+// Geçen süreyi kısa metne dönüştürür
 function formatTimeAgo(date: Date): string {
   const diffSec = Math.floor((Date.now() - date.getTime()) / 1000)
   if (diffSec < 60) return 'Az önce'
@@ -48,7 +48,7 @@ function formatTimeAgo(date: Date): string {
   return `${diffDay} gün önce`
 }
 
-// Ajans sahibi ana yönetim paneli (Tamamen Gerçek Veritabanı Verileriyle)
+// Ajans sahibinin ana yönetim panelini gösterir
 export default async function AgencyPage() {
   const cookieStore = await cookies()
   const agencyId = cookieStore.get('agency-id')?.value
@@ -94,7 +94,6 @@ export default async function AgencyPage() {
 
   let recentActivities: RecentActivityItem[] = []
 
-  // Veritabanından ajansın gerçek verilerini sorgula
   if (agencyId) {
     try {
       const [agency, brands, employees, tasks, templates, notifications] = await Promise.all([
@@ -142,7 +141,6 @@ export default async function AgencyPage() {
         agencyName = agency.name
       }
 
-      // 1. Temel Sayımlar (Gerçek Veri)
       activeBrandsCount = brands.length
       employeeCount = employees.length
 
@@ -154,20 +152,17 @@ export default async function AgencyPage() {
 
       pendingApprovalCount = tasks.filter((t) => t.status === 'pending_approval').length
 
-      // Modal seçenekleri
       brandsList = brands.map((b) => ({ id: b.id, name: b.name }))
       employeesList = employees.map((e) => ({
         id: e.id,
         name: [e.first_name, e.last_name].filter(Boolean).join(' ') || 'İsimsiz Çalışan',
       }))
 
-      // 2. Grafikler İçin Gerçek Hesaplamalar
       totalTasksCount = tasks.length
       completedTasksCount = tasks.filter((t) => t.status === 'completed').length
       completionRate =
         totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0
 
-      // İçerik dağılımı gerçek adetleri
       contentDistribution = {
         reels: tasks.filter((t) => t.content === 'reels').length,
         post: tasks.filter((t) => t.content === 'post').length,
@@ -175,7 +170,6 @@ export default async function AgencyPage() {
         carousel: tasks.filter((t) => t.content === 'carousel').length,
       }
 
-      // Aylık marka büyümesi gerçek verisi (Son 6 ay)
       const last6 = getLast6Months()
       monthlyGrowth = last6.map((m) => {
         const countInMonth = brands.filter((b) => {
@@ -188,7 +182,6 @@ export default async function AgencyPage() {
 
 
 
-      // 4. Aktif Müşteriler Listesi
       brandOverviewItems = brands.map((b) => {
         const customerProfile = b.profiles?.[0]
         const manager = customerProfile
@@ -203,7 +196,6 @@ export default async function AgencyPage() {
         }
       })
 
-      // 5. Görev Pipeline Gerçek Gruplama
       const mapTaskItem = (t: (typeof tasks)[number]): PipelineTaskItem => ({
         id: t.id,
         platform: t.platform,
@@ -218,18 +210,15 @@ export default async function AgencyPage() {
         pendingApproval: tasks.filter((t) => t.status === 'pending_approval').map(mapTaskItem),
       }
 
-      // 6. Haftalık Takvim Gerçek Verisi
-      // Önce görevlerden gün bazlı platformları ekle
       tasks.forEach((t) => {
         if (!t.due_date) return
         const d = new Date(t.due_date)
-        const jsDay = d.getDay() // 0: Pazar, 1: Pzt ... 6: Cmt
-        const dayKey = jsDay === 0 ? 7 : jsDay // 1: Pzt ... 7: Paz
+        const jsDay = d.getDay()
+        const dayKey = jsDay === 0 ? 7 : jsDay
         if (weekSchedule[dayKey] && !weekSchedule[dayKey].includes(t.platform)) {
           weekSchedule[dayKey].push(t.platform)
         }
       })
-      // Şablonlardan da planlanmış platformları ekle
       templates.forEach((tmpl) => {
         const dayKey = tmpl.day_of_week
         if (weekSchedule[dayKey] && !weekSchedule[dayKey].includes(tmpl.platform)) {
@@ -237,7 +226,6 @@ export default async function AgencyPage() {
         }
       })
 
-      // 7. Son Aktiviteler Gerçek Akışı
       if (notifications && notifications.length > 0) {
         recentActivities = notifications.map((n) => ({
           id: n.id,
@@ -247,7 +235,6 @@ export default async function AgencyPage() {
           type: (n.type as any) ?? 'task',
         }))
       } else {
-        // Bildirim henüz yoksa son eklenen görev ve müşterilerden türet
         const activityList: RecentActivityItem[] = []
         tasks.slice(0, 3).forEach((t) => {
           activityList.push({
@@ -270,7 +257,6 @@ export default async function AgencyPage() {
         recentActivities = activityList
       }
     } catch {
-      // Beklenmeyen sorgu aksamasında varsayılan boş yapılar korunur
     }
   }
 
@@ -278,7 +264,6 @@ export default async function AgencyPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 pb-12">
-      {/* Sayfa Üst Başlığı (Açık Tuval) */}
       <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
@@ -295,7 +280,6 @@ export default async function AgencyPage() {
         </div>
       </div>
 
-      {/* 1. Satır: 4 Temel Metrik Kartı (Gerçek DB Sayımları) */}
       <AgencyMetricsRow
         activeBrandsCount={activeBrandsCount}
         employeeCount={employeeCount}
@@ -303,7 +287,6 @@ export default async function AgencyPage() {
         pendingApprovalCount={pendingApprovalCount}
       />
 
-      {/* 2. Satır: 3 Analitik Görsel Panel (Gerçek DB Grafikleri) */}
       <AgencyChartsRow
         monthlyGrowth={monthlyGrowth}
         completionRate={completionRate}
@@ -312,19 +295,14 @@ export default async function AgencyPage() {
         contentDistribution={contentDistribution}
       />
 
-      {/* 3. Satır: 2 Hızlı Aksiyon Butonu ("Yeni Görev Ata" ve "Yeni İlan Oluştur") */}
       <AgencyActionButtons brands={brandsList} employees={employeesList} />
 
-      {/* 4. Satır (Tam Genişlik 1): Son Aktiviteler */}
       <AgencyRecentActivities activities={recentActivities} />
 
-      {/* 5. Satır (Tam Genişlik 2): Görev Durumu (Mini Pipeline) */}
       <AgencyTaskPipeline pipeline={pipeline} />
 
-      {/* 6. Satır (Tam Genişlik 3): Haftalık İçerik Takvimi */}
       <AgencyContentCalendar weekSchedule={weekSchedule} />
 
-      {/* 7. Satır (Tam Genişlik 4): Aktif Müşteriler */}
       <AgencyActiveBrands brands={brandOverviewItems} />
     </div>
   )

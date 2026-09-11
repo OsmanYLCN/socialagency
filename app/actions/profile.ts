@@ -15,7 +15,7 @@ export interface ProfileDetails {
   avatarUrl?: string
 }
 
-// Giriş yapmış kullanıcının profil detaylarını döndürür
+// Kullanıcının profil bilgilerini getirir
 export async function getProfileDetailsAction(): Promise<ProfileDetails | null> {
   const cookieStore = await cookies()
   let userId = cookieStore.get('user-id')?.value
@@ -33,7 +33,6 @@ export async function getProfileDetailsAction(): Promise<ProfileDetails | null> 
         userId = data.user.id
       }
     } catch {
-      // ignore
     }
   }
 
@@ -45,7 +44,6 @@ export async function getProfileDetailsAction(): Promise<ProfileDetails | null> 
       })
       if (p?.id) userId = p.id
     } catch {
-      // ignore
     }
   }
 
@@ -68,7 +66,6 @@ export async function getProfileDetailsAction(): Promise<ProfileDetails | null> 
       }
     }
   } catch {
-    // fallback
   }
 
   try {
@@ -81,7 +78,6 @@ export async function getProfileDetailsAction(): Promise<ProfileDetails | null> 
       avatarUrl = profData.avatar_url
     }
   } catch {
-    // ignore
   }
 
   const profile = await prisma.profiles.findUnique({
@@ -132,7 +128,7 @@ export async function getProfileDetailsAction(): Promise<ProfileDetails | null> 
   }
 }
 
-// Kişisel bilgileri (Ad, Soyad, Telefon, E-posta, Profil Fotoğrafı) günceller
+// Kullanıcının profil bilgilerini günceller
 export async function updateProfileDetailsAction(
   prevState: { success?: boolean; error?: string; message?: string; fullName?: string; avatarUrl?: string } | null,
   formData: FormData
@@ -151,7 +147,6 @@ export async function updateProfileDetailsAction(
         userId = data.user.id
       }
     } catch {
-      // ignore
     }
   }
 
@@ -163,7 +158,6 @@ export async function updateProfileDetailsAction(
       })
       if (p?.id) userId = p.id
     } catch {
-      // ignore
     }
   }
 
@@ -242,7 +236,6 @@ export async function updateProfileDetailsAction(
   }
 
   try {
-    // 1. public.profiles tablosunu güncelle
     const profileUpdateData: Record<string, unknown> = {
       first_name: firstName,
       last_name: lastName,
@@ -256,7 +249,6 @@ export async function updateProfileDetailsAction(
       .update(profileUpdateData)
       .eq('id', userId)
 
-    // 2. Supabase Auth kullanıcısını güncelle
     const userMetadata: Record<string, unknown> = {
       first_name: firstName,
       last_name: lastName,
@@ -288,14 +280,12 @@ export async function updateProfileDetailsAction(
           phone: `+90${phone}`,
         })
       } catch {
-        // E.164 veya format aksaması durumunda metadata'da sakla
         await serviceClient.auth.admin.updateUserById(userId, authUpdates)
       }
     } else {
       await serviceClient.auth.admin.updateUserById(userId, authUpdates)
     }
 
-    // 3. İstemci çerezlerini tazele
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -332,7 +322,7 @@ export async function updateProfileDetailsAction(
   }
 }
 
-// Şifre değiştirme eylemi
+// Kullanıcının şifresini değiştirir
 export async function changePasswordAction(
   prevState: { success?: boolean; error?: string; message?: string } | null,
   formData: FormData
@@ -351,7 +341,6 @@ export async function changePasswordAction(
         userId = data.user.id
       }
     } catch {
-      // ignore
     }
   }
 
@@ -363,7 +352,6 @@ export async function changePasswordAction(
       })
       if (p?.id) userId = p.id
     } catch {
-      // ignore
     }
   }
 

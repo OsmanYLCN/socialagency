@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Ajansınızı SMAUP platformuna kaydedin.',
 }
 
-// Ajans sahibi kayıt sayfası
+// Ajans sahibi kayıt ekranını gösterir
 export default function RegisterPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">

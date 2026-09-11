@@ -61,7 +61,7 @@ interface SidebarProps {
   role: string
 }
 
-// Açılıp kapanabilen sol menü bileşeni
+// Açılır kapanır sol menüyü gösterir
 export function Sidebar({ role }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
@@ -74,7 +74,6 @@ export function Sidebar({ role }: SidebarProps) {
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
-      {/* Menü Daraltma/Genişletme Butonu */}
       <button
         type="button"
         onClick={() => setIsCollapsed((prev) => !prev)}
@@ -89,7 +88,6 @@ export function Sidebar({ role }: SidebarProps) {
         )}
       </button>
 
-      {/* Platform Yuvarlak Logo Alanı */}
       <div
         className={`flex h-16 items-center border-b border-slate-100 transition-all duration-200 ${
           isCollapsed ? 'justify-center px-2' : 'px-5'
@@ -117,7 +115,6 @@ export function Sidebar({ role }: SidebarProps) {
         </Link>
       </div>
 
-      {/* Navigasyon Bağlantıları */}
       <nav
         className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4"
         aria-label="Ana navigasyon"
@@ -158,7 +155,6 @@ export function Sidebar({ role }: SidebarProps) {
         })}
       </nav>
 
-      {/* Alt Platform Marka Alanı */}
       <div className="border-t border-slate-100/80 px-4 py-4">
         <div
           title="SMAUP"

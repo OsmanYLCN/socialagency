@@ -40,7 +40,7 @@ function renderPlatformIcon(platform: string, className = 'h-3.5 w-3.5') {
   }
 }
 
-// Tam Genişlik 2: Görev Durumu (Mini Pipeline) Paneli
+// Görev durumlarını sütunlarda gösterir
 export function AgencyTaskPipeline({
   pipeline = {
     planned: [],
@@ -73,7 +73,6 @@ export function AgencyTaskPipeline({
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Kolon 1: Planlandı */}
         <div className="flex flex-col gap-2.5 rounded-2xl bg-slate-50/80 p-3.5 border border-slate-100">
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-2">
             <span className="text-xs font-bold text-slate-700">Planlandı</span>
@@ -99,7 +98,6 @@ export function AgencyTaskPipeline({
           )}
         </div>
 
-        {/* Kolon 2: Hazırlanıyor */}
         <div className="flex flex-col gap-2.5 rounded-2xl bg-indigo-50/40 p-3.5 border border-indigo-100/60">
           <div className="flex items-center justify-between border-b border-indigo-100 pb-2">
             <span className="text-xs font-bold text-indigo-900">Hazırlanıyor</span>
@@ -125,7 +123,6 @@ export function AgencyTaskPipeline({
           )}
         </div>
 
-        {/* Kolon 3: Paylaşıldı */}
         <div className="flex flex-col gap-2.5 rounded-2xl bg-emerald-50/40 p-3.5 border border-emerald-100/60">
           <div className="flex items-center justify-between border-b border-emerald-100 pb-2">
             <span className="text-xs font-bold text-emerald-900">Paylaşıldı</span>
@@ -151,7 +148,6 @@ export function AgencyTaskPipeline({
           )}
         </div>
 
-        {/* Kolon 4: Onay Bekliyor */}
         <div className="flex flex-col gap-2.5 rounded-2xl bg-amber-50/40 p-3.5 border border-amber-100/60">
           <div className="flex items-center justify-between border-b border-amber-100 pb-2">
             <span className="text-xs font-bold text-amber-900">Onay Bekliyor</span>

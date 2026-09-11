@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'B2B Sosyal Medya Ajans Yönetim Platformu.',
 }
 
-// Karşılama ve ajans/müşteri yönlendirme ana sayfası
+// Kullanıcıyı uygun panele yönlendirir
 export default function HomePage() {
   return (
     <main className="flex h-screen w-screen flex-col overflow-hidden md:flex-row select-none">

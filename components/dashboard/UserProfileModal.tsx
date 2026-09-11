@@ -38,7 +38,7 @@ interface UserProfileModalProps {
   onProfileUpdated?: (name: string, email: string, phone: string, avatarUrl?: string) => void
 }
 
-// İsimden baş harfleri türetir
+// İsimden baş harfleri oluşturur
 function getInitials(name: string): string {
   const parts = name.trim().split(' ').filter(Boolean)
   if (parts.length === 0) return 'KL'
@@ -46,7 +46,7 @@ function getInitials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
-// Başında 0 veya +90 olmadan sadece 10 haneli rakamları zorlar (Örn: 5393594419)
+// Telefon numarasını standart biçime dönüştürür
 function sanitizeTurkishPhone(raw: string): string {
   let val = raw.replace(/\D/g, '')
   if (val.startsWith('90') && val.length > 10) {
@@ -67,7 +67,6 @@ export function UserProfileModal({
 }: UserProfileModalProps) {
   const [activeTab, setActiveTab] = useState<'info' | 'password'>(initialTab)
 
-  // Ad - Soyad ayrıştırma
   const parts = (initialData.fullName || '').trim().split(' ')
   const initialFirstName = parts[0] || ''
   const initialLastName = parts.slice(1).join(' ') || ''
@@ -75,7 +74,6 @@ export function UserProfileModal({
   const [firstName, setFirstName] = useState(initialFirstName)
   const [lastName, setLastName] = useState(initialLastName)
 
-  // Profil fotoğrafı durumları
   const [avatarUrl, setAvatarUrl] = useState(initialData.avatarUrl || '')
   const [previewAvatar, setPreviewAvatar] = useState(initialData.avatarUrl || '')
   const [removeAvatar, setRemoveAvatar] = useState(false)
@@ -83,7 +81,6 @@ export function UserProfileModal({
   const [cropperImageSrc, setCropperImageSrc] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // E-posta ve telefon düzenleme durumları
   const [email, setEmail] = useState(initialData.email || '')
   const [isEditingEmail, setIsEditingEmail] = useState(false)
 
@@ -94,7 +91,6 @@ export function UserProfileModal({
     setPhone(sanitizeTurkishPhone(e.target.value))
   }
 
-  // Dosya seçildiğinde doğrudan kırpma modalını açar
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -117,7 +113,6 @@ export function UserProfileModal({
     reader.readAsDataURL(file)
   }
 
-  // Kırpma işlemi tamamlandığında görseli forma ve önizlemeye ekler
   const handleCropComplete = (croppedBlob: Blob, previewUrl: string) => {
     const file = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' })
     setPreviewAvatar(previewUrl)
@@ -130,7 +125,6 @@ export function UserProfileModal({
         dt.items.add(file)
         fileInputRef.current.files = dt.files
       } catch {
-        // Fallback
       }
     }
   }
@@ -144,12 +138,10 @@ export function UserProfileModal({
     }
   }
 
-  // Şifre sekmesi durumları
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  // Server Action durumları
   const [profileState, profileActionRun, isProfilePending] = useActionState(
     updateProfileDetailsAction,
     null
@@ -159,7 +151,6 @@ export function UserProfileModal({
     null
   )
 
-  // Modal her açıldığında varsayılan sekmeyi ve verileri eşle
   useEffect(() => {
     if (isOpen) {
       setActiveTab(initialTab)
@@ -177,7 +168,6 @@ export function UserProfileModal({
       setNewPassword('')
       setConfirmPassword('')
 
-      // Eğer e-posta veya telefon henüz prop olarak aktarılmadıysa veritabanından çek
       if (!initialData.email || !initialData.phone || !initialData.avatarUrl) {
         getProfileDetailsAction().then((profile) => {
           if (profile?.email && !initialData.email) setEmail(profile.email)
@@ -193,7 +183,6 @@ export function UserProfileModal({
     }
   }, [isOpen, initialTab, initialData])
 
-  // ESC tuşu ile kapatma
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -204,7 +193,6 @@ export function UserProfileModal({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
-  // Profil güncelleme başarılı olduğunda üst bileşeni güncelle
   useEffect(() => {
     if (profileState?.success && profileState.fullName) {
       const finalAvatar = profileState.avatarUrl !== undefined ? profileState.avatarUrl : (removeAvatar ? '' : avatarUrl)
@@ -225,12 +213,10 @@ export function UserProfileModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
-      {/* Modal Kartı */}
       <div
         className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Başlığı */}
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4.5 bg-slate-50/50">
           <div>
             <h2 className="text-base font-bold text-slate-900">Hesap & Profil Yönetimi</h2>
@@ -245,7 +231,6 @@ export function UserProfileModal({
           </button>
         </div>
 
-        {/* Sekmeler (Tabs) */}
         <div className="flex border-b border-slate-100 px-6 bg-white">
           <button
             type="button"
@@ -274,12 +259,9 @@ export function UserProfileModal({
           </button>
         </div>
 
-        {/* Modal Gövdesi */}
         <div className="p-6">
-          {/* TAB 1: KİŞİSEL BİLGİLER */}
           {activeTab === 'info' && (
             <form action={profileActionRun} className="space-y-4.5">
-              {/* Başarı / Hata Bildirimleri */}
               {profileState?.success && (
                 <div className="flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/80 p-3 text-xs font-semibold text-emerald-800">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
@@ -294,7 +276,6 @@ export function UserProfileModal({
                 </div>
               )}
 
-              {/* Profil Fotoğrafı Bölümü */}
               <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5">
                 <div className="relative group flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-white shadow-sm ring-2 ring-slate-200/80">
                   {previewAvatar ? (
@@ -354,7 +335,6 @@ export function UserProfileModal({
                   </div>
                 </div>
 
-                {/* Gizli Dosya Seçici ve Silme Bayrağı */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -370,7 +350,6 @@ export function UserProfileModal({
                 />
               </div>
 
-              {/* Ad & Soyad */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-bold text-slate-700">Ad</label>
@@ -397,7 +376,6 @@ export function UserProfileModal({
                 </div>
               </div>
 
-              {/* E-posta Alanı (İnline Düzenleme) */}
               <div>
                 <div className="mb-1 flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-700">E-posta Adresi</label>
@@ -441,7 +419,6 @@ export function UserProfileModal({
                 )}
               </div>
 
-              {/* Telefon Numarası Alanı (İnline Ekleme & Düzenleme) */}
               <div>
                 <div className="mb-1 flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-700">Telefon Numarası</label>
@@ -520,7 +497,6 @@ export function UserProfileModal({
                 )}
               </div>
 
-              {/* Alt Butonlar */}
               <div className="mt-6 flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
@@ -550,10 +526,8 @@ export function UserProfileModal({
             </form>
           )}
 
-          {/* TAB 2: ŞİFRE DEĞİŞTİR */}
           {activeTab === 'password' && (
             <form action={passwordActionRun} className="space-y-4">
-              {/* Başarı / Hata Bildirimleri */}
               {passwordState?.success && (
                 <div className="flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/80 p-3 text-xs font-semibold text-emerald-800">
                   <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" />
@@ -575,7 +549,6 @@ export function UserProfileModal({
                 </p>
               </div>
 
-              {/* Yeni Şifre */}
               <div>
                 <label className="mb-1 block text-xs font-bold text-slate-700">Yeni Şifre</label>
                 <div className="relative">
@@ -603,7 +576,6 @@ export function UserProfileModal({
                 )}
               </div>
 
-              {/* Yeni Şifre Tekrar */}
               <div>
                 <label className="mb-1 block text-xs font-bold text-slate-700">Yeni Şifre (Tekrar)</label>
                 <input
@@ -627,7 +599,6 @@ export function UserProfileModal({
                 )}
               </div>
 
-              {/* Alt Butonlar */}
               <div className="mt-6 flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
@@ -656,7 +627,6 @@ export function UserProfileModal({
         </div>
       </div>
 
-      {/* Fotoğraf Konumlandırma ve Kırpma Modalı */}
       <ImageCropperModal
         isOpen={cropperOpen}
         imageSrc={cropperImageSrc}

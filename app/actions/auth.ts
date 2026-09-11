@@ -11,7 +11,7 @@ const ROLE_REDIRECT: Record<string, string> = {
   customer: '/customer',
 }
 
-// Güvenli çerez yapılandırması
+// Oturum çerezi seçeneklerini hazırlar
 function getCookieOptions(maxAgeDays: number) {
   const isProd = process.env.NODE_ENV === 'production'
   return {
@@ -23,7 +23,7 @@ function getCookieOptions(maxAgeDays: number) {
   }
 }
 
-// Kullanıcı girişi: kimlik doğrulaması yapar, rolü okur ve ilgili panele yönlendirir
+// Kullanıcıyı doğrular ve rolüne yönlendirir
 export async function loginAction(
   prevState: { error: string } | null,
   formData: FormData
@@ -109,7 +109,7 @@ export async function loginAction(
   redirect(destination)
 }
 
-// Ajans sahibi kaydı: kullanıcı hesabı, ajans ve profil oluşturup oturum açar
+// Ajans sahibi hesabı ve profilini oluşturur
 export async function registerAction(
   prevState: { error: string } | null,
   formData: FormData
@@ -213,13 +213,12 @@ export async function registerAction(
   redirect('/agency')
 }
 
-// Oturum kapatma: çerezleri temizler ve login sayfasına yönlendirir
+// Oturumu kapatır ve girişe yönlendirir
 export async function logoutAction() {
   try {
     const anonClient = getAnonClient()
     await anonClient.auth.signOut()
   } catch {
-    // Oturum geçersiz veya ağ hatası olsa bile çerezleri temizleyip yönlendirir
   }
 
   const cookieStore = await cookies()

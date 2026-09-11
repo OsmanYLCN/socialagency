@@ -10,9 +10,9 @@ interface ImageCropperModalProps {
   onCropComplete: (croppedBlob: Blob, previewUrl: string) => void
 }
 
-const VIEWPORT_SIZE = 320 // Önizleme alanı boyutu (px)
-const CROP_DIAMETER = 240 // Yuvarlak kırpma alanı çapı (px)
-const OUTPUT_SIZE = 400 // Çıktı görselinin çözünürlüğü (400x400 px)
+const VIEWPORT_SIZE = 320
+const CROP_DIAMETER = 240
+const OUTPUT_SIZE = 400
 
 export function ImageCropperModal({
   isOpen,
@@ -21,7 +21,7 @@ export function ImageCropperModal({
   onCropComplete,
 }: ImageCropperModalProps) {
   const [zoom, setZoom] = useState(1)
-  const [rotation, setRotation] = useState(0) // 0, 90, 180, 270
+  const [rotation, setRotation] = useState(0)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -29,7 +29,7 @@ export function ImageCropperModal({
 
   const imgRef = useRef<HTMLImageElement>(null)
 
-  // Resim kaynağı yüklendiğinde boyutları oku ve merkezle
+  // Görsel boyutlarını okuyup konumu sıfırlar
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget
     setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight })
@@ -38,7 +38,6 @@ export function ImageCropperModal({
     setOffset({ x: 0, y: 0 })
   }
 
-  // Modal açıldığında resetle
   useEffect(() => {
     if (isOpen) {
       setZoom(1)
@@ -47,7 +46,6 @@ export function ImageCropperModal({
     }
   }, [isOpen, imageSrc])
 
-  // ESC ile kapatma
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) onClose()
@@ -56,26 +54,22 @@ export function ImageCropperModal({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
-  // Boyut hesaplamaları
   const isRotatedSideways = rotation % 180 !== 0
   const rawW = imageDimensions ? (isRotatedSideways ? imageDimensions.height : imageDimensions.width) : 1
   const rawH = imageDimensions ? (isRotatedSideways ? imageDimensions.width : imageDimensions.height) : 1
 
-  // Daireyi tam doldurması için gereken temel ölçek
   const minScale = Math.max(CROP_DIAMETER / rawW, CROP_DIAMETER / rawH)
   const currentScale = minScale * zoom
 
   const renderW = rawW * currentScale
   const renderH = rawH * currentScale
 
-  // Sınırları aşmayı engelleyen (clamping) hesaplama
   const maxOffsetX = Math.max(0, (renderW - CROP_DIAMETER) / 2)
   const maxOffsetY = Math.max(0, (renderH - CROP_DIAMETER) / 2)
 
   const clampedX = Math.max(-maxOffsetX, Math.min(maxOffsetX, offset.x))
   const clampedY = Math.max(-maxOffsetY, Math.min(maxOffsetY, offset.y))
 
-  // Sürükleme başlangıcı
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(true)
@@ -86,7 +80,6 @@ export function ImageCropperModal({
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
   }
 
-  // Sürükleme hareketi
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDragging) return
     const newX = e.clientX - dragStart.x
@@ -97,32 +90,28 @@ export function ImageCropperModal({
     })
   }
 
-  // Sürükleme bitişi
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isDragging) {
       setIsDragging(false)
       try {
         ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
       } catch {
-        // ignore
       }
     }
   }
 
-  // Fare tekerleği ile zoom
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault()
     const delta = -e.deltaY * 0.0015
     setZoom((prev) => Math.max(1, Math.min(3, prev + delta)))
   }
 
-  // 90 derece döndürme
   const handleRotate = () => {
     setRotation((prev) => (prev + 90) % 360)
     setOffset({ x: 0, y: 0 })
   }
 
-  // Kırpma işlemini gerçekleştirip Blob ve DataURL üretme
+  // Görseli kırpıp çıktı dosyasını üretir
   const handleApplyCrop = useCallback(() => {
     if (!imageDimensions || !imgRef.current) return
 
@@ -135,24 +124,18 @@ export function ImageCropperModal({
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
 
-    // Tuvalin merkezine git
     const center = OUTPUT_SIZE / 2
     ctx.translate(center, center)
 
-    // Ekrandaki daire çapından çıktı boyutuna olan oran
     const ratio = OUTPUT_SIZE / CROP_DIAMETER
 
-    // Kullanıcının yaptığı kaydırmayı çıktı ölçeğine dönüştür
     ctx.translate(clampedX * ratio, clampedY * ratio)
 
-    // Döndürme
     ctx.rotate((rotation * Math.PI) / 180)
 
-    // Orijinal görselin genişlik ve yüksekliği
     const origW = imageDimensions.width
     const origH = imageDimensions.height
 
-    // Doğal ölçek
     const drawW = origW * minScale * zoom * ratio
     const drawH = origH * minScale * zoom * ratio
 
@@ -178,7 +161,6 @@ export function ImageCropperModal({
         className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Başlık */}
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 bg-slate-50/60">
           <div>
             <h3 className="text-sm font-bold text-slate-900">Fotoğrafı Konumlandır</h3>
@@ -195,14 +177,12 @@ export function ImageCropperModal({
           </button>
         </div>
 
-        {/* Kırpma Alanı */}
         <div className="flex flex-col items-center justify-center bg-slate-900 p-6 select-none">
           <div
             className="relative overflow-hidden rounded-xl bg-slate-950 shadow-inner flex items-center justify-center"
             style={{ width: VIEWPORT_SIZE, height: VIEWPORT_SIZE }}
             onWheel={handleWheel}
           >
-            {/* Arka Plandaki Görsel */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               ref={imgRef}
@@ -221,7 +201,6 @@ export function ImageCropperModal({
               }}
             />
 
-            {/* Daire Kırpma Maskesi (Aperture) */}
             <div
               className={`absolute inset-0 pointer-events-auto flex items-center justify-center ${
                 isDragging ? 'cursor-grabbing' : 'cursor-grab'
@@ -231,7 +210,6 @@ export function ImageCropperModal({
               onPointerUp={handlePointerUp}
               onPointerCancel={handlePointerUp}
             >
-              {/* Karartılmış çevre ve şeffaf daire maskesi */}
               <div
                 className="pointer-events-none rounded-full border-2 border-white/80 shadow-[0_0_0_9999px_rgba(15,23,42,0.7)]"
                 style={{
@@ -247,9 +225,7 @@ export function ImageCropperModal({
           </p>
         </div>
 
-        {/* Kontroller: Zoom ve Döndürme */}
         <div className="border-t border-slate-100 bg-white px-6 py-4 space-y-3">
-          {/* Zoom Slider */}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -292,7 +268,6 @@ export function ImageCropperModal({
           </div>
         </div>
 
-        {/* Butonlar */}
         <div className="flex items-center justify-end gap-2.5 border-t border-slate-100 bg-slate-50/50 px-5 py-3">
           <button
             type="button"

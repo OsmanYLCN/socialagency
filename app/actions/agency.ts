@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { getServiceClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 
-// Yeni müşteri (marka ve yetkili kullanıcı) oluşturma eylemi
+// Marka ve müşteri kullanıcısı oluşturur
 export async function createCustomerAction(
   prevState: { success?: boolean; error?: string } | null,
   formData: FormData
@@ -40,7 +40,6 @@ export async function createCustomerAction(
     return { error: msg }
   }
 
-  // 1. Supabase Auth üzerinde müşteri kullanıcısı oluştur
   const { data: authUser, error: authError } = await serviceClient.auth.admin.createUser({
     email: contactEmail,
     password,
@@ -56,7 +55,6 @@ export async function createCustomerAction(
     return { error: msg }
   }
 
-  // 2. Marka kaydını ekle
   const { data: brand, error: brandError } = await serviceClient
     .from('brands')
     .insert({
@@ -72,7 +70,6 @@ export async function createCustomerAction(
     return { error: `Marka kaydedilemedi: ${brandError?.message ?? 'Bilinmeyen hata'}` }
   }
 
-  // 3. Profil kaydını bağla
   const { error: profileError } = await serviceClient.from('profiles').insert({
     id: authUser.user.id,
     agency_id: agencyId,
@@ -93,7 +90,7 @@ export async function createCustomerAction(
   return { success: true }
 }
 
-// Yeni ajans çalışanı oluşturma eylemi
+// Yeni ajans çalışanı oluşturur
 export async function createEmployeeAction(
   prevState: { success?: boolean; error?: string } | null,
   formData: FormData
@@ -129,7 +126,6 @@ export async function createEmployeeAction(
     return { error: msg }
   }
 
-  // 1. Supabase Auth üzerinde çalışan kullanıcısı oluştur
   const { data: authUser, error: authError } = await serviceClient.auth.admin.createUser({
     email,
     password,
@@ -145,7 +141,6 @@ export async function createEmployeeAction(
     return { error: msg }
   }
 
-  // 2. Profil tablosuna çalışan kaydını ekle
   const { error: profileError } = await serviceClient.from('profiles').insert({
     id: authUser.user.id,
     agency_id: agencyId,
@@ -165,7 +160,7 @@ export async function createEmployeeAction(
   return { success: true }
 }
 
-// Yeni görev atama eylemi
+// Ajans için yeni görev oluşturur
 export async function createTaskAction(
   prevState: { success?: boolean; error?: string } | null,
   formData: FormData

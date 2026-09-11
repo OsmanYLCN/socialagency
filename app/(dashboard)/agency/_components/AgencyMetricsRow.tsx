@@ -7,7 +7,7 @@ interface MetricsProps {
   pendingApprovalCount: number
 }
 
-// 1. Satır: 4 Temel Metrik Kartı
+// Temel ajans metriklerini gösterir
 export function AgencyMetricsRow({
   activeBrandsCount,
   employeeCount,

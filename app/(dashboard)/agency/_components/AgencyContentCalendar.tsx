@@ -8,7 +8,7 @@ import {
 } from '@/components/icons/PlatformIcons'
 
 interface ContentCalendarProps {
-  weekSchedule?: Record<number, string[]> // 1=Pzt, 2=Sal... 7=Paz -> platforms
+  weekSchedule?: Record<number, string[]>
 }
 
 function renderPlatformBadge(platform: string) {
@@ -54,7 +54,7 @@ function renderPlatformBadge(platform: string) {
   }
 }
 
-// Tam Genişlik 3: Haftalık İçerik Takvimi Paneli
+// Haftalık içerik takvimini gösterir
 export function AgencyContentCalendar({ weekSchedule = {} }: ContentCalendarProps) {
   const days = [
     { num: 1, name: 'Pazartesi', short: 'Pzt' },
@@ -78,7 +78,6 @@ export function AgencyContentCalendar({ weekSchedule = {} }: ContentCalendarProp
         </div>
       </div>
 
-      {/* 7 Günlük Geniş Izgara */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
         {days.map((day) => {
           const scheduled = weekSchedule[day.num] ?? []

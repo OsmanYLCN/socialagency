@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
-// Geliştirme ortamında çoklu bağlantıyı önleyen global Prisma istemcisi
+// Paylaşımlı Prisma istemcisini hazırlar
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }

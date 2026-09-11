@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react'
 import { loginAction } from '@/app/actions/auth'
 import { Eye, EyeOff, Mail, Lock, Loader2, LogIn, AlertCircle } from 'lucide-react'
 
-// Ortak giriş formu bileşeni
+// Kullanıcı giriş formunu yönetir
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, null)
   const [showPassword, setShowPassword] = useState(false)

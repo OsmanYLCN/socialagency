@@ -12,7 +12,7 @@ interface RecentActivitiesProps {
   activities?: RecentActivityItem[]
 }
 
-// Tam Genişlik 1: Son Aktiviteler Paneli
+// Son aktiviteler panelini gösterir
 export function AgencyRecentActivities({ activities = [] }: RecentActivitiesProps) {
   return (
     <div className="w-full rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">

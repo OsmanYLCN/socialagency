@@ -11,7 +11,7 @@ const ROLE_REDIRECT: Record<string, string> = {
   customer: '/customer',
 }
 
-// Rota koruma ve oturum kontrolü (Next.js 16)
+// Rotaları ve oturumları korur
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('sb-access-token')?.value

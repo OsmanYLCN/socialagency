@@ -14,7 +14,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 
-// Ajans sahibi kayıt formu bileşeni
+// Ajans sahibi kayıt formunu yönetir
 export function RegisterForm() {
   const [state, formAction, pending] = useActionState(registerAction, null)
   const [showPassword, setShowPassword] = useState(false)

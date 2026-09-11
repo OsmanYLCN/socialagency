@@ -30,7 +30,7 @@ const ROLE_BADGE: Record<string, { label: string; textColor: string; colors: str
   },
 }
 
-// İsimden baş harfleri türetir
+// İsimden baş harfleri oluşturur
 function getInitials(name: string): string {
   const parts = name.trim().split(' ').filter(Boolean)
   if (parts.length === 0) return 'KL'
@@ -46,7 +46,7 @@ interface TopbarProps {
   initialAvatar?: string
 }
 
-// Dashboard üst bilgi çubuğu, arama alanı ve zenginleştirilmiş kullanıcı mini menüsü
+// Dashboard üst çubuğunu ve kullanıcı menüsünü gösterir
 export function Topbar({
   userName,
   role,
@@ -95,7 +95,6 @@ export function Topbar({
   const badge = ROLE_BADGE[role] ?? ROLE_BADGE.agency_owner
   const initials = getInitials(currentName)
 
-  // Dışarı tıklandığında menüyü kapatır
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -121,7 +120,6 @@ export function Topbar({
   return (
     <>
       <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white px-6">
-        {/* Sol Arama Çubuğu */}
         <div className="relative w-72 max-w-sm">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
@@ -131,9 +129,7 @@ export function Topbar({
           />
         </div>
 
-        {/* Sağ İşlem ve Profil Alanı */}
         <div className="flex items-center gap-2.5">
-          {/* Bildirim Butonu */}
           <button
             id="topbar-notifications"
             aria-label="Bildirimler"
@@ -143,7 +139,6 @@ export function Topbar({
             <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
           </button>
 
-          {/* Ayarlar Kısayol Butonu */}
           <Link
             href="/agency/settings"
             aria-label="Ayarlar"
@@ -154,7 +149,6 @@ export function Topbar({
 
           <div className="mx-1 h-5 w-px bg-slate-200" />
 
-          {/* Kullanıcı Menü Butonu & Zengin Dropdown */}
           <div className="relative" ref={menuRef}>
             <button
               id="topbar-user-menu"
@@ -187,10 +181,8 @@ export function Topbar({
               />
             </button>
 
-            {/* Global Standartlarda Mini Dropdown */}
             {isOpen && (
               <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200/90 bg-white p-1.5 shadow-xl shadow-slate-900/10 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                {/* 1. Kullanıcı Bilgi Kartı */}
                 <div className="flex items-start gap-3 p-3 border-b border-slate-100 bg-slate-50/50 rounded-xl mb-1">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-xs font-bold text-white shadow-xs">
                     {currentAvatar ? (
@@ -214,9 +206,7 @@ export function Topbar({
                   </div>
                 </div>
 
-                {/* 2. Menü Maddeleri */}
                 <div className="space-y-0.5">
-                  {/* Kişisel Bilgiler */}
                   <button
                     type="button"
                     onClick={handleOpenInfoModal}
@@ -226,7 +216,6 @@ export function Topbar({
                     <span>Kişisel Bilgiler</span>
                   </button>
 
-                  {/* Şifre Değiştir */}
                   <button
                     type="button"
                     onClick={handleOpenPasswordModal}
@@ -237,10 +226,8 @@ export function Topbar({
                   </button>
                 </div>
 
-                {/* 3. Ayırıcı Çizgi */}
                 <div className="my-1 border-t border-slate-100" />
 
-                {/* 4. Çıkış Yap */}
                 <form action={logoutAction}>
                   <button
                     type="submit"
@@ -257,7 +244,6 @@ export function Topbar({
         </div>
       </header>
 
-      {/* Kişisel Bilgiler ve Şifre Yönetim Modalı */}
       <UserProfileModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

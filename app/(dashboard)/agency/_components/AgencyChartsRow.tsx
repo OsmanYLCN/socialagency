@@ -20,7 +20,7 @@ interface ChartsRowProps {
   contentDistribution?: ContentDistribution
 }
 
-// 2. Satır: 3 Analitik Görsel Panel (Gerçek Veritabanı Verileriyle)
+// Ajans grafiklerini ve dağılımlarını gösterir
 export function AgencyChartsRow({
   monthlyGrowth = [
     { month: 'Haz', count: 0 },
@@ -35,12 +35,10 @@ export function AgencyChartsRow({
   totalTasksCount = 0,
   contentDistribution = { reels: 0, post: 0, story: 0, carousel: 0 },
 }: ChartsRowProps) {
-  // 1. Görev Tamamlama Oranı Halka Hesaplaması
   const radius = 42
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference - (completionRate / 100) * circumference
 
-  // 2. İçerik Dağılımı Yüzdeleri
   const totalContent =
     contentDistribution.reels +
     contentDistribution.post +
@@ -52,7 +50,6 @@ export function AgencyChartsRow({
   const storyPct = totalContent > 0 ? Math.round((contentDistribution.story / totalContent) * 100) : 0
   const carouselPct = totalContent > 0 ? Math.max(0, 100 - (reelsPct + postPct + storyPct)) : 0
 
-  // 3. Aylık Müşteri Artışı SVG Koordinatları
   const maxVal = Math.max(...monthlyGrowth.map((d) => d.count), 5)
   const points = monthlyGrowth.map((item, idx) => {
     const x = 20 + idx * 56
@@ -71,7 +68,6 @@ export function AgencyChartsRow({
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      {/* 1. Aylık Müşteri Artışı (Gerçek Veri) */}
       <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
         <div className="flex items-center justify-between">
           <div>
@@ -83,7 +79,6 @@ export function AgencyChartsRow({
           </div>
         </div>
 
-        {/* SVG Alan & Çizgi Grafiği */}
         <div className="relative mt-4 h-44 w-full">
           <svg viewBox="0 0 320 140" className="h-full w-full overflow-visible">
             <defs>
@@ -93,15 +88,12 @@ export function AgencyChartsRow({
               </linearGradient>
             </defs>
 
-            {/* Yatay Kılavuz Çizgileri */}
             <line x1="10" y1="30" x2="310" y2="30" stroke="#f1f5f9" strokeDasharray="3 3" />
             <line x1="10" y1="70" x2="310" y2="70" stroke="#f1f5f9" strokeDasharray="3 3" />
             <line x1="10" y1="120" x2="310" y2="120" stroke="#f1f5f9" />
 
-            {/* Degrade Alan */}
             <path d={areaD} fill="url(#clientGrowthGrad)" />
 
-            {/* Ana Eğri */}
             <path
               d={pathD}
               fill="none"
@@ -110,7 +102,6 @@ export function AgencyChartsRow({
               strokeLinecap="round"
             />
 
-            {/* Veri Noktaları */}
             {points.map((pt, idx) => (
               <g key={idx}>
                 <circle
@@ -132,7 +123,6 @@ export function AgencyChartsRow({
           </svg>
         </div>
 
-        {/* X Ekseni Ayları */}
         <div className="mt-2 flex justify-between px-2 text-[11px] font-medium text-slate-400">
           {monthlyGrowth.map((m) => (
             <span key={m.month}>{m.month}</span>
@@ -140,7 +130,6 @@ export function AgencyChartsRow({
         </div>
       </div>
 
-      {/* 2. Görev Tamamlama Oranı (Gerçek Veri) */}
       <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
         <div className="flex items-center justify-between">
           <div>
@@ -152,7 +141,6 @@ export function AgencyChartsRow({
           </div>
         </div>
 
-        {/* Halka Grafik */}
         <div className="relative my-4 flex items-center justify-center">
           <svg className="h-36 w-36 -rotate-90 transform" viewBox="0 0 100 100">
             <circle
@@ -192,7 +180,6 @@ export function AgencyChartsRow({
           </div>
         </div>
 
-        {/* Alt Metrikler */}
         <div className="flex justify-around border-t border-slate-100 pt-3 text-center">
           <div>
             <p className="text-xs text-slate-400">Tamamlanan</p>
@@ -206,7 +193,6 @@ export function AgencyChartsRow({
         </div>
       </div>
 
-      {/* 3. İçerik Dağılımı (Gerçek Veri) */}
       <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
         <div className="flex items-center justify-between">
           <div>
@@ -218,7 +204,6 @@ export function AgencyChartsRow({
           </div>
         </div>
 
-        {/* Dairesel Dağılım Çarkı */}
         <div className="my-3 flex items-center justify-center">
           <div className="relative flex h-32 w-32 items-center justify-center">
             {totalContent === 0 ? (
@@ -294,7 +279,6 @@ export function AgencyChartsRow({
           </div>
         </div>
 
-        {/* Dağılım Lejantı */}
         <div className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 text-xs">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />

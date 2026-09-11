@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: 'B2B Sosyal Medya Ajans Yönetim Paneli',
 }
 
-// Ortak dashboard iskeleti (Sidebar, Topbar ve içerik alanı)
+// Ortak dashboard düzenini oluşturur
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
   const userRole = cookieStore.get('user-role')?.value ?? 'agency_owner'
@@ -20,7 +20,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const agencyId = cookieStore.get('agency-id')?.value
   const userId = cookieStore.get('user-id')?.value
 
-  // Çerezde e-posta yoksa doğrudan veritabanından al
   if (!userEmail) {
     try {
       const profile = await prisma.profiles.findFirst({
@@ -36,7 +35,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
         userPhone = profile.users?.phone || userPhone
       }
     } catch {
-      // ignore
     }
   }
 

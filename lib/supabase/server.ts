@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase servis rolü istemcisi (RLS bypass ve admin işlemleri)
+// Yönetici işlemleri için Supabase istemcisi
 export function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -12,7 +12,7 @@ export function getServiceClient() {
   return createClient(url, key)
 }
 
-// Supabase anonim istemcisi (kullanıcı yetkilendirmesi ve oturum işlemleri)
+// Kimlik doğrulama için anonim istemci
 export function getAnonClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -24,7 +24,7 @@ export function getAnonClient() {
   return createClient(url, key)
 }
 
-// Genel sunucu istemcisi
+// Sunucu Supabase istemcisini oluşturur
 export function createServerClient() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -12,7 +12,7 @@ interface ActiveBrandsProps {
   brands?: BrandOverviewItem[]
 }
 
-// Tam Genişlik 4: Aktif Müşteriler Paneli
+// Aktif müşteriler panelini gösterir
 export function AgencyActiveBrands({ brands = [] }: ActiveBrandsProps) {
   return (
     <div className="w-full rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">

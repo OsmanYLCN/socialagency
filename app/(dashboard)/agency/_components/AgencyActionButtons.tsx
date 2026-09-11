@@ -19,11 +19,10 @@ interface ActionButtonsProps {
   employees?: EmployeeOption[]
 }
 
-// 3. Satır: 2 Hızlı Aksiyon Butonu ("Yeni Görev Ata" ve "Yeni İlan Oluştur")
+// Ajans hızlı işlem butonlarını gösterir
 export function AgencyActionButtons({ brands = [], employees = [] }: ActionButtonsProps) {
   const [activeModal, setActiveModal] = useState<'task' | 'announcement' | null>(null)
 
-  // Görev Oluşturma Eylemi
   const [taskState, taskActionRun, isTaskPending] = useActionState(createTaskAction, null)
 
   useEffect(() => {
@@ -34,9 +33,7 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
 
   return (
     <>
-      {/* 2 Yatay Buton (Daha Belirgin Çizgiler ve Ferah Yerleşim) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Buton 1: Yeni Görev Ata */}
         <button
           type="button"
           onClick={() => setActiveModal('task')}
@@ -48,7 +45,6 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
           <span>Yeni Görev Ata</span>
         </button>
 
-        {/* Buton 2: Yeni İlan Oluştur */}
         <button
           type="button"
           onClick={() => setActiveModal('announcement')}
@@ -61,7 +57,6 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
         </button>
       </div>
 
-      {/* Modal: Yeni Görev Ata */}
       {activeModal === 'task' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl animate-in zoom-in-95 duration-150">
@@ -202,7 +197,6 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
         </div>
       )}
 
-      {/* Modal: Yeni İlan Oluştur */}
       {activeModal === 'announcement' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl animate-in zoom-in-95 duration-150">
