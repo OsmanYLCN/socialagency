@@ -75,10 +75,9 @@ export default function HomePage() {
       <Link
         id="customer-portal-link"
         href="/login"
-        className="group/client relative flex h-1/2 w-full flex-col items-center justify-center overflow-hidden bg-white px-8 md:h-full md:w-1/2 md:px-14 lg:px-20 transition-colors duration-500 hover:bg-slate-50/60 cursor-pointer"
+        className="group/client relative flex h-1/2 w-full flex-col items-center justify-center overflow-hidden bg-white px-8 md:h-full md:w-1/2 md:px-14 lg:px-20 cursor-pointer"
       >
         <div className="pointer-events-none absolute -right-32 -top-32 h-[500px] w-[500px] rounded-full bg-blue-50/80 blur-3xl transition-all duration-500 group-hover/client:scale-110" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 h-[500px] w-[500px] rounded-full bg-slate-100/80 blur-3xl" />
 
         <div className="absolute right-8 top-8 hidden md:block">
           <span className="text-[11px] font-semibold tracking-[0.25em] text-slate-400 uppercase">
