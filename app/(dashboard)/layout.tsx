@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
+import { requireAuthenticatedUser } from '@/lib/auth'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { Topbar } from '@/components/dashboard/Topbar'
 
@@ -11,19 +12,22 @@ export const metadata: Metadata = {
 
 // Ortak dashboard düzenini oluşturur
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const user = await requireAuthenticatedUser()
   const cookieStore = await cookies()
-  const userRole = cookieStore.get('user-role')?.value ?? 'agency_owner'
-  const userName = cookieStore.get('user-name')?.value ?? ''
+  const userRole = user.role
+  const userName =
+    [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+    cookieStore.get('user-name')?.value ||
+    ''
   let userEmail = cookieStore.get('user-email')?.value ?? ''
   let userPhone = cookieStore.get('user-phone')?.value ?? ''
   const userAvatar = cookieStore.get('user-avatar')?.value ?? ''
-  const agencyId = cookieStore.get('agency-id')?.value
-  const userId = cookieStore.get('user-id')?.value
+  const userId = user.id
 
   if (!userEmail) {
     try {
-      const profile = await prisma.profiles.findFirst({
-        where: userId ? { id: userId } : agencyId ? { agency_id: agencyId } : undefined,
+      const profile = await prisma.profiles.findUnique({
+        where: { id: userId },
         include: {
           users: { select: { email: true, phone: true } },
           agencies: { select: { contact_email: true } },

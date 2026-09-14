@@ -1,5 +1,5 @@
-import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
+import { requireAgencyOwner } from '@/lib/auth'
 import { AgencyMetricsRow } from './_components/AgencyMetricsRow'
 import { AgencyChartsRow } from './_components/AgencyChartsRow'
 import { AgencyActionButtons } from './_components/AgencyActionButtons'
@@ -55,9 +55,10 @@ function formatTimeAgo(date: Date): string {
 
 // Ajans sahibinin ana yönetim panelini gösterir
 export default async function AgencyPage() {
-  const cookieStore = await cookies()
-  const agencyId = cookieStore.get('agency-id')?.value
-  const userName = cookieStore.get('user-name')?.value ?? 'Ajans Yöneticisi'
+  const user = await requireAgencyOwner()
+  const agencyId = user.agencyId
+  const userName =
+    [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Ajans Yöneticisi'
 
   let agencyName = 'Ajansım'
   let activeBrandsCount = 0
@@ -99,8 +100,7 @@ export default async function AgencyPage() {
 
   let recentActivities: RecentActivityItem[] = []
 
-  if (agencyId) {
-    try {
+  try {
       const [agency, brands, employees, tasks, templates, notifications] = await Promise.all([
         prisma.agencies.findUnique({
           where: { id: agencyId },
@@ -261,8 +261,7 @@ export default async function AgencyPage() {
         })
         recentActivities = activityList
       }
-    } catch {
-    }
+  } catch {
   }
 
   const currentDateStr = getFormattedDate()

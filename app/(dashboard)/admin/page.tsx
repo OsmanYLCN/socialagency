@@ -1,7 +1,10 @@
 import { ShieldCheck } from 'lucide-react'
+import { requireRole } from '@/lib/auth'
 
 // Süper yönetici panelini gösterir
-export default function AdminPage() {
+export default async function AdminPage() {
+  await requireRole('super_admin')
+
   return (
     <div className="flex flex-1 items-center justify-center py-20">
       <div className="w-full max-w-lg rounded-2xl border border-slate-200/80 bg-white p-10 text-center shadow-sm">

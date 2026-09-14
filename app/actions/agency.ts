@@ -1,9 +1,9 @@
 'use server'
 
-import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { getServiceClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { getAgencyOwner } from '@/lib/auth'
 import { content_type, platform_type } from '@prisma/client'
 
 function isPlatform(value: string): value is platform_type {
@@ -32,14 +32,16 @@ export async function createCustomerAction(
     return { error: 'Şifre en az 6 karakter olmalıdır.' }
   }
 
-  const cookieStore = await cookies()
-  const agencyId = cookieStore.get('agency-id')?.value
+  const agencyOwner = await getAgencyOwner()
 
-  if (!agencyId) {
-    return { error: 'Ajans oturumu bulunamadı. Lütfen tekrar giriş yapın.' }
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
   }
 
   const monthlyFee = monthlyFeeStr ? parseFloat(monthlyFeeStr) : 0
+  if (!Number.isFinite(monthlyFee) || monthlyFee < 0) {
+    return { error: 'Aylık ücret geçerli ve negatif olmayan bir sayı olmalıdır.' }
+  }
 
   let serviceClient
   try {
@@ -67,7 +69,7 @@ export async function createCustomerAction(
   const { data: brand, error: brandError } = await serviceClient
     .from('brands')
     .insert({
-      agency_id: agencyId,
+      agency_id: agencyOwner.agencyId,
       name: brandName,
       monthly_fee: monthlyFee,
     })
@@ -81,7 +83,7 @@ export async function createCustomerAction(
 
   const { error: profileError } = await serviceClient.from('profiles').insert({
     id: authUser.user.id,
-    agency_id: agencyId,
+    agency_id: agencyOwner.agencyId,
     brand_id: brand.id,
     role: 'customer',
     first_name: brandName,
@@ -118,14 +120,16 @@ export async function createEmployeeAction(
     return { error: 'Şifre en az 6 karakter olmalıdır.' }
   }
 
-  const cookieStore = await cookies()
-  const agencyId = cookieStore.get('agency-id')?.value
+  const agencyOwner = await getAgencyOwner()
 
-  if (!agencyId) {
-    return { error: 'Ajans oturumu bulunamadı. Lütfen tekrar giriş yapın.' }
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
   }
 
   const salary = salaryStr ? parseFloat(salaryStr) : 0
+  if (!Number.isFinite(salary) || salary < 0) {
+    return { error: 'Maaş geçerli ve negatif olmayan bir sayı olmalıdır.' }
+  }
 
   let serviceClient
   try {
@@ -152,7 +156,7 @@ export async function createEmployeeAction(
 
   const { error: profileError } = await serviceClient.from('profiles').insert({
     id: authUser.user.id,
-    agency_id: agencyId,
+    agency_id: agencyOwner.agencyId,
     role: 'employee',
     first_name: firstName,
     last_name: lastName,
@@ -189,22 +193,51 @@ export async function createTaskAction(
     return { error: 'Geçersiz platform veya içerik türü seçildi.' }
   }
 
-  const cookieStore = await cookies()
-  const agencyId = cookieStore.get('agency-id')?.value
+  const agencyOwner = await getAgencyOwner()
 
-  if (!agencyId) {
-    return { error: 'Ajans oturumu bulunamadı.' }
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const dueDate = new Date(`${dueDateStr}T00:00:00.000Z`)
+  if (Number.isNaN(dueDate.getTime())) {
+    return { error: 'Geçerli bir teslim tarihi seçilmelidir.' }
+  }
+
+  const brand = await prisma.brands.findFirst({
+    where: { id: brandId, agency_id: agencyOwner.agencyId },
+    select: { id: true },
+  })
+
+  if (!brand) {
+    return { error: 'Seçilen marka bu ajansa ait değil.' }
+  }
+
+  if (assigneeId) {
+    const assignee = await prisma.profiles.findFirst({
+      where: {
+        id: assigneeId,
+        agency_id: agencyOwner.agencyId,
+        role: 'employee',
+        is_active: true,
+      },
+      select: { id: true },
+    })
+
+    if (!assignee) {
+      return { error: 'Seçilen çalışan bu ajansa ait aktif bir çalışan değil.' }
+    }
   }
 
   try {
     await prisma.tasks.create({
       data: {
-        agency_id: agencyId,
+        agency_id: agencyOwner.agencyId,
         brand_id: brandId,
         assignee_id: assigneeId,
         platform,
         content,
-        due_date: new Date(dueDateStr),
+        due_date: dueDate,
         status: assigneeId ? 'assigned' : 'unassigned',
         assignment_note: note || null,
       },

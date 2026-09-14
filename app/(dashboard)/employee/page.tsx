@@ -1,7 +1,10 @@
 import { UserCircle } from 'lucide-react'
+import { requireRole } from '@/lib/auth'
 
 // Çalışan panelini gösterir
-export default function EmployeePage() {
+export default async function EmployeePage() {
+  await requireRole('employee')
+
   return (
     <div className="flex flex-1 items-center justify-center py-20">
       <div className="w-full max-w-lg rounded-2xl border border-slate-200/80 bg-white p-10 text-center shadow-sm">
