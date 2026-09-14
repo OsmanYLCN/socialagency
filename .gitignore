@@ -24,6 +24,7 @@
 .DS_Store
 *.pem
 /report.md
+/gcli
 
 # debug
 npm-debug.log*

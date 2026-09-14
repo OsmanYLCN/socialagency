@@ -100,8 +100,7 @@ export default async function AgencyPage() {
 
   let recentActivities: RecentActivityItem[] = []
 
-  try {
-      const [agency, brands, employees, tasks, templates, notifications] = await Promise.all([
+  const [agency, brands, employees, tasks, templates, notifications] = await Promise.all([
         prisma.agencies.findUnique({
           where: { id: agencyId },
           select: { name: true },
@@ -142,7 +141,7 @@ export default async function AgencyPage() {
         }),
       ])
 
-      if (agency?.name) {
+  if (agency?.name) {
         agencyName = agency.name
       }
 
@@ -231,7 +230,7 @@ export default async function AgencyPage() {
         }
       })
 
-      if (notifications && notifications.length > 0) {
+  if (notifications && notifications.length > 0) {
         recentActivities = notifications.map((n) => ({
           id: n.id,
           title: n.message,
@@ -260,8 +259,6 @@ export default async function AgencyPage() {
           })
         })
         recentActivities = activityList
-      }
-  } catch {
   }
 
   const currentDateStr = getFormattedDate()
