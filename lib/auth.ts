@@ -71,6 +71,13 @@ export async function requireAuthenticatedUser(): Promise<AuthenticatedUser> {
   const user = await getAuthenticatedUser()
 
   if (!user) {
+    const cookieStore = await cookies()
+    const refreshToken = cookieStore.get('sb-refresh-token')?.value
+    if (refreshToken) {
+      const role = cookieStore.get('user-role')?.value
+      const destination = ROLE_REDIRECT[role ?? ''] ?? '/agency'
+      redirect(`/auth/refresh?next=${encodeURIComponent(destination)}`)
+    }
     redirect('/login')
   }
 
@@ -91,6 +98,9 @@ export async function getAgencyOwner(): Promise<AgencyOwner | null> {
   const user = await getAuthenticatedUser()
 
   if (!user || user.role !== 'agency_owner' || !user.agencyId) {
+    if (!user && (await cookies()).get('sb-refresh-token')?.value) {
+      redirect('/auth/refresh?next=/agency')
+    }
     return null
   }
 

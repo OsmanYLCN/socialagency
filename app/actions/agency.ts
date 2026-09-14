@@ -4,6 +4,13 @@ import { revalidatePath } from 'next/cache'
 import { getServiceClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { getAgencyOwner } from '@/lib/auth'
+import {
+  getFormString,
+  parseNonNegativeNumber,
+  validateDate,
+  validateEmail,
+  validatePassword,
+} from '@/lib/validation'
 import { content_type, platform_type } from '@prisma/client'
 
 function isPlatform(value: string): value is platform_type {
@@ -19,18 +26,17 @@ export async function createCustomerAction(
   prevState: { success?: boolean; error?: string } | null,
   formData: FormData
 ) {
-  const brandName = (formData.get('brand_name') as string)?.trim()
-  const contactEmail = (formData.get('contact_email') as string)?.trim()
-  const password = formData.get('password') as string
-  const monthlyFeeStr = (formData.get('monthly_fee') as string)?.trim()
+  const brandName = getFormString(formData, 'brand_name')
+  const contactEmail = getFormString(formData, 'contact_email')
+  const password = getFormString(formData, 'password')
+  const monthlyFeeStr = getFormString(formData, 'monthly_fee')
 
-  if (!brandName || !contactEmail || !password) {
-    return { error: 'Marka adı, e-posta ve şifre zorunludur.' }
-  }
-
-  if (password.length < 6) {
-    return { error: 'Şifre en az 6 karakter olmalıdır.' }
-  }
+  if (!brandName) return { error: 'Marka adı zorunludur.' }
+  if (brandName.length > 255) return { error: 'Marka adı çok uzun.' }
+  const emailError = validateEmail(contactEmail)
+  if (emailError) return { error: emailError }
+  const passwordError = validatePassword(password)
+  if (passwordError) return { error: passwordError }
 
   const agencyOwner = await getAgencyOwner()
 
@@ -38,10 +44,8 @@ export async function createCustomerAction(
     return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
   }
 
-  const monthlyFee = monthlyFeeStr ? parseFloat(monthlyFeeStr) : 0
-  if (!Number.isFinite(monthlyFee) || monthlyFee < 0) {
-    return { error: 'Aylık ücret geçerli ve negatif olmayan bir sayı olmalıdır.' }
-  }
+  const monthlyFee = parseNonNegativeNumber(monthlyFeeStr, 'Aylık ücret')
+  if (typeof monthlyFee === 'string') return { error: monthlyFee }
 
   let serviceClient
   try {
@@ -106,19 +110,17 @@ export async function createEmployeeAction(
   prevState: { success?: boolean; error?: string } | null,
   formData: FormData
 ) {
-  const firstName = (formData.get('first_name') as string)?.trim()
-  const lastName = (formData.get('last_name') as string)?.trim()
-  const email = (formData.get('email') as string)?.trim()
-  const password = formData.get('password') as string
-  const salaryStr = (formData.get('salary') as string)?.trim()
+  const firstName = getFormString(formData, 'first_name')
+  const lastName = getFormString(formData, 'last_name')
+  const email = getFormString(formData, 'email')
+  const password = getFormString(formData, 'password')
+  const salaryStr = getFormString(formData, 'salary')
 
-  if (!firstName || !lastName || !email || !password) {
-    return { error: 'Ad, soyad, e-posta ve şifre zorunludur.' }
-  }
-
-  if (password.length < 6) {
-    return { error: 'Şifre en az 6 karakter olmalıdır.' }
-  }
+  if (!firstName || !lastName) return { error: 'Ad ve soyad zorunludur.' }
+  const emailError = validateEmail(email)
+  if (emailError) return { error: emailError }
+  const passwordError = validatePassword(password)
+  if (passwordError) return { error: passwordError }
 
   const agencyOwner = await getAgencyOwner()
 
@@ -126,10 +128,8 @@ export async function createEmployeeAction(
     return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
   }
 
-  const salary = salaryStr ? parseFloat(salaryStr) : 0
-  if (!Number.isFinite(salary) || salary < 0) {
-    return { error: 'Maaş geçerli ve negatif olmayan bir sayı olmalıdır.' }
-  }
+  const salary = parseNonNegativeNumber(salaryStr, 'Maaş')
+  if (typeof salary === 'string') return { error: salary }
 
   let serviceClient
   try {
@@ -178,12 +178,12 @@ export async function createTaskAction(
   prevState: { success?: boolean; error?: string } | null,
   formData: FormData
 ) {
-  const brandId = (formData.get('brand_id') as string)?.trim()
-  const assigneeId = (formData.get('assignee_id') as string)?.trim() || null
-  const platform = (formData.get('platform') as string)?.trim()
-  const content = (formData.get('content') as string)?.trim()
-  const dueDateStr = (formData.get('due_date') as string)?.trim()
-  const note = (formData.get('note') as string)?.trim()
+  const brandId = getFormString(formData, 'brand_id')
+  const assigneeId = getFormString(formData, 'assignee_id') || null
+  const platform = getFormString(formData, 'platform')
+  const content = getFormString(formData, 'content')
+  const dueDateStr = getFormString(formData, 'due_date')
+  const note = getFormString(formData, 'note')
 
   if (!brandId || !platform || !content || !dueDateStr) {
     return { error: 'Marka, platform, içerik türü ve teslim tarihi zorunludur.' }
@@ -192,6 +192,8 @@ export async function createTaskAction(
   if (!isPlatform(platform) || !isContentType(content)) {
     return { error: 'Geçersiz platform veya içerik türü seçildi.' }
   }
+  const dateError = validateDate(dueDateStr)
+  if (dateError) return { error: dateError }
 
   const agencyOwner = await getAgencyOwner()
 
@@ -200,9 +202,6 @@ export async function createTaskAction(
   }
 
   const dueDate = new Date(`${dueDateStr}T00:00:00.000Z`)
-  if (Number.isNaN(dueDate.getTime())) {
-    return { error: 'Geçerli bir teslim tarihi seçilmelidir.' }
-  }
 
   const brand = await prisma.brands.findFirst({
     where: { id: brandId, agency_id: agencyOwner.agencyId },

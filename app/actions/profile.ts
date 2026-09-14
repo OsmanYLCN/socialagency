@@ -3,6 +3,14 @@
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getServiceClient } from '@/lib/supabase/server'
+import { requireAuthenticatedUser } from '@/lib/auth'
+import {
+  getFormString,
+  normalizeTurkishPhone,
+  validateEmail,
+  validatePassword,
+  validateTurkishPhone,
+} from '@/lib/validation'
 
 export interface ProfileDetails {
   id: string
@@ -132,66 +140,23 @@ export async function updateProfileDetailsAction(
   prevState: { success?: boolean; error?: string; message?: string; fullName?: string; avatarUrl?: string } | null,
   formData: FormData
 ) {
+  const user = await requireAuthenticatedUser()
   const cookieStore = await cookies()
-  let userId = cookieStore.get('user-id')?.value
-  const token = cookieStore.get('sb-access-token')?.value
-  const agencyId = cookieStore.get('agency-id')?.value
-
+  const userId = user.id
   const serviceClient = getServiceClient()
-
-  if (!userId && token) {
-    try {
-      const { data } = await serviceClient.auth.getUser(token)
-      if (data?.user) {
-        userId = data.user.id
-      }
-    } catch {
-    }
-  }
-
-  if (!userId && agencyId) {
-    try {
-      const p = await prisma.profiles.findFirst({
-        where: { agency_id: agencyId },
-        select: { id: true },
-      })
-      if (p?.id) userId = p.id
-    } catch {
-    }
-  }
-
-  if (!userId) {
-    return { error: 'Oturum bulunamadı. Lütfen tekrar giriş yapın.' }
-  }
-
-  const firstName = (formData.get('first_name') as string)?.trim() ?? ''
-  const lastName = (formData.get('last_name') as string)?.trim() ?? ''
-  let phone = (formData.get('phone') as string)?.trim() ?? ''
-  const email = (formData.get('email') as string)?.trim() ?? ''
+  const firstName = getFormString(formData, 'first_name')
+  const lastName = getFormString(formData, 'last_name')
+  const phone = normalizeTurkishPhone(getFormString(formData, 'phone'))
+  const email = getFormString(formData, 'email')
   const removeAvatar = formData.get('removeAvatar') === 'true'
   const avatarFile = formData.get('avatar') as File | null
 
-  if (phone) {
-    phone = phone.replace(/\D/g, '')
-    if (phone.startsWith('90') && phone.length > 10) {
-      phone = phone.slice(2)
-    }
-    while (phone.startsWith('0')) {
-      phone = phone.slice(1)
-    }
-    phone = phone.slice(0, 10)
-
-    if (phone.length !== 10) {
-      return { error: 'Telefon numarası başında 0 olmadan 10 haneli olmalıdır.' }
-    }
-    if (!phone.startsWith('5')) {
-      return { error: 'Telefon numarası 5 ile başlamalıdır.' }
-    }
-  }
-
-  if (!firstName) {
-    return { error: 'Ad alanı zorunludur.' }
-  }
+  if (!firstName) return { error: 'Ad alanı zorunludur.' }
+  if (firstName.length > 100 || lastName.length > 100) return { error: 'Ad veya soyad çok uzun.' }
+  const emailError = validateEmail(email)
+  if (emailError) return { error: emailError }
+  const phoneError = validateTurkishPhone(phone)
+  if (phoneError) return { error: phoneError }
 
   const fullName = [firstName, lastName].filter(Boolean).join(' ')
 
@@ -243,10 +208,14 @@ export async function updateProfileDetailsAction(
       profileUpdateData.avatar_url = newAvatarUrl || null
     }
 
-    await serviceClient
+    const { error: profileError } = await serviceClient
       .from('profiles')
       .update(profileUpdateData)
       .eq('id', userId)
+
+    if (profileError) {
+      return { error: `Profil güncellenemedi: ${profileError.message}` }
+    }
 
     const userMetadata: Record<string, unknown> = {
       first_name: firstName,
@@ -326,44 +295,13 @@ export async function changePasswordAction(
   prevState: { success?: boolean; error?: string; message?: string } | null,
   formData: FormData
 ) {
-  const cookieStore = await cookies()
-  let userId = cookieStore.get('user-id')?.value
-  const token = cookieStore.get('sb-access-token')?.value
-  const agencyId = cookieStore.get('agency-id')?.value
-
+  const user = await requireAuthenticatedUser()
+  const userId = user.id
   const serviceClient = getServiceClient()
-
-  if (!userId && token) {
-    try {
-      const { data } = await serviceClient.auth.getUser(token)
-      if (data?.user) {
-        userId = data.user.id
-      }
-    } catch {
-    }
-  }
-
-  if (!userId && agencyId) {
-    try {
-      const p = await prisma.profiles.findFirst({
-        where: { agency_id: agencyId },
-        select: { id: true },
-      })
-      if (p?.id) userId = p.id
-    } catch {
-    }
-  }
-
-  if (!userId) {
-    return { error: 'Oturum bulunamadı. Lütfen tekrar giriş yapın.' }
-  }
-
-  const newPassword = (formData.get('new_password') as string) ?? ''
-  const confirmPassword = (formData.get('confirm_password') as string) ?? ''
-
-  if (!newPassword || newPassword.length < 6) {
-    return { error: 'Yeni şifre en az 6 karakter olmalıdır.' }
-  }
+  const newPassword = getFormString(formData, 'new_password')
+  const confirmPassword = getFormString(formData, 'confirm_password')
+  const passwordError = validatePassword(newPassword, 'Yeni şifre')
+  if (passwordError) return { error: passwordError }
 
   if (newPassword !== confirmPassword) {
     return { error: 'Girdiğiniz yeni şifreler eşleşmiyor.' }

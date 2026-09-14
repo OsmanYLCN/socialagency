@@ -21,6 +21,13 @@ export function proxy(request: NextRequest) {
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
 
   if (isProtected && !token) {
+    const refreshToken = request.cookies.get('sb-refresh-token')?.value
+    if (refreshToken) {
+      const refreshUrl = new URL('/auth/refresh', request.url)
+      refreshUrl.searchParams.set('next', pathname)
+      return NextResponse.redirect(refreshUrl)
+    }
+
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('from', pathname)
     return NextResponse.redirect(loginUrl)

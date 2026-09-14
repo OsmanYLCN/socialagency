@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { getServiceClient, getAnonClient } from '@/lib/supabase/server'
+import { getFormString, validateEmail, validatePassword } from '@/lib/validation'
 
 const ROLE_REDIRECT: Record<string, string> = {
   super_admin: '/admin',
@@ -28,12 +29,13 @@ export async function loginAction(
   prevState: { error: string } | null,
   formData: FormData
 ) {
-  const email = (formData.get('email') as string)?.trim()
-  const password = formData.get('password') as string
+  const email = getFormString(formData, 'email')
+  const password = getFormString(formData, 'password')
 
-  if (!email || !password) {
-    return { error: 'E-posta ve şifre zorunludur.' }
-  }
+  const emailError = validateEmail(email)
+  if (emailError) return { error: emailError }
+  const passwordError = validatePassword(password)
+  if (passwordError) return { error: passwordError }
 
   let supabase
   try {
@@ -114,18 +116,20 @@ export async function registerAction(
   prevState: { error: string } | null,
   formData: FormData
 ) {
-  const agencyName = (formData.get('agency_name') as string)?.trim()
-  const fullName = (formData.get('full_name') as string)?.trim()
-  const email = (formData.get('email') as string)?.trim()
-  const password = formData.get('password') as string
+  const agencyName = getFormString(formData, 'agency_name')
+  const fullName = getFormString(formData, 'full_name')
+  const email = getFormString(formData, 'email')
+  const password = getFormString(formData, 'password')
 
-  if (!agencyName || !fullName || !email || !password) {
-    return { error: 'Tüm alanlar zorunludur.' }
+  if (!agencyName || !fullName) return { error: 'Ajans adı ve ad soyad zorunludur.' }
+  if (agencyName.length > 255 || fullName.length > 200) {
+    return { error: 'Ajans adı veya ad soyad çok uzun.' }
   }
 
-  if (password.length < 6) {
-    return { error: 'Şifre en az 6 karakter olmalıdır.' }
-  }
+  const emailError = validateEmail(email)
+  if (emailError) return { error: emailError }
+  const passwordError = validatePassword(password)
+  if (passwordError) return { error: passwordError }
 
   const nameParts = fullName.split(' ')
   const firstName = nameParts[0] ?? fullName
@@ -215,13 +219,16 @@ export async function registerAction(
 
 // Oturumu kapatır ve girişe yönlendirir
 export async function logoutAction() {
-  try {
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('sb-access-token')?.value
+  const refreshToken = cookieStore.get('sb-refresh-token')?.value
+
+  if (accessToken && refreshToken) {
     const anonClient = getAnonClient()
+    await anonClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
     await anonClient.auth.signOut()
-  } catch {
   }
 
-  const cookieStore = await cookies()
   cookieStore.delete('sb-access-token')
   cookieStore.delete('sb-refresh-token')
   cookieStore.delete('user-role')
