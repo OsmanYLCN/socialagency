@@ -1,7 +1,7 @@
-﻿'use client'
+'use client'
 
 import { useActionState, useState, useCallback } from 'react'
-import { Building2, Mail, Lock, DollarSign, User, Eye, EyeOff, RefreshCw, Check, Loader2, X, AlertCircle } from 'lucide-react'
+import { Building2, Mail, Lock, DollarSign, Eye, EyeOff, RefreshCw, Check, Loader2, X, AlertCircle } from 'lucide-react'
 import { createCustomerAction } from '@/app/actions/agency'
 
 interface CreateCustomerModalProps {

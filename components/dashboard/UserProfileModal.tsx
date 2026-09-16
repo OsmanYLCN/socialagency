@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useActionState, useEffect, useRef } from 'react'
-import Image, { type ImageLoaderProps } from 'next/image'
+import Image from 'next/image'
 import {
   X,
   User,
@@ -23,6 +23,8 @@ import {
   changePasswordAction,
   getProfileDetailsAction,
 } from '@/app/actions/profile'
+import { normalizeTurkishPhone } from '@/lib/validation'
+import { getInitials, avatarLoader } from '@/lib/utils'
 import { ImageCropperModal } from './ImageCropperModal'
 
 interface UserProfileModalProps {
@@ -37,31 +39,6 @@ interface UserProfileModalProps {
     avatarUrl?: string
   }
   onProfileUpdated?: (name: string, email: string, phone: string, avatarUrl?: string) => void
-}
-
-// İsimden baş harfleri oluşturur
-function getInitials(name: string): string {
-  const parts = name.trim().split(' ').filter(Boolean)
-  if (parts.length === 0) return 'KL'
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-}
-
-// Telefon numarasını standart biçime dönüştürür
-function sanitizeTurkishPhone(raw: string): string {
-  let val = raw.replace(/\D/g, '')
-  if (val.startsWith('90') && val.length > 10) {
-    val = val.slice(2)
-  }
-
-  while (val.startsWith('0')) {
-    val = val.slice(1)
-  }
-  return val.slice(0, 10)
-}
-
-function avatarLoader({ src }: ImageLoaderProps): string {
-  return src
 }
 
 export function UserProfileModal({
@@ -90,11 +67,11 @@ export function UserProfileModal({
   const [email, setEmail] = useState(initialData.email || '')
   const [isEditingEmail, setIsEditingEmail] = useState(false)
 
-  const [phone, setPhone] = useState(sanitizeTurkishPhone(initialData.phone || ''))
+  const [phone, setPhone] = useState(normalizeTurkishPhone(initialData.phone || ''))
   const [isEditingPhone, setIsEditingPhone] = useState(false)
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPhone(sanitizeTurkishPhone(e.target.value))
+    setPhone(normalizeTurkishPhone(e.target.value))
   }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,7 +152,7 @@ export function UserProfileModal({
     if (isOpen && (!initialData.email || !initialData.phone || !initialData.avatarUrl)) {
       getProfileDetailsAction().then((profile) => {
         if (profile?.email && !initialData.email) setEmail(profile.email)
-        if (profile?.phone && !initialData.phone) setPhone(sanitizeTurkishPhone(profile.phone))
+        if (profile?.phone && !initialData.phone) setPhone(normalizeTurkishPhone(profile.phone))
         if (profile?.firstName && !firstName) setFirstName(profile.firstName)
         if (profile?.lastName && !lastName) setLastName(profile.lastName)
         if (profile?.avatarUrl && !initialData.avatarUrl) {

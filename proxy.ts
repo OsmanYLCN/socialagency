@@ -1,15 +1,9 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { ROLE_REDIRECT } from '@/lib/constants'
 
 const PROTECTED_PREFIXES = ['/admin', '/agency', '/employee', '/customer']
 const AUTH_ROUTES = ['/login', '/register']
-
-const ROLE_REDIRECT: Record<string, string> = {
-  super_admin: '/admin',
-  agency_owner: '/agency',
-  employee: '/employee',
-  customer: '/customer',
-}
 
 // Rotaları ve oturumları korur
 export function proxy(request: NextRequest) {

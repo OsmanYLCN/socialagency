@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Bell, ChevronDown, LogOut, Search, Settings, User, KeyRound } from 'lucide-react'
-import Image, { type ImageLoaderProps } from 'next/image'
+import Image from 'next/image'
 import Link from 'next/link'
 import { logoutAction } from '@/app/actions/auth'
 import { getProfileDetailsAction } from '@/app/actions/profile'
+import { ROLE_SETTINGS } from '@/lib/constants'
+import { getInitials, avatarLoader } from '@/lib/utils'
 import { UserProfileModal } from './UserProfileModal'
 
 const ROLE_BADGE: Record<string, { label: string; textColor: string; colors: string }> = {
@@ -31,24 +33,12 @@ const ROLE_BADGE: Record<string, { label: string; textColor: string; colors: str
   },
 }
 
-// İsimden baş harfleri oluşturur
-function getInitials(name: string): string {
-  const parts = name.trim().split(' ').filter(Boolean)
-  if (parts.length === 0) return 'KL'
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-}
-
 interface TopbarProps {
   userName: string
   role: string
   initialEmail?: string
   initialPhone?: string
   initialAvatar?: string
-}
-
-function avatarLoader({ src }: ImageLoaderProps): string {
-  return src
 }
 
 // Dashboard üst çubuğunu ve kullanıcı menüsünü gösterir
@@ -136,7 +126,7 @@ export function Topbar({
           </button>
 
           <Link
-            href="/agency/settings"
+            href={ROLE_SETTINGS[role] ?? '/agency/settings'}
             aria-label="Ayarlar"
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-800"
           >

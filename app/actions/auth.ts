@@ -4,13 +4,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { getServiceClient, getAnonClient } from '@/lib/supabase/server'
 import { getFormString, validateEmail, validatePassword } from '@/lib/validation'
-
-const ROLE_REDIRECT: Record<string, string> = {
-  super_admin: '/admin',
-  agency_owner: '/agency',
-  employee: '/employee',
-  customer: '/customer',
-}
+import { ROLE_REDIRECT } from '@/lib/constants'
 
 // Oturum çerezi seçeneklerini hazırlar
 function getCookieOptions(maxAgeDays: number) {

@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getServiceClient } from '@/lib/supabase/server'
+import { ROLE_REDIRECT } from '@/lib/constants'
 
 export interface AuthenticatedUser {
   id: string
@@ -15,13 +16,6 @@ export interface AuthenticatedUser {
 export type AgencyOwner = AuthenticatedUser & {
   role: 'agency_owner'
   agencyId: string
-}
-
-const ROLE_REDIRECT: Record<string, string> = {
-  super_admin: '/admin',
-  agency_owner: '/agency',
-  employee: '/employee',
-  customer: '/customer',
 }
 
 // Access token ve profil kaydını birlikte doğrular.
@@ -95,10 +89,12 @@ export async function requireRole(role: string): Promise<AuthenticatedUser> {
 }
 
 export async function getAgencyOwner(): Promise<AgencyOwner | null> {
+  const cookieStore = await cookies()
+  const refreshToken = cookieStore.get('sb-refresh-token')?.value
   const user = await getAuthenticatedUser()
 
   if (!user || user.role !== 'agency_owner' || !user.agencyId) {
-    if (!user && (await cookies()).get('sb-refresh-token')?.value) {
+    if (!user && refreshToken) {
       redirect('/auth/refresh?next=/agency')
     }
     return null

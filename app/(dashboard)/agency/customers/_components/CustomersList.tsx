@@ -1,7 +1,7 @@
-﻿'use client'
+'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, ArrowUpDown, Building, Mail, CheckSquare, Copy, Check, MoreHorizontal, Pencil, Trash2, Building2 } from 'lucide-react'
+import { Search, ArrowUpDown, Mail, CheckSquare, Copy, Check, MoreHorizontal, Pencil, Trash2, Building2 } from 'lucide-react'
 import type { BrandItem } from './CustomersClientView'
 
 type SortKey = 'newest' | 'oldest' | 'fee_high' | 'fee_low' | 'alpha'

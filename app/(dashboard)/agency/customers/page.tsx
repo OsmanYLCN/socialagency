@@ -1,6 +1,5 @@
-﻿import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { requireAgencyOwner } from '@/lib/auth'
-import { CustomersMetricsRow } from './_components/CustomersMetricsRow'
 import { CustomersClientView } from './_components/CustomersClientView'
 
 // Ajans musteri ve marka yonetim sayfasi
