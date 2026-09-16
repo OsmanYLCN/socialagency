@@ -249,3 +249,135 @@ export async function createTaskAction(
     return { error: msg }
   }
 }
+
+// Müşteri markasının adını ve aylık ücretini günceller
+export async function updateCustomerAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const brandId = getFormString(formData, 'brand_id')
+  const brandName = getFormString(formData, 'brand_name')
+  const monthlyFeeStr = getFormString(formData, 'monthly_fee')
+
+  if (!brandId) return { error: 'Marka kimliği gereklidir.' }
+  if (!brandName) return { error: 'Marka adı zorunludur.' }
+  if (brandName.length > 255) return { error: 'Marka adı çok uzun.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const monthlyFee = parseNonNegativeNumber(monthlyFeeStr, 'Aylık ücret')
+  if (typeof monthlyFee === 'string') return { error: monthlyFee }
+
+  const existing = await prisma.brands.findFirst({
+    where: { id: brandId, agency_id: agencyOwner.agencyId },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Marka bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  try {
+    await prisma.brands.update({
+      where: { id: brandId },
+      data: { name: brandName, monthly_fee: monthlyFee },
+    })
+
+    revalidatePath('/agency/customers')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Marka güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Müşteri hesabını ve markasını kalıcı olarak siler
+export async function deleteCustomerAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const brandId = getFormString(formData, 'brand_id')
+  const authUserId = getFormString(formData, 'auth_user_id')
+
+  if (!brandId) return { error: 'Marka kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existing = await prisma.brands.findFirst({
+    where: { id: brandId, agency_id: agencyOwner.agencyId },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Marka bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  let serviceClient
+  try {
+    serviceClient = getServiceClient()
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Supabase bağlantı hatası.'
+    return { error: msg }
+  }
+
+  try {
+    if (authUserId) {
+      await serviceClient.auth.admin.deleteUser(authUserId)
+    }
+
+    await prisma.brands.delete({ where: { id: brandId } })
+
+    revalidatePath('/agency/customers')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Müşteri silinirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Müşteri profilinin aktiflik durumunu değiştirir
+export async function toggleCustomerStatusAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const profileId = getFormString(formData, 'profile_id')
+  const isActive = getFormString(formData, 'is_active') === 'true'
+
+  if (!profileId) return { error: 'Profil kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const profile = await prisma.profiles.findFirst({
+    where: { id: profileId, agency_id: agencyOwner.agencyId, role: 'customer' },
+    select: { id: true },
+  })
+
+  if (!profile) {
+    return { error: 'Müşteri profili bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  try {
+    await prisma.profiles.update({
+      where: { id: profileId },
+      data: { is_active: isActive },
+    })
+
+    revalidatePath('/agency/customers')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Durum güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
