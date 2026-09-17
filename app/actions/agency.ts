@@ -101,6 +101,7 @@ export async function createCustomerAction(
     return { error: `Müşteri profili oluşturulamadı: ${profileError.message}` }
   }
 
+  revalidatePath('/agency/customers')
   revalidatePath('/agency')
   return { success: true }
 }
