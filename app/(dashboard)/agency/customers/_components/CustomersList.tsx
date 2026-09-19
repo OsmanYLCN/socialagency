@@ -65,7 +65,7 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
   const [menuOpen, setMenuOpen] = useState(false)
   const monogram = getMonogram(brand.name)
   const colorClass = getBrandColor(brand.name)
-  const customerName = [brand.customer?.firstName, brand.customer?.lastName].filter(Boolean).join(' ') || 'Yetkili Atanmadi'
+  const customerName = [brand.customer?.firstName, brand.customer?.lastName].filter(Boolean).join(' ') || 'Yetkili Atanmadı'
 
   return (
     <div className="group relative flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:border-indigo-200 hover:shadow-sm">
@@ -100,7 +100,7 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
                   className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 cursor-pointer"
                 >
                   <Pencil className="h-3.5 w-3.5 text-slate-400" />
-                  Duzenle
+                  Düzenle
                 </button>
                 <button
                   type="button"
@@ -137,7 +137,7 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
           <div className="flex items-center gap-1 text-xs">
             <Check className="h-3.5 w-3.5 text-emerald-400" />
             <span className="font-semibold text-emerald-600">{brand.completedTaskCount}</span>
-            <span className="text-slate-400">tamamlandi</span>
+            <span className="text-slate-400">tamamlandı</span>
           </div>
         </div>
 
@@ -162,8 +162,8 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'newest', label: 'En Yeni' },
   { value: 'oldest', label: 'En Eski' },
-  { value: 'fee_high', label: 'Yuksek Butce' },
-  { value: 'fee_low', label: 'Dusuk Butce' },
+  { value: 'fee_high', label: 'Yüksek Bütçe' },
+  { value: 'fee_low', label: 'Düşük Bütçe' },
   { value: 'alpha', label: 'A-Z' },
 ]
 
@@ -208,7 +208,7 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Marka adi, yetkili veya e-posta ile ara..."
+            placeholder="Marka adı, yetkili veya e-posta ile ara..."
             className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
           />
         </div>
@@ -229,7 +229,7 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
       {/* Sonuc sayisi */}
       {query && (
         <p className="text-xs text-slate-400">
-          <span className="font-semibold text-slate-700">{filtered.length}</span> sonuc bulundu
+          <span className="font-semibold text-slate-700">{filtered.length}</span> sonuç bulundu
         </p>
       )}
 
@@ -241,23 +241,23 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
           </div>
           {query ? (
             <>
-              <p className="text-sm font-bold text-slate-800">Eslesme bulunamadi</p>
+              <p className="text-sm font-bold text-slate-800">Eşleşme bulunamadı</p>
               <p className="mt-1 max-w-xs text-xs text-slate-400">
-                "<span className="font-medium text-slate-600">{query}</span>" icin sonuc yok. Farklı bir arama deneyin.
+                &quot;<span className="font-medium text-slate-600">{query}</span>&quot; için sonuç bulunamadı. Farklı bir arama deneyin.
               </p>
             </>
           ) : (
             <>
-              <p className="text-sm font-bold text-slate-800">Henuz Musteri Eklenmemis</p>
+              <p className="text-sm font-bold text-slate-800">Henüz Müşteri Eklenmemiş</p>
               <p className="mt-1 max-w-xs text-xs text-slate-400">
-                Yukarıdaki butonu kullanarak ilk musteri ve markayı ekleyebilirsiniz.
+                Yukarıdaki butonu kullanarak ilk müşteri ve markayı ekleyebilirsiniz.
               </p>
               <button
                 type="button"
                 onClick={onAdd}
                 className="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700 cursor-pointer"
               >
-                Ilk Musteriyi Ekle
+                İlk Müşteriyi Ekle
               </button>
             </>
           )}

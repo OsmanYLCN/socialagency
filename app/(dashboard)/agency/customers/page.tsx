@@ -11,7 +11,7 @@ export default async function CustomersPage() {
     where: { id: agencyId },
     select: { name: true },
   })
-  const agencyName = agency?.name ?? 'Ajansim'
+  const agencyName = agency?.name ?? 'Ajansım'
 
   const brands = await prisma.brands.findMany({
     where: { agency_id: agencyId },

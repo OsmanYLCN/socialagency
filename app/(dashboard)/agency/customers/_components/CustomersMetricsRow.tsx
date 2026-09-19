@@ -1,4 +1,4 @@
-﻿import { Building2, TrendingUp, CheckSquare, DollarSign } from 'lucide-react'
+import { Building2, TrendingUp, CheckSquare, DollarSign } from 'lucide-react'
 
 export interface CustomerMetrics {
   totalBrands: number
@@ -40,9 +40,9 @@ export function CustomersMetricsRow({
       isText: true,
     },
     {
-      label: 'Aktif Gorevler',
+      label: 'Aktif Görevler',
       value: activeTasksCount,
-      sub: 'Uretim / Onay bekleyen',
+      sub: 'Üretim / Onay bekleyen',
       icon: CheckSquare,
       iconBg: 'bg-amber-50 text-amber-600 border-amber-100',
     },

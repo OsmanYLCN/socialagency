@@ -1,7 +1,7 @@
-﻿// Musteriler sayfasi yuklenirken gosterilen iskelet animasyon
+// Musteriler sayfasi yuklenirken gosterilen iskelet animasyon
 export default function CustomersLoading() {
   return (
-    <div className="mx-auto max-w-7xl space-y-6 pb-12" aria-busy="true" aria-label="Musteriler yukleniyor">
+    <div className="mx-auto max-w-7xl space-y-6 pb-12" aria-busy="true" aria-label="Müşteriler yükleniyor">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="space-y-2">
           <div className="h-7 w-56 animate-pulse rounded-lg bg-slate-200" />

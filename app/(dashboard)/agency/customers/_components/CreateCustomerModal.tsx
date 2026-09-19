@@ -75,8 +75,8 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
               <Building2 className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Yeni Musteri Ekle</h3>
-              <p className="text-xs text-slate-500">Marka olusturun ve giris hesabi tanimlayin</p>
+              <h3 className="text-base font-bold text-slate-900">Yeni Müşteri Ekle</h3>
+              <p className="text-xs text-slate-500">Marka oluşturun ve giriş hesabı tanımlayın</p>
             </div>
           </div>
           <button
@@ -100,7 +100,7 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
           {/* Marka Adi */}
           <div>
             <label htmlFor="cm-brand-name" className="mb-1.5 block text-xs font-semibold text-slate-700">
-              Marka Adi <span className="text-rose-500">*</span>
+              Marka Adı <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <Building2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -110,7 +110,7 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
                 type="text"
                 required
                 autoComplete="organization"
-                placeholder="Ornek: Nike Turkiye"
+                placeholder="Örnek: Nike Türkiye"
                 className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
               />
             </div>
@@ -119,7 +119,7 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
           {/* Aylık Ucret */}
           <div>
             <label htmlFor="cm-fee" className="mb-1.5 block text-xs font-semibold text-slate-700">
-              Aylik Hizmet Bedeli (₺)
+              Aylık Hizmet Bedeli (₺)
             </label>
             <div className="relative">
               <DollarSign className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -136,13 +136,13 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
           </div>
 
           <div className="border-t border-slate-100 pt-1">
-            <p className="mb-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Musteri Hesabi</p>
+            <p className="mb-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Müşteri Hesabı</p>
 
             {/* E-posta */}
             <div className="space-y-4">
               <div>
                 <label htmlFor="cm-email" className="mb-1.5 block text-xs font-semibold text-slate-700">
-                  Giris E-postasi <span className="text-rose-500">*</span>
+                  Giriş E-postası <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -161,7 +161,7 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
               {/* Sifre */}
               <div>
                 <label htmlFor="cm-password" className="mb-1.5 block text-xs font-semibold text-slate-700">
-                  Giris Sifresi <span className="text-rose-500">*</span>
+                  Giriş Şifresi <span className="text-rose-500">*</span>
                 </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
@@ -190,11 +190,11 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
                   <button
                     type="button"
                     onClick={handleGenerate}
-                    title="Guvenli sifre uret"
+                    title="Güvenli şifre üret"
                     className="flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer transition-colors"
                   >
                     <RefreshCw className="h-3.5 w-3.5" />
-                    Uret
+                    Üret
                   </button>
 
                   {/* Kopyala butonu */}
@@ -202,7 +202,7 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
                     <button
                       type="button"
                       onClick={handleCopy}
-                      title="Sifreyi kopyala"
+                      title="Şifreyi kopyala"
                       className={`flex h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold cursor-pointer transition-all ${
                         copied
                           ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
@@ -210,7 +210,7 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
                       }`}
                     >
                       {copied ? <Check className="h-3.5 w-3.5" /> : null}
-                      {copied ? 'Kopyalandi' : 'Kopyala'}
+                      {copied ? 'Kopyalandı' : 'Kopyala'}
                     </button>
                   )}
                 </div>
@@ -225,7 +225,7 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
               onClick={onClose}
               className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
             >
-              Iptal
+              İptal
             </button>
             <button
               type="submit"
@@ -235,12 +235,12 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
               {isPending ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  Olusturuluyor...
+                  Oluşturuluyor...
                 </>
               ) : (
                 <>
                   <Check className="h-3.5 w-3.5" />
-                  Musteri Ekle
+                  Müşteri Ekle
                 </>
               )}
             </button>
