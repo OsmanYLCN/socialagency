@@ -333,6 +333,12 @@ export async function deleteCustomerAction(
       await serviceClient.auth.admin.deleteUser(authUserId)
     }
 
+    // İlişkili profillerin brand_id bağlantısını çöz (foreign key kısıt ihlalini önler)
+    await prisma.profiles.updateMany({
+      where: { brand_id: brandId },
+      data: { brand_id: null },
+    })
+
     await prisma.brands.delete({ where: { id: brandId } })
 
     revalidatePath('/agency/customers')

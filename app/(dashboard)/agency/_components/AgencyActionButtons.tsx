@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useActionState } from 'react'
-import { CheckSquare, Megaphone, X, Loader2, Check } from 'lucide-react'
+import Link from 'next/link'
+import { CheckSquare, Building2, X, Loader2, Check } from 'lucide-react'
 import { createTaskAction } from '@/app/actions/agency'
 
 interface BrandOption {
@@ -21,13 +22,13 @@ interface ActionButtonsProps {
 
 // Ajans hızlı işlem butonlarını gösterir
 export function AgencyActionButtons({ brands = [], employees = [] }: ActionButtonsProps) {
-  const [activeModal, setActiveModal] = useState<'task' | 'announcement' | null>(null)
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
 
   const [taskState, taskActionRun, isTaskPending] = useActionState(
     async (prevState: { success?: boolean; error?: string } | null, formData: FormData) => {
       const result = await createTaskAction(prevState, formData)
       if (result.success) {
-        setActiveModal(null)
+        setIsTaskModalOpen(false)
       }
       return result
     },
@@ -39,7 +40,7 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <button
           type="button"
-          onClick={() => setActiveModal('task')}
+          onClick={() => setIsTaskModalOpen(true)}
           className="group flex items-center justify-center gap-3 rounded-2xl border-2 border-indigo-200/90 bg-white px-6 py-4 text-sm font-bold text-indigo-700 shadow-xs transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50/40 hover:shadow-sm active:scale-[0.99] cursor-pointer"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition-transform duration-200 group-hover:scale-110">
@@ -48,19 +49,18 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
           <span>Yeni Görev Ata</span>
         </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveModal('announcement')}
-          className="group flex items-center justify-center gap-3 rounded-2xl border-2 border-slate-200/90 bg-white px-6 py-4 text-sm font-bold text-slate-800 shadow-xs transition-all duration-200 hover:border-slate-400 hover:bg-slate-50/60 hover:shadow-sm active:scale-[0.99] cursor-pointer"
+        <Link
+          href="/agency/customers"
+          className="group flex items-center justify-center gap-3 rounded-2xl border-2 border-slate-200/90 bg-white px-6 py-4 text-sm font-bold text-slate-800 shadow-xs transition-all duration-200 hover:border-indigo-300 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.99]"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-transform duration-200 group-hover:scale-110">
-            <Megaphone className="h-4.5 w-4.5" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition-transform duration-200 group-hover:scale-110">
+            <Building2 className="h-4.5 w-4.5" />
           </div>
-          <span>Yeni İlan Oluştur</span>
-        </button>
+          <span>Müşteri ve Marka Yönetimi</span>
+        </Link>
       </div>
 
-      {activeModal === 'task' && (
+      {isTaskModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl animate-in zoom-in-95 duration-150">
             <div className="mb-5 flex items-center justify-between">
@@ -75,7 +75,7 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
               </div>
               <button
                 type="button"
-                onClick={() => setActiveModal(null)}
+                onClick={() => setIsTaskModalOpen(false)}
                 className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
               >
                 <X className="h-5 w-5" />
@@ -181,7 +181,7 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
               <div className="mt-6 flex items-center justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setActiveModal(null)}
+                  onClick={() => setIsTaskModalOpen(false)}
                   className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
                 >
                   İptal
@@ -196,77 +196,6 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {activeModal === 'announcement' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl animate-in zoom-in-95 duration-150">
-            <div className="mb-5 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                  <Megaphone className="h-4 w-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900">Yeni İlan Oluştur</h3>
-                  <p className="text-xs text-slate-500">Ajans içi duyuru veya açık iş pozisyonu yayınlayın</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveModal(null)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3.5">
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">İlan Başlığı</label>
-                <input
-                  type="text"
-                  placeholder="Örn: Senior Sosyal Medya Uzmanı Aranıyor"
-                  className="h-10 w-full rounded-xl border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">İlan Türü</label>
-                <select className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100">
-                  <option>Ekip İçi Duyuru</option>
-                  <option>İş İlanı (Kariyer)</option>
-                  <option>Müşteri Bilgilendirmesi</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">İçerik / Detaylar</label>
-                <textarea
-                  rows={3}
-                  placeholder="İlan metnini buraya yazın..."
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                />
-              </div>
-
-              <div className="mt-6 flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveModal(null)}
-                  className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
-                >
-                  Kapat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveModal(null)}
-                  className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800 cursor-pointer"
-                >
-                  Yayınla
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}

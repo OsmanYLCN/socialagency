@@ -142,123 +142,130 @@ export default async function AgencyPage() {
       ])
 
   if (agency?.name) {
-        agencyName = agency.name
-      }
+    agencyName = agency.name
+  }
 
-      activeBrandsCount = brands.length
-      employeeCount = employees.length
+  activeBrandsCount = brands.length
+  employeeCount = employees.length
 
-      const todayStr = new Date().toISOString().split('T')[0]
-      todayTasksCount = tasks.filter((t) => {
-        const dStr = t.due_date ? new Date(t.due_date).toISOString().split('T')[0] : ''
-        return dStr === todayStr
-      }).length
+  const now = new Date()
+  const todayYear = now.getFullYear()
+  const todayMonth = String(now.getMonth() + 1).padStart(2, '0')
+  const todayDay = String(now.getDate()).padStart(2, '0')
+  const todayStr = `${todayYear}-${todayMonth}-${todayDay}`
 
-      pendingApprovalCount = tasks.filter((t) => t.status === 'pending_approval').length
+  todayTasksCount = tasks.filter((t) => {
+    if (!t.due_date) return false
+    const d = new Date(t.due_date)
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}` === todayStr
+  }).length
 
-      brandsList = brands.map((b) => ({ id: b.id, name: b.name }))
-      employeesList = employees.map((e) => ({
-        id: e.id,
-        name: [e.first_name, e.last_name].filter(Boolean).join(' ') || 'İsimsiz Çalışan',
-      }))
+  pendingApprovalCount = tasks.filter((t) => t.status === 'pending_approval').length
 
-      totalTasksCount = tasks.length
-      completedTasksCount = tasks.filter((t) => t.status === 'completed').length
-      completionRate =
-        totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0
+  brandsList = brands.map((b) => ({ id: b.id, name: b.name }))
+  employeesList = employees.map((e) => ({
+    id: e.id,
+    name: [e.first_name, e.last_name].filter(Boolean).join(' ') || 'İsimsiz Çalışan',
+  }))
 
-      contentDistribution = {
-        reels: tasks.filter((t) => t.content === 'reels').length,
-        post: tasks.filter((t) => t.content === 'post').length,
-        story: tasks.filter((t) => t.content === 'story').length,
-        carousel: tasks.filter((t) => t.content === 'carousel').length,
-      }
+  totalTasksCount = tasks.length
+  completedTasksCount = tasks.filter((t) => t.status === 'completed').length
+  completionRate =
+    totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0
 
-      const last6 = getLast6Months()
-      monthlyGrowth = last6.map((m) => {
-        const countInMonth = brands.filter((b) => {
-          if (!b.created_at) return false
-          const d = new Date(b.created_at)
-          return d.getFullYear() === m.year && d.getMonth() === m.monthIndex
-        }).length
-        return { month: m.month, count: countInMonth }
-      })
+  contentDistribution = {
+    reels: tasks.filter((t) => t.content === 'reels').length,
+    post: tasks.filter((t) => t.content === 'post').length,
+    story: tasks.filter((t) => t.content === 'story').length,
+    carousel: tasks.filter((t) => t.content === 'carousel').length,
+  }
 
+  const last6 = getLast6Months()
+  monthlyGrowth = last6.map((m) => {
+    const countInMonth = brands.filter((b) => {
+      if (!b.created_at) return false
+      const d = new Date(b.created_at)
+      return d.getFullYear() === m.year && d.getMonth() === m.monthIndex
+    }).length
+    return { month: m.month, count: countInMonth }
+  })
 
+  brandOverviewItems = brands.map((b) => {
+    const customerProfile = b.profiles?.[0]
+    const manager = customerProfile
+      ? [customerProfile.first_name, customerProfile.last_name].filter(Boolean).join(' ')
+      : 'Atanmadı'
+    const activeTasks = b.tasks.filter((t) => t.status !== 'completed').length
+    return {
+      id: b.id,
+      name: b.name,
+      managerName: manager,
+      activeTasksCount: activeTasks,
+    }
+  })
 
-      brandOverviewItems = brands.map((b) => {
-        const customerProfile = b.profiles?.[0]
-        const manager = customerProfile
-          ? [customerProfile.first_name, customerProfile.last_name].filter(Boolean).join(' ')
-          : 'Atanmadı'
-        const activeTasks = b.tasks.filter((t) => t.status !== 'completed').length
-        return {
-          id: b.id,
-          name: b.name,
-          managerName: manager,
-          activeTasksCount: activeTasks,
-        }
-      })
+  const mapTaskItem = (t: (typeof tasks)[number]): PipelineTaskItem => ({
+    id: t.id,
+    platform: t.platform,
+    content: t.content,
+    title: `${t.brands?.name || 'Marka'} – ${t.content}`,
+  })
 
-      const mapTaskItem = (t: (typeof tasks)[number]): PipelineTaskItem => ({
-        id: t.id,
-        platform: t.platform,
-        content: t.content,
-        title: `${t.brands?.name || 'Marka'} – ${t.content}`,
-      })
+  pipeline = {
+    planned: tasks.filter((t) => t.status === 'unassigned').map(mapTaskItem),
+    inProgress: tasks.filter((t) => t.status === 'assigned').map(mapTaskItem),
+    shared: tasks.filter((t) => t.status === 'completed').map(mapTaskItem),
+    pendingApproval: tasks.filter((t) => t.status === 'pending_approval').map(mapTaskItem),
+  }
 
-      pipeline = {
-        planned: tasks.filter((t) => t.status === 'unassigned').map(mapTaskItem),
-        inProgress: tasks.filter((t) => t.status === 'assigned').map(mapTaskItem),
-        shared: tasks.filter((t) => t.status === 'completed').map(mapTaskItem),
-        pendingApproval: tasks.filter((t) => t.status === 'pending_approval').map(mapTaskItem),
-      }
-
-      tasks.forEach((t) => {
-        if (!t.due_date) return
-        const d = new Date(t.due_date)
-        const jsDay = d.getDay()
-        const dayKey = jsDay === 0 ? 7 : jsDay
-        if (weekSchedule[dayKey] && !weekSchedule[dayKey].includes(t.platform)) {
-          weekSchedule[dayKey].push(t.platform)
-        }
-      })
-      templates.forEach((tmpl) => {
-        const dayKey = tmpl.day_of_week
-        if (weekSchedule[dayKey] && !weekSchedule[dayKey].includes(tmpl.platform)) {
-          weekSchedule[dayKey].push(tmpl.platform)
-        }
-      })
+  tasks.forEach((t) => {
+    if (!t.due_date) return
+    const d = new Date(t.due_date)
+    const jsDay = d.getDay()
+    const dayKey = jsDay === 0 ? 7 : jsDay
+    if (weekSchedule[dayKey] && !weekSchedule[dayKey].includes(t.platform)) {
+      weekSchedule[dayKey].push(t.platform)
+    }
+  })
+  templates.forEach((tmpl) => {
+    const dayKey = tmpl.day_of_week
+    if (weekSchedule[dayKey] && !weekSchedule[dayKey].includes(tmpl.platform)) {
+      weekSchedule[dayKey].push(tmpl.platform)
+    }
+  })
 
   if (notifications && notifications.length > 0) {
-        recentActivities = notifications.map((n) => ({
-          id: n.id,
-          title: n.message,
-          subtitle: n.type,
-          timeAgo: n.created_at ? formatTimeAgo(new Date(n.created_at)) : 'Yakın zamanda',
-          type: getActivityType(n.type),
-        }))
-      } else {
-        const activityList: RecentActivityItem[] = []
-        tasks.slice(0, 3).forEach((t) => {
-          activityList.push({
-            id: t.id,
-            title: `Yeni görev: ${t.brands?.name || 'Marka'}`,
-            subtitle: `${t.platform} için ${t.content} oluşturuldu`,
-            timeAgo: t.created_at ? formatTimeAgo(new Date(t.created_at)) : 'Yeni',
-            type: 'task',
-          })
-        })
-        brands.slice(0, 2).forEach((b) => {
-          activityList.push({
-            id: b.id,
-            title: `Müşteri eklendi: ${b.name}`,
-            subtitle: 'Ajans portföyüne katıldı',
-            timeAgo: b.created_at ? formatTimeAgo(new Date(b.created_at)) : 'Yeni',
-            type: 'brand',
-          })
-        })
-        recentActivities = activityList
+    recentActivities = notifications.map((n) => ({
+      id: n.id,
+      title: n.message,
+      subtitle: n.type,
+      timeAgo: n.created_at ? formatTimeAgo(new Date(n.created_at)) : 'Yakın zamanda',
+      type: getActivityType(n.type),
+    }))
+  } else {
+    const activityList: RecentActivityItem[] = []
+    tasks.slice(0, 3).forEach((t) => {
+      activityList.push({
+        id: t.id,
+        title: `Yeni görev: ${t.brands?.name || 'Marka'}`,
+        subtitle: `${t.platform} için ${t.content} oluşturuldu`,
+        timeAgo: t.created_at ? formatTimeAgo(new Date(t.created_at)) : 'Yeni',
+        type: 'task',
+      })
+    })
+    brands.slice(0, 2).forEach((b) => {
+      activityList.push({
+        id: b.id,
+        title: `Müşteri eklendi: ${b.name}`,
+        subtitle: 'Ajans portföyüne katıldı',
+        timeAgo: b.created_at ? formatTimeAgo(new Date(b.created_at)) : 'Yeni',
+        type: 'brand',
+      })
+    })
+    recentActivities = activityList
   }
 
   const currentDateStr = getFormattedDate()

@@ -218,9 +218,13 @@ export async function logoutAction() {
   const refreshToken = cookieStore.get('sb-refresh-token')?.value
 
   if (accessToken && refreshToken) {
-    const anonClient = getAnonClient()
-    await anonClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-    await anonClient.auth.signOut()
+    try {
+      const anonClient = getAnonClient()
+      await anonClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+      await anonClient.auth.signOut()
+    } catch {
+      // Supabase bağlantısı veya süresi dolmuş token hataları yerel oturum kapatmayı engellememeli
+    }
   }
 
   cookieStore.delete('sb-access-token')

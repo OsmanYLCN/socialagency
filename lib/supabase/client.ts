@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-// İstemci Supabase bağlantısını oluşturur
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// İstemci tarafı Supabase bağlantısını güvenli şekilde sağlar
+export function createBrowserClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+  if (!url || !anonKey) {
+    throw new Error('Supabase URL veya Anon Key tanımlanmamış (.env kontrol edin).')
+  }
+
+  return createClient(url, anonKey)
+}
