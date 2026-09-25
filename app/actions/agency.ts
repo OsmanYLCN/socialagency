@@ -30,6 +30,7 @@ export async function createCustomerAction(
   const contactEmail = getFormString(formData, 'contact_email')
   const password = getFormString(formData, 'password')
   const monthlyFeeStr = getFormString(formData, 'monthly_fee')
+  const authorizedName = getFormString(formData, 'authorized_name')
 
   if (!brandName) return { error: 'Marka adı zorunludur.' }
   if (brandName.length > 255) return { error: 'Marka adı çok uzun.' }
@@ -47,6 +48,10 @@ export async function createCustomerAction(
   const monthlyFee = parseNonNegativeNumber(monthlyFeeStr, 'Aylık ücret')
   if (typeof monthlyFee === 'string') return { error: monthlyFee }
 
+  const nameParts = authorizedName.trim().split(/\s+/).filter(Boolean)
+  const firstName = nameParts[0] || brandName
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : authorizedName ? '' : '(Müşteri)'
+
   let serviceClient
   try {
     serviceClient = getServiceClient()
@@ -59,7 +64,7 @@ export async function createCustomerAction(
     email: contactEmail,
     password,
     email_confirm: true,
-    user_metadata: { brand_name: brandName, role: 'customer' },
+    user_metadata: { brand_name: brandName, role: 'customer', first_name: firstName, last_name: lastName },
   })
 
   if (authError || !authUser.user) {
@@ -90,8 +95,8 @@ export async function createCustomerAction(
     agency_id: agencyOwner.agencyId,
     brand_id: brand.id,
     role: 'customer',
-    first_name: brandName,
-    last_name: '(Müşteri)',
+    first_name: firstName,
+    last_name: lastName,
     is_active: true,
   })
 
@@ -259,6 +264,7 @@ export async function updateCustomerAction(
   const brandId = getFormString(formData, 'brand_id')
   const brandName = getFormString(formData, 'brand_name')
   const monthlyFeeStr = getFormString(formData, 'monthly_fee')
+  const authorizedName = getFormString(formData, 'authorized_name')
 
   if (!brandId) return { error: 'Marka kimliği gereklidir.' }
   if (!brandName) return { error: 'Marka adı zorunludur.' }
@@ -286,6 +292,32 @@ export async function updateCustomerAction(
       where: { id: brandId },
       data: { name: brandName, monthly_fee: monthlyFee },
     })
+
+    if (authorizedName !== undefined) {
+      const nameParts = authorizedName.trim().split(/\s+/).filter(Boolean)
+      const firstName = nameParts[0] || (authorizedName.trim() ? authorizedName.trim() : brandName)
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : (authorizedName.trim() ? '' : '(Müşteri)')
+
+      await prisma.profiles.updateMany({
+        where: { brand_id: brandId, role: 'customer' },
+        data: { first_name: firstName, last_name: lastName },
+      })
+
+      try {
+        const serviceClient = getServiceClient()
+        const customerProfile = await prisma.profiles.findFirst({
+          where: { brand_id: brandId, role: 'customer' },
+          select: { id: true },
+        })
+        if (customerProfile) {
+          await serviceClient.auth.admin.updateUserById(customerProfile.id, {
+            user_metadata: { first_name: firstName, last_name: lastName, brand_name: brandName },
+          })
+        }
+      } catch {
+        // Supabase kullanıcı güncellemesi başarısız olsa bile Prisma güncellemesi yeterlidir
+      }
+    }
 
     revalidatePath('/agency/customers')
     revalidatePath('/agency')

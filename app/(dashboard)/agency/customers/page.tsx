@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requireAgencyOwner } from '@/lib/auth'
 import { CustomersClientView } from './_components/CustomersClientView'
+
+export const metadata: Metadata = {
+  title: 'Müşteriler & Markalar – SMAUP',
+  description: 'Ajansınıza bağlı marka ve müşteri hesaplarını yönetin.',
+}
 
 // Ajans musteri ve marka yonetim sayfasi
 export default async function CustomersPage() {

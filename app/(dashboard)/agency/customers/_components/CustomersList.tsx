@@ -173,16 +173,16 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
   const [sort, setSort] = useState<SortKey>('newest')
 
   const filtered = useMemo(() => {
-    const q = query.toLowerCase().trim()
+    const q = query.toLocaleLowerCase('tr-TR').trim()
     const result = q
       ? brands.filter(
           (b) =>
-            b.name.toLowerCase().includes(q) ||
-            b.customer?.email?.toLowerCase().includes(q) ||
+            b.name.toLocaleLowerCase('tr-TR').includes(q) ||
+            b.customer?.email?.toLocaleLowerCase('tr-TR').includes(q) ||
             [b.customer?.firstName, b.customer?.lastName]
               .filter(Boolean)
               .join(' ')
-              .toLowerCase()
+              .toLocaleLowerCase('tr-TR')
               .includes(q)
         )
       : [...brands]

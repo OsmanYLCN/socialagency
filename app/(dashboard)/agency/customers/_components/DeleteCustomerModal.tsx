@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useActionState, useEffect, useState } from 'react'
 import { AlertTriangle, Trash2, Loader2, X, AlertCircle } from 'lucide-react'
@@ -44,7 +44,8 @@ export function DeleteCustomerModal({ isOpen, brand, onClose }: DeleteCustomerMo
 
   if (!isOpen || !brand) return null
 
-  const isMatched = confirmText.trim().toLowerCase() === brand.name.trim().toLowerCase()
+  const isMatched =
+    confirmText.trim().toLocaleLowerCase('tr-TR') === brand.name.trim().toLocaleLowerCase('tr-TR')
 
   return (
     <div

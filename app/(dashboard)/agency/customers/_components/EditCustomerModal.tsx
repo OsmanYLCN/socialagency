@@ -1,7 +1,7 @@
-﻿'use client'
+'use client'
 
 import { useActionState, useEffect, useState, useTransition } from 'react'
-import { Building2, DollarSign, Mail, Check, Loader2, X, AlertCircle, ShieldAlert, Power } from 'lucide-react'
+import { Building2, DollarSign, Mail, Check, Loader2, X, AlertCircle, ShieldAlert, Power, User } from 'lucide-react'
 import { updateCustomerAction, toggleCustomerStatusAction } from '@/app/actions/agency'
 import type { BrandItem } from './CustomersClientView'
 
@@ -15,6 +15,7 @@ interface EditCustomerModalProps {
 export function EditCustomerModal({ isOpen, brand, onClose }: EditCustomerModalProps) {
   const [name, setName] = useState('')
   const [fee, setFee] = useState('')
+  const [authorizedName, setAuthorizedName] = useState('')
   const [isToggling, startTransition] = useTransition()
   const [toggleError, setToggleError] = useState<string | null>(null)
 
@@ -22,6 +23,8 @@ export function EditCustomerModal({ isOpen, brand, onClose }: EditCustomerModalP
     if (brand) {
       setName(brand.name)
       setFee(brand.monthlyFee ? String(brand.monthlyFee) : '0')
+      const contactName = [brand.customer?.firstName, brand.customer?.lastName].filter(Boolean).join(' ')
+      setAuthorizedName(contactName)
       setToggleError(null)
     }
   }, [brand])
@@ -128,6 +131,25 @@ export function EditCustomerModal({ isOpen, brand, onClose }: EditCustomerModalP
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Marka adını girin"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+              />
+            </div>
+          </div>
+
+          {/* Yetkili Adı & Soyadı */}
+          <div>
+            <label htmlFor="edit-authorized-name" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              Yetkili Adı & Soyadı <span className="text-slate-400 font-normal">(İsteğe bağlı)</span>
+            </label>
+            <div className="relative">
+              <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                id="edit-authorized-name"
+                name="authorized_name"
+                type="text"
+                value={authorizedName}
+                onChange={(e) => setAuthorizedName(e.target.value)}
+                placeholder="Örnek: Mehmet Yılmaz"
                 className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
               />
             </div>

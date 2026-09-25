@@ -1,7 +1,7 @@
 'use client'
 
-import { useActionState, useState, useCallback } from 'react'
-import { Building2, Mail, Lock, DollarSign, Eye, EyeOff, RefreshCw, Check, Loader2, X, AlertCircle } from 'lucide-react'
+import { useActionState, useState, useCallback, useEffect } from 'react'
+import { Building2, Mail, Lock, DollarSign, Eye, EyeOff, RefreshCw, Check, Loader2, X, AlertCircle, User } from 'lucide-react'
 import { createCustomerAction } from '@/app/actions/agency'
 
 interface CreateCustomerModalProps {
@@ -45,6 +45,24 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
   const [showPassword, setShowPassword] = useState(false)
   const [password, setPassword] = useState('')
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown)
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
+  useEffect(() => {
+    if (isOpen) {
+      setPassword('')
+      setShowPassword(false)
+      setCopied(false)
+    }
+  }, [isOpen])
 
   const handleGenerate = useCallback(() => {
     const pw = generateSecurePassword()
@@ -111,6 +129,24 @@ export function CreateCustomerModal({ isOpen, onClose }: CreateCustomerModalProp
                 required
                 autoComplete="organization"
                 placeholder="Örnek: Nike Türkiye"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+              />
+            </div>
+          </div>
+
+          {/* Yetkili Adı & Soyadı */}
+          <div>
+            <label htmlFor="cm-authorized-name" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              Yetkili Adı & Soyadı <span className="text-slate-400 font-normal">(İsteğe bağlı)</span>
+            </label>
+            <div className="relative">
+              <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                id="cm-authorized-name"
+                name="authorized_name"
+                type="text"
+                autoComplete="name"
+                placeholder="Örnek: Mehmet Yılmaz"
                 className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
               />
             </div>
