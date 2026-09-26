@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Bell, ChevronDown, LogOut, Search, Settings, User, KeyRound } from 'lucide-react'
+import { Bell, ChevronDown, LogOut, Search, Settings, User } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { logoutAction } from '@/app/actions/auth'
@@ -94,12 +94,6 @@ export function Topbar({
   const handleOpenInfoModal = () => {
     setIsOpen(false)
     setModalTab('info')
-    setIsModalOpen(true)
-  }
-
-  const handleOpenPasswordModal = () => {
-    setIsOpen(false)
-    setModalTab('password')
     setIsModalOpen(true)
   }
 
@@ -208,15 +202,6 @@ export function Topbar({
                   >
                     <User className="h-4 w-4 text-slate-400" />
                     <span>Kişisel Bilgiler</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleOpenPasswordModal}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
-                  >
-                    <KeyRound className="h-4 w-4 text-slate-400" />
-                    <span>Şifreyi Değiştir</span>
                   </button>
                 </div>
 

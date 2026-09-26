@@ -31,6 +31,15 @@ export async function createCustomerAction(
   const password = getFormString(formData, 'password')
   const monthlyFeeStr = getFormString(formData, 'monthly_fee')
   const authorizedName = getFormString(formData, 'authorized_name')
+  const phone = getFormString(formData, 'phone')
+  const sector = getFormString(formData, 'sector')
+  const website = getFormString(formData, 'website')
+  const instagram = getFormString(formData, 'instagram')
+  const city = getFormString(formData, 'city')
+  const billingTitle = getFormString(formData, 'billing_title')
+  const taxId = getFormString(formData, 'tax_id')
+  const taxOffice = getFormString(formData, 'tax_office')
+  const notes = getFormString(formData, 'notes')
 
   if (!brandName) return { error: 'Marka adı zorunludur.' }
   if (brandName.length > 255) return { error: 'Marka adı çok uzun.' }
@@ -64,7 +73,21 @@ export async function createCustomerAction(
     email: contactEmail,
     password,
     email_confirm: true,
-    user_metadata: { brand_name: brandName, role: 'customer', first_name: firstName, last_name: lastName },
+    user_metadata: {
+      brand_name: brandName,
+      role: 'customer',
+      first_name: firstName,
+      last_name: lastName,
+      phone: phone || null,
+      sector: sector || null,
+      website: website || null,
+      instagram: instagram || null,
+      city: city || null,
+      billing_title: billingTitle || null,
+      tax_id: taxId || null,
+      tax_office: taxOffice || null,
+      notes: notes || null,
+    },
   })
 
   if (authError || !authUser.user) {
@@ -121,6 +144,15 @@ export async function createEmployeeAction(
   const email = getFormString(formData, 'email')
   const password = getFormString(formData, 'password')
   const salaryStr = getFormString(formData, 'salary')
+  const phone = getFormString(formData, 'phone')
+  const department = getFormString(formData, 'department')
+  const title = getFormString(formData, 'title')
+  const workType = getFormString(formData, 'work_type')
+  const startDate = getFormString(formData, 'start_date')
+  const city = getFormString(formData, 'city')
+  const iban = getFormString(formData, 'iban')
+  const emergencyContact = getFormString(formData, 'emergency_contact')
+  const notes = getFormString(formData, 'notes')
 
   if (!firstName || !lastName) return { error: 'Ad ve soyad zorunludur.' }
   const emailError = validateEmail(email)
@@ -149,7 +181,20 @@ export async function createEmployeeAction(
     email,
     password,
     email_confirm: true,
-    user_metadata: { first_name: firstName, last_name: lastName, role: 'employee' },
+    user_metadata: {
+      first_name: firstName,
+      last_name: lastName,
+      role: 'employee',
+      phone: phone || null,
+      department: department || null,
+      title: title || null,
+      work_type: workType || null,
+      start_date: startDate || null,
+      city: city || null,
+      iban: iban || null,
+      emergency_contact: emergencyContact || null,
+      notes: notes || null,
+    },
   })
 
   if (authError || !authUser.user) {
@@ -175,9 +220,11 @@ export async function createEmployeeAction(
     return { error: `Çalışan profili oluşturulamadı: ${profileError.message}` }
   }
 
+  revalidatePath('/agency/employees')
   revalidatePath('/agency')
   return { success: true }
 }
+
 
 // Ajans için yeni görev oluşturur
 export async function createTaskAction(
@@ -363,6 +410,7 @@ export async function deleteCustomerAction(
   try {
     if (authUserId) {
       await serviceClient.auth.admin.deleteUser(authUserId)
+      await prisma.profiles.deleteMany({ where: { id: authUserId } })
     }
 
     // İlişkili profillerin brand_id bağlantısını çöz (foreign key kısıt ihlalini önler)
@@ -417,6 +465,202 @@ export async function toggleCustomerStatusAction(
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Durum güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Çalışanın ad, soyad ve maaş bilgilerini günceller
+export async function updateEmployeeAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const employeeId = getFormString(formData, 'employee_id')
+  const firstName = getFormString(formData, 'first_name')
+  const lastName = getFormString(formData, 'last_name')
+  const salaryStr = getFormString(formData, 'salary')
+
+  if (!employeeId) return { error: 'Çalışan kimliği gereklidir.' }
+  if (!firstName || !lastName) return { error: 'Ad ve soyad zorunludur.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const salary = parseNonNegativeNumber(salaryStr, 'Maaş')
+  if (typeof salary === 'string') return { error: salary }
+
+  const existing = await prisma.profiles.findFirst({
+    where: { id: employeeId, agency_id: agencyOwner.agencyId, role: 'employee' },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Çalışan bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  try {
+    await prisma.profiles.update({
+      where: { id: employeeId },
+      data: { first_name: firstName, last_name: lastName, salary },
+    })
+
+    try {
+      const serviceClient = getServiceClient()
+      await serviceClient.auth.admin.updateUserById(employeeId, {
+        user_metadata: { first_name: firstName, last_name: lastName },
+      })
+    } catch {
+      // Supabase metadata güncelleme başarısız olsa bile Prisma güncellemesi yeterlidir
+    }
+
+    revalidatePath('/agency/employees')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Çalışan güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Çalışanın aktiflik durumunu değiştirir
+export async function toggleEmployeeStatusAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const employeeId = getFormString(formData, 'employee_id')
+  const isActive = getFormString(formData, 'is_active') === 'true'
+
+  if (!employeeId) return { error: 'Çalışan kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existing = await prisma.profiles.findFirst({
+    where: { id: employeeId, agency_id: agencyOwner.agencyId, role: 'employee' },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Çalışan bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  try {
+    await prisma.profiles.update({
+      where: { id: employeeId },
+      data: { is_active: isActive },
+    })
+
+    revalidatePath('/agency/employees')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Durum güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Çalışanın şifresini ajans sahibi tarafından sıfırlar
+export async function resetEmployeePasswordAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const employeeId = getFormString(formData, 'employee_id')
+  const newPassword = getFormString(formData, 'new_password')
+
+  if (!employeeId) return { error: 'Çalışan kimliği gereklidir.' }
+  const passwordError = validatePassword(newPassword, 'Yeni şifre')
+  if (passwordError) return { error: passwordError }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existing = await prisma.profiles.findFirst({
+    where: { id: employeeId, agency_id: agencyOwner.agencyId, role: 'employee' },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Çalışan bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  let serviceClient
+  try {
+    serviceClient = getServiceClient()
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Supabase bağlantı hatası.'
+    return { error: msg }
+  }
+
+  try {
+    const { error: resetError } = await serviceClient.auth.admin.updateUserById(employeeId, {
+      password: newPassword,
+    })
+
+    if (resetError) {
+      return { error: `Şifre sıfırlanamadı: ${resetError.message}` }
+    }
+
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Şifre sıfırlanırken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Çalışanı ve hesabını siler; üzerindeki görevleri güvenli şekilde iş havuzuna iade eder
+export async function deleteEmployeeAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const employeeId = getFormString(formData, 'employee_id')
+
+  if (!employeeId) return { error: 'Çalışan kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existing = await prisma.profiles.findFirst({
+    where: { id: employeeId, agency_id: agencyOwner.agencyId, role: 'employee' },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Çalışan bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  let serviceClient
+  try {
+    serviceClient = getServiceClient()
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Supabase bağlantı hatası.'
+    return { error: msg }
+  }
+
+  try {
+    // 1. Çalışana atanmış tüm görevleri iş havuzuna iade et (veri kaybını önler)
+    await prisma.tasks.updateMany({
+      where: { assignee_id: employeeId },
+      data: { assignee_id: null, status: 'unassigned' },
+    })
+
+    // 2. Supabase Auth kullanıcı hesabını sil
+    await serviceClient.auth.admin.deleteUser(employeeId)
+
+    // 3. Profil kaydını sil (tasks.updateMany sonrası foreign key uyumludur; cascade yapılmışsa hata vermez)
+    await prisma.profiles.deleteMany({ where: { id: employeeId } })
+
+    revalidatePath('/agency/employees')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Çalışan silinirken hata oluştu.'
     return { error: msg }
   }
 }

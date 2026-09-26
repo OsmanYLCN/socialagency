@@ -17,6 +17,7 @@ import {
   EyeOff,
   ShieldCheck,
   Camera,
+  Lock,
 } from 'lucide-react'
 import {
   updateProfileDetailsAction,
@@ -321,31 +322,71 @@ export function UserProfileModal({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {/* Ad ve Soyad */}
+              {initialData.role === 'employee' || initialData.role === 'customer' ? (
                 <div>
-                  <label className="mb-1 block text-xs font-bold text-slate-700">Ad</label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
-                    placeholder="Adınız"
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 text-xs text-slate-800 placeholder-slate-400 transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <div className="mb-1 flex items-center justify-between">
+                        <label className="text-xs font-bold text-slate-700">Ad</label>
+                        <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+                          <Lock className="h-3 w-3" />
+                          Kilitli
+                        </span>
+                      </div>
+                      <div className="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-100/80 px-3.5 text-xs font-semibold text-slate-700 cursor-not-allowed select-none">
+                        <span>{firstName || '—'}</span>
+                        <Lock className="h-3.5 w-3.5 text-slate-400" />
+                      </div>
+                      <input type="hidden" name="first_name" value={firstName} />
+                    </div>
+                    <div>
+                      <div className="mb-1 flex items-center justify-between">
+                        <label className="text-xs font-bold text-slate-700">Soyad</label>
+                        <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+                          <Lock className="h-3 w-3" />
+                          Kilitli
+                        </span>
+                      </div>
+                      <div className="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-100/80 px-3.5 text-xs font-semibold text-slate-700 cursor-not-allowed select-none">
+                        <span>{lastName || '—'}</span>
+                        <Lock className="h-3.5 w-3.5 text-slate-400" />
+                      </div>
+                      <input type="hidden" name="last_name" value={lastName} />
+                    </div>
+                  </div>
+                  <p className="mt-1.5 flex items-center gap-1 text-[11px] text-slate-400">
+                    <Lock className="h-3 w-3 shrink-0 text-slate-400" />
+                    <span>Ad ve soyad bilginiz ajans yöneticiniz tarafından tanımlanmıştır ve değiştirilemez.</span>
+                  </p>
                 </div>
-                <div>
-                  <label className="mb-1 block text-xs font-bold text-slate-700">Soyad</label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Soyadınız"
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 text-xs text-slate-800 placeholder-slate-400 transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
-                  />
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-slate-700">Ad</label>
+                    <input
+                      type="text"
+                      name="first_name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                      placeholder="Adınız"
+                      className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 text-xs text-slate-800 placeholder-slate-400 transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-slate-700">Soyad</label>
+                    <input
+                      type="text"
+                      name="last_name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder="Soyadınız"
+                      className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 text-xs text-slate-800 placeholder-slate-400 transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <div className="mb-1 flex items-center justify-between">

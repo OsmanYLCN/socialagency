@@ -17,7 +17,7 @@ export default function RegisterPage() {
         <div className="absolute -bottom-32 -right-32 h-[500px] w-[500px] rounded-full bg-slate-200/50 blur-3xl" />
       </div>
 
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-slate-200/80 bg-white p-10 shadow-xl shadow-slate-200/60">
+      <div className="relative z-10 w-full max-w-xl rounded-2xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-xl shadow-slate-200/60">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-indigo-100 bg-indigo-50 shadow-sm">
             <Building2 className="h-7 w-7 text-indigo-600" />

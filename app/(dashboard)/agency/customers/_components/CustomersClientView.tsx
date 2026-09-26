@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { type CustomerMetrics, CustomersMetricsRow } from './CustomersMetricsRow'
 import { CustomersHeader } from './CustomersHeader'
 import { CustomersList } from './CustomersList'
-import { CreateCustomerModal } from './CreateCustomerModal'
 import { EditCustomerModal } from './EditCustomerModal'
 import { DeleteCustomerModal } from './DeleteCustomerModal'
 
@@ -32,26 +32,25 @@ interface CustomersClientViewProps {
 
 // Musteriler sayfasinin interaktif istemci kabugunu gosterir
 export function CustomersClientView({ agencyName, brands, metrics }: CustomersClientViewProps) {
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const router = useRouter()
   const [editTarget, setEditTarget] = useState<BrandItem | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<BrandItem | null>(null)
 
+  const handleNavigateNew = () => {
+    router.push('/agency/customers/new')
+  }
+
   return (
     <>
-      <CustomersHeader agencyName={agencyName} onAddClick={() => setIsCreateOpen(true)} />
+      <CustomersHeader agencyName={agencyName} onAddClick={handleNavigateNew} />
 
       <CustomersMetricsRow {...metrics} />
 
       <CustomersList
         brands={brands}
-        onAdd={() => setIsCreateOpen(true)}
+        onAdd={handleNavigateNew}
         onEdit={(brand) => setEditTarget(brand)}
         onDelete={(brand) => setDeleteTarget(brand)}
-      />
-
-      <CreateCustomerModal
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
       />
 
       <EditCustomerModal

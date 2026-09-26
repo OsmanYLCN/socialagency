@@ -114,6 +114,11 @@ export async function registerAction(
   const fullName = getFormString(formData, 'full_name')
   const email = getFormString(formData, 'email')
   const password = getFormString(formData, 'password')
+  const phone = getFormString(formData, 'phone')
+  const website = getFormString(formData, 'website')
+  const sector = getFormString(formData, 'sector')
+  const employeeCountStr = getFormString(formData, 'employee_count')
+  const address = getFormString(formData, 'address')
 
   if (!agencyName || !fullName) return { error: 'Ajans adı ve ad soyad zorunludur.' }
   if (agencyName.length > 255 || fullName.length > 200) {
@@ -141,7 +146,7 @@ export async function registerAction(
     email,
     password,
     email_confirm: true,
-    user_metadata: { full_name: fullName, first_name: firstName, last_name: lastName },
+    user_metadata: { full_name: fullName, first_name: firstName, last_name: lastName, phone },
   })
 
   if (signUpError || !newUser.user) {
@@ -152,11 +157,23 @@ export async function registerAction(
     return { error: msg }
   }
 
+  // Sektör ve web sitesi bilgisi social_media JSON alanında saklanır
+  const socialMedia: Record<string, string> = {}
+  if (website) socialMedia.website = website
+  if (sector) socialMedia.sector = sector
+
+  const employeeCount = employeeCountStr ? parseInt(employeeCountStr, 10) : null
+  const validEmployeeCount = employeeCount && !isNaN(employeeCount) && employeeCount > 0 ? employeeCount : null
+
   const { data: agency, error: agencyError } = await serviceClient
     .from('agencies')
     .insert({
       name: agencyName,
       contact_email: email,
+      contact_phone: phone || null,
+      address: address || null,
+      employee_count: validEmployeeCount,
+      social_media: socialMedia,
       status: 'pending',
     })
     .select('id')

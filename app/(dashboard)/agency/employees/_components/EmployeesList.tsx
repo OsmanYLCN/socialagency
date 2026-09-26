@@ -2,20 +2,33 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { Search, ArrowUpDown, Mail, CheckSquare, Copy, Check, MoreHorizontal, Pencil, Trash2, Building2 } from 'lucide-react'
-import type { BrandItem } from './CustomersClientView'
+import {
+  Search,
+  ArrowUpDown,
+  Mail,
+  CheckSquare,
+  Copy,
+  Check,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  KeyRound,
+  Users,
+} from 'lucide-react'
+import type { EmployeeItem } from './EmployeesClientView'
 
-type SortKey = 'newest' | 'oldest' | 'fee_high' | 'fee_low' | 'alpha'
+type SortKey = 'newest' | 'oldest' | 'salary_high' | 'salary_low' | 'alpha' | 'tasks_high'
 
-interface CustomersListProps {
-  brands: BrandItem[]
-  onEdit: (brand: BrandItem) => void
-  onDelete: (brand: BrandItem) => void
+interface EmployeesListProps {
+  employees: EmployeeItem[]
+  onEdit: (employee: EmployeeItem) => void
+  onDelete: (employee: EmployeeItem) => void
+  onResetPassword: (employee: EmployeeItem) => void
   onAdd: () => void
 }
 
-// Markadan monogram renk sinifi uretir
-function getBrandColor(name: string): string {
+// Personel adından monogram renk sınıfı üretir
+function getEmployeeColor(name: string): string {
   const colors = [
     'bg-indigo-50 text-indigo-700',
     'bg-emerald-50 text-emerald-700',
@@ -31,12 +44,14 @@ function getBrandColor(name: string): string {
   return colors[Math.abs(hash) % colors.length]
 }
 
-// Markadan 2 harflik monogram uretir
-function getMonogram(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean)
-  if (words.length === 0) return '??'
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
-  return (words[0][0] + words[1][0]).toUpperCase()
+// Personel adından 2 harflik monogram üretir
+function getMonogram(firstName: string | null, lastName: string | null): string {
+  const first = firstName?.trim() ?? ''
+  const last = lastName?.trim() ?? ''
+  if (first && last) return (first[0] + last[0]).toUpperCase()
+  if (first) return first.slice(0, 2).toUpperCase()
+  if (last) return last.slice(0, 2).toUpperCase()
+  return '??'
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -62,11 +77,21 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () => void; onDelete: () => void }) {
+function EmployeeCard({
+  employee,
+  onEdit,
+  onDelete,
+  onResetPassword,
+}: {
+  employee: EmployeeItem
+  onEdit: () => void
+  onDelete: () => void
+  onResetPassword: () => void
+}) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const monogram = getMonogram(brand.name)
-  const colorClass = getBrandColor(brand.name)
-  const customerName = [brand.customer?.firstName, brand.customer?.lastName].filter(Boolean).join(' ') || 'Yetkili Atanmadı'
+  const fullName = [employee.firstName, employee.lastName].filter(Boolean).join(' ')
+  const monogram = getMonogram(employee.firstName, employee.lastName)
+  const colorClass = getEmployeeColor(fullName || employee.email)
 
   return (
     <div className="group relative flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:border-indigo-200 hover:shadow-sm">
@@ -77,8 +102,10 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
             {monogram}
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="truncate text-sm font-bold text-slate-900">{brand.name}</h4>
-            <p className="mt-0.5 truncate text-xs text-slate-400">{customerName}</p>
+            <h4 className="truncate text-sm font-bold text-slate-900">
+              {fullName || '—'}
+            </h4>
+            <p className="mt-0.5 truncate text-xs text-slate-400">Çalışan</p>
           </div>
         </div>
 
@@ -94,7 +121,7 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
           {menuOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 top-8 z-20 w-40 rounded-xl border border-slate-200/80 bg-white p-1.5 shadow-lg">
+              <div className="absolute right-0 top-8 z-20 w-44 rounded-xl border border-slate-200/80 bg-white p-1.5 shadow-lg">
                 <button
                   type="button"
                   onClick={() => { setMenuOpen(false); onEdit() }}
@@ -103,6 +130,15 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
                   <Pencil className="h-3.5 w-3.5 text-slate-400" />
                   Düzenle
                 </button>
+                <button
+                  type="button"
+                  onClick={() => { setMenuOpen(false); onResetPassword() }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-amber-700 hover:bg-amber-50 cursor-pointer"
+                >
+                  <KeyRound className="h-3.5 w-3.5" />
+                  Şifreyi Sıfırla
+                </button>
+                <div className="my-1 h-px bg-slate-100" />
                 <button
                   type="button"
                   onClick={() => { setMenuOpen(false); onDelete() }}
@@ -118,44 +154,40 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
       </div>
 
       {/* Orta: Email */}
-      {brand.customer?.email && (
-        <div className="mt-3 flex items-center gap-1 text-xs text-slate-400">
-          <Mail className="h-3 w-3 shrink-0" />
-          <span className="truncate">{brand.customer.email}</span>
-          <CopyButton text={brand.customer.email} />
-        </div>
-      )}
+      <div className="mt-3 flex items-center gap-1 text-xs text-slate-400">
+        <Mail className="h-3 w-3 shrink-0" />
+        <span className="truncate">{employee.email}</span>
+        <CopyButton text={employee.email} />
+      </div>
 
-      {/* Alt: Metrikler */}
+      {/* Alt: Metrikler & Maaş */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
         <div className="flex items-center gap-2.5 text-xs min-w-0">
           <div className="flex items-center gap-1 whitespace-nowrap">
             <CheckSquare className="h-3.5 w-3.5 shrink-0 text-indigo-400" />
-            <span className="font-semibold text-indigo-600">{brand.activeTaskCount}</span>
+            <span className="font-semibold text-indigo-600">{employee.activeTaskCount}</span>
             <span className="text-slate-400">aktif</span>
           </div>
           <div className="h-3 w-px bg-slate-200 shrink-0" />
           <div className="flex items-center gap-1 whitespace-nowrap">
             <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
-            <span className="font-semibold text-emerald-600">{brand.completedTaskCount}</span>
+            <span className="font-semibold text-emerald-600">{employee.completedTaskCount}</span>
             <span className="text-slate-400">tamamlandı</span>
           </div>
         </div>
 
         <span className="shrink-0 whitespace-nowrap rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-700">
-          {brand.monthlyFee > 0
-            ? brand.monthlyFee.toLocaleString('tr-TR', { minimumFractionDigits: 0 }) + ' ₺'
-            : 'Ücret yok'}
+          {employee.salary > 0
+            ? employee.salary.toLocaleString('tr-TR', { minimumFractionDigits: 0 }) + ' ₺'
+            : 'Maaş yok'}
         </span>
       </div>
 
       {/* Aktiflik rozeti */}
-      {brand.customer && (
-        <span
-          className={`absolute right-4 top-4 h-2 w-2 rounded-full ${brand.customer.isActive ? 'bg-emerald-400' : 'bg-slate-300'}`}
-          title={brand.customer.isActive ? 'Aktif' : 'Pasif'}
-        />
-      )}
+      <span
+        className={`absolute right-4 top-4 h-2 w-2 rounded-full ${employee.isActive ? 'bg-emerald-400' : 'bg-slate-300'}`}
+        title={employee.isActive ? 'Aktif' : 'Askıda'}
+      />
     </div>
   )
 }
@@ -163,41 +195,50 @@ function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () =
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'newest', label: 'En Yeni' },
   { value: 'oldest', label: 'En Eski' },
-  { value: 'fee_high', label: 'Yüksek Bütçe' },
-  { value: 'fee_low', label: 'Düşük Bütçe' },
   { value: 'alpha', label: 'A-Z' },
+  { value: 'salary_high', label: 'Yüksek Maaş' },
+  { value: 'salary_low', label: 'Düşük Maaş' },
+  { value: 'tasks_high', label: 'En Çok İş' },
 ]
 
-// Marka kartlari listesi, arama ve siralama ile
-export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersListProps) {
+// Calisan kartlari listesi, arama ve siralama ile
+export function EmployeesList({
+  employees,
+  onEdit,
+  onDelete,
+  onResetPassword,
+  onAdd,
+}: EmployeesListProps) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
 
   const filtered = useMemo(() => {
     const q = query.toLocaleLowerCase('tr-TR').trim()
     const result = q
-      ? brands.filter(
-          (b) =>
-            b.name.toLocaleLowerCase('tr-TR').includes(q) ||
-            b.customer?.email?.toLocaleLowerCase('tr-TR').includes(q) ||
-            [b.customer?.firstName, b.customer?.lastName]
-              .filter(Boolean)
-              .join(' ')
-              .toLocaleLowerCase('tr-TR')
-              .includes(q)
+      ? employees.filter(
+          (e) =>
+            (e.firstName ?? '').toLocaleLowerCase('tr-TR').includes(q) ||
+            (e.lastName ?? '').toLocaleLowerCase('tr-TR').includes(q) ||
+            e.email.toLocaleLowerCase('tr-TR').includes(q) ||
+            [e.firstName, e.lastName].filter(Boolean).join(' ').toLocaleLowerCase('tr-TR').includes(q)
         )
-      : [...brands]
+      : [...employees]
 
     return result.sort((a, b) => {
-      if (sort === 'alpha') return a.name.localeCompare(b.name, 'tr')
-      if (sort === 'fee_high') return b.monthlyFee - a.monthlyFee
-      if (sort === 'fee_low') return a.monthlyFee - b.monthlyFee
+      if (sort === 'alpha') {
+        const nameA = [a.firstName, a.lastName].filter(Boolean).join(' ')
+        const nameB = [b.firstName, b.lastName].filter(Boolean).join(' ')
+        return nameA.localeCompare(nameB, 'tr')
+      }
+      if (sort === 'salary_high') return b.salary - a.salary
+      if (sort === 'salary_low') return a.salary - b.salary
+      if (sort === 'tasks_high') return b.activeTaskCount - a.activeTaskCount
       if (sort === 'oldest')
         return (a.createdAt ? new Date(a.createdAt).getTime() : 0) - (b.createdAt ? new Date(b.createdAt).getTime() : 0)
       // newest (default)
       return (b.createdAt ? new Date(b.createdAt).getTime() : 0) - (a.createdAt ? new Date(a.createdAt).getTime() : 0)
     })
-  }, [brands, query, sort])
+  }, [employees, query, sort])
 
   return (
     <div className="space-y-4">
@@ -209,7 +250,7 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Marka adı, yetkili veya e-posta ile ara..."
+            placeholder="Ad, soyad veya e-posta ile ara..."
             className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
           />
         </div>
@@ -234,11 +275,11 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
         </p>
       )}
 
-      {/* Listesi */}
+      {/* Liste */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-16 text-center shadow-xs">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
-            <Building2 className="h-7 w-7" />
+            <Users className="h-7 w-7" />
           </div>
           {query ? (
             <>
@@ -249,27 +290,28 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
             </>
           ) : (
             <>
-              <p className="text-sm font-bold text-slate-800">Henüz Müşteri Eklenmemiş</p>
+              <p className="text-sm font-bold text-slate-800">Henüz Çalışan Eklenmemiş</p>
               <p className="mt-1 max-w-xs text-xs text-slate-400">
-                Yukarıdaki butonu kullanarak ilk müşteri ve markayı ekleyebilirsiniz.
+                Yukarıdaki butonu kullanarak ilk ekip üyesini ekleyebilirsiniz.
               </p>
               <Link
-                href="/agency/customers/new"
+                href="/agency/employees/new"
                 className="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700 cursor-pointer"
               >
-                İlk Müşteriyi Ekle
+                İlk Çalışanı Ekle
               </Link>
             </>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((brand) => (
-            <BrandCard
-              key={brand.id}
-              brand={brand}
-              onEdit={() => onEdit(brand)}
-              onDelete={() => onDelete(brand)}
+          {filtered.map((employee) => (
+            <EmployeeCard
+              key={employee.id}
+              employee={employee}
+              onEdit={() => onEdit(employee)}
+              onDelete={() => onDelete(employee)}
+              onResetPassword={() => onResetPassword(employee)}
             />
           ))}
         </div>

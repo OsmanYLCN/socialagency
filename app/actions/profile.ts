@@ -144,8 +144,9 @@ export async function updateProfileDetailsAction(
   const cookieStore = await cookies()
   const userId = user.id
   const serviceClient = getServiceClient()
-  const firstName = getFormString(formData, 'first_name')
-  const lastName = getFormString(formData, 'last_name')
+  const isNameLocked = user.role === 'employee' || user.role === 'customer'
+  const firstName = isNameLocked ? (user.firstName || '') : getFormString(formData, 'first_name')
+  const lastName = isNameLocked ? (user.lastName || '') : getFormString(formData, 'last_name')
   const phone = normalizeTurkishPhone(getFormString(formData, 'phone'))
   const email = getFormString(formData, 'email')
   const removeAvatar = formData.get('removeAvatar') === 'true'

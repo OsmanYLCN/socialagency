@@ -1,48 +1,55 @@
-import { Building2, TrendingUp, CheckSquare, DollarSign } from 'lucide-react'
+import { Users, UserCheck, DollarSign, CheckSquare } from 'lucide-react'
 
-export interface CustomerMetrics {
-  totalBrands: number
-  activeBrands: number
-  monthlyRevenue: number
-  activeTasksCount: number
+export interface EmployeeMetrics {
+  totalEmployees: number
+  activeEmployees: number
+  totalMonthlySalary: number
+  assignedTasksCount: number
 }
 
-// Musteri sayfasi ozet metrik kartlarini gosterir
-export function CustomersMetricsRow({
-  totalBrands,
-  activeBrands,
-  monthlyRevenue,
-  activeTasksCount,
-}: CustomerMetrics) {
+// Calisanlar sayfasi ozet metrik kartlarini gosterir
+export function EmployeesMetricsRow({
+  totalEmployees,
+  activeEmployees,
+  totalMonthlySalary,
+  assignedTasksCount,
+}: EmployeeMetrics) {
   const metrics = [
     {
-      label: 'Toplam Marka',
-      value: totalBrands,
-      sub: `${activeBrands} aktif`,
-      icon: Building2,
+      label: 'Toplam Ekip',
+      value: totalEmployees,
+      sub: `${activeEmployees} aktif`,
+      icon: Users,
       iconBg: 'bg-indigo-50 text-indigo-600 border-indigo-100',
     },
     {
-      label: 'Aktif Markalar',
-      value: activeBrands,
-      sub: totalBrands > 0 ? `%${Math.round((activeBrands / totalBrands) * 100)} aktiflik` : '-',
-      icon: TrendingUp,
+      label: 'Aktif Personel',
+      value: activeEmployees,
+      sub:
+        totalEmployees > 0
+          ? `%${Math.round((activeEmployees / totalEmployees) * 100)} aktiflik`
+          : '-',
+      icon: UserCheck,
       iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     },
     {
-      label: 'Aylık Toplam Gelir',
-      value: monthlyRevenue.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0 }),
-      sub: totalBrands > 0
-        ? `Ortalama ${Math.round(monthlyRevenue / totalBrands).toLocaleString('tr-TR')} ₺`
-        : '-',
+      label: 'Aylık Toplam Bordro',
+      value: totalMonthlySalary.toLocaleString('tr-TR', {
+        style: 'currency',
+        currency: 'TRY',
+        minimumFractionDigits: 0,
+      }),
+      sub:
+        totalEmployees > 0
+          ? `Ort. ${Math.round(totalMonthlySalary / totalEmployees).toLocaleString('tr-TR')} ₺ / kişi`
+          : '-',
       icon: DollarSign,
       iconBg: 'bg-sky-50 text-sky-600 border-sky-100',
-      isText: true,
     },
     {
-      label: 'Aktif Görevler',
-      value: activeTasksCount,
-      sub: 'Üretim / Onay bekleyen',
+      label: 'Atanmış Aktif İşler',
+      value: assignedTasksCount,
+      sub: 'Üretim sürecinde',
       icon: CheckSquare,
       iconBg: 'bg-amber-50 text-amber-600 border-amber-100',
     },
