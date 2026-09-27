@@ -1,11 +1,15 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { TasksHeader } from './TasksHeader'
 import { TasksMetricsRow } from './TasksMetricsRow'
 import { TasksFilterBar, TaskFilterState } from './TasksFilterBar'
 import { TasksKanbanView } from './TasksKanbanView'
 import { TasksListView } from './TasksListView'
+import { CreateTaskModal } from './CreateTaskModal'
+import { TaskDetailModal } from './TaskDetailModal'
+import { EditTaskModal } from './EditTaskModal'
+import { DeleteTaskModal } from './DeleteTaskModal'
 
 export interface TaskCommentItem {
   id: string
@@ -90,6 +94,24 @@ export function TasksClientView({
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban')
   const [filters, setFilters] = useState<TaskFilterState>(INITIAL_FILTERS)
 
+  // Modal durumları
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [detailTask, setDetailTask] = useState<TaskItem | null>(null)
+  const [editTask, setEditTask] = useState<TaskItem | null>(null)
+  const [deleteTask, setDeleteTask] = useState<TaskItem | null>(null)
+
+  // Server revalidation sonrası seçili görevin güncel verilerini senkronize et
+  useEffect(() => {
+    if (detailTask) {
+      const updated = tasks.find((t) => t.id === detailTask.id)
+      if (updated) {
+        setDetailTask(updated)
+      } else {
+        setDetailTask(null)
+      }
+    }
+  }, [tasks])
+
   // Filtrelenmiş görevleri hesapla (Türkçe locale duyarlı)
   const filteredTasks = useMemo(() => {
     const query = filters.search.trim().toLocaleLowerCase('tr-TR')
@@ -157,9 +179,7 @@ export function TasksClientView({
         agencyName={agencyName}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
-        onNewTaskClick={() => {
-          // Modal açılacak (Aşama 6)
-        }}
+        onNewTaskClick={() => setIsCreateOpen(true)}
       />
 
       {/* 2. Dörtlü Metrik Kartları */}
@@ -176,36 +196,61 @@ export function TasksClientView({
         filteredCount={filteredTasks.length}
       />
 
-      {/* 4. Görünüm Alanı */}
+      {/* 4. Görünüm Alanı (Kanban veya Liste) */}
       {viewMode === 'kanban' ? (
         <TasksKanbanView
           tasks={filteredTasks}
           employees={employees}
-          onTaskClick={(task) => {
-            // TaskDetailModal açılacak (Aşama 6)
-          }}
-          onEditClick={(task) => {
-            // EditTaskModal açılacak (Aşama 6)
-          }}
-          onDeleteClick={(task) => {
-            // DeleteTaskModal açılacak (Aşama 6)
-          }}
+          onTaskClick={(task) => setDetailTask(task)}
+          onEditClick={(task) => setEditTask(task)}
+          onDeleteClick={(task) => setDeleteTask(task)}
         />
       ) : (
         <TasksListView
           tasks={filteredTasks}
           employees={employees}
-          onTaskClick={(task) => {
-            // TaskDetailModal açılacak (Aşama 6)
-          }}
-          onEditClick={(task) => {
-            // EditTaskModal açılacak (Aşama 6)
-          }}
-          onDeleteClick={(task) => {
-            // DeleteTaskModal açılacak (Aşama 6)
-          }}
+          onTaskClick={(task) => setDetailTask(task)}
+          onEditClick={(task) => setEditTask(task)}
+          onDeleteClick={(task) => setDeleteTask(task)}
         />
       )}
+
+      {/* 5. Modallar */}
+      <CreateTaskModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        brands={brands}
+        employees={employees}
+      />
+
+      <TaskDetailModal
+        isOpen={!!detailTask}
+        task={detailTask}
+        onClose={() => setDetailTask(null)}
+        employees={employees}
+        onEditClick={(task) => {
+          setDetailTask(null)
+          setEditTask(task)
+        }}
+        onDeleteClick={(task) => {
+          setDetailTask(null)
+          setDeleteTask(task)
+        }}
+      />
+
+      <EditTaskModal
+        isOpen={!!editTask}
+        task={editTask}
+        onClose={() => setEditTask(null)}
+        brands={brands}
+        employees={employees}
+      />
+
+      <DeleteTaskModal
+        isOpen={!!deleteTask}
+        task={deleteTask}
+        onClose={() => setDeleteTask(null)}
+      />
     </div>
   )
 }
