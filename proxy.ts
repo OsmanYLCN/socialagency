@@ -14,6 +14,7 @@ export function proxy(request: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix))
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
 
+  // 1. Korumalı rotaya erişmeye çalışan oturumsuz kullanıcılar
   if (isProtected && !token) {
     const refreshToken = request.cookies.get('sb-refresh-token')?.value
     if (refreshToken) {
@@ -27,6 +28,25 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
+  // 2. Korumalı rotaya erişen oturumlu kullanıcıların rol denetimi (Middleware Route Guard)
+  if (isProtected && token && role) {
+    const defaultHome = ROLE_REDIRECT[role] ?? '/login'
+
+    if (pathname.startsWith('/admin') && role !== 'super_admin') {
+      return NextResponse.redirect(new URL(defaultHome, request.url))
+    }
+    if (pathname.startsWith('/agency') && role !== 'agency_owner') {
+      return NextResponse.redirect(new URL(defaultHome, request.url))
+    }
+    if (pathname.startsWith('/employee') && role !== 'employee') {
+      return NextResponse.redirect(new URL(defaultHome, request.url))
+    }
+    if (pathname.startsWith('/customer') && role !== 'customer') {
+      return NextResponse.redirect(new URL(defaultHome, request.url))
+    }
+  }
+
+  // 3. Zaten oturum açmış kullanıcının giriş/kayıt sayfalarına gitmesini önle
   if (isAuthRoute && token && role) {
     const destination = ROLE_REDIRECT[role] ?? '/agency'
     return NextResponse.redirect(new URL(destination, request.url))

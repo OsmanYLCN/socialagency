@@ -866,10 +866,21 @@ export async function deleteCustomerAction(
     return { error: msg }
   }
 
+  // Bu markaya ve bu ajansa ait müşteri profilini doğrula (IDOR koruması)
+  const targetCustomerProfile = await prisma.profiles.findFirst({
+    where: {
+      brand_id: brandId,
+      agency_id: agencyOwner.agencyId,
+      role: 'customer',
+      ...(authUserId ? { id: authUserId } : {}),
+    },
+    select: { id: true },
+  })
+
   try {
-    if (authUserId) {
-      await serviceClient.auth.admin.deleteUser(authUserId)
-      await prisma.profiles.deleteMany({ where: { id: authUserId } })
+    if (targetCustomerProfile?.id) {
+      await serviceClient.auth.admin.deleteUser(targetCustomerProfile.id)
+      await prisma.profiles.deleteMany({ where: { id: targetCustomerProfile.id } })
     }
 
     // İlişkili profillerin brand_id bağlantısını çöz (foreign key kısıt ihlalini önler)
