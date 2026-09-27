@@ -5,6 +5,7 @@ import { TasksHeader } from './TasksHeader'
 import { TasksMetricsRow } from './TasksMetricsRow'
 import { TasksFilterBar, TaskFilterState } from './TasksFilterBar'
 import { TasksKanbanView } from './TasksKanbanView'
+import { TasksListView } from './TasksListView'
 
 export interface TaskCommentItem {
   id: string
@@ -191,14 +192,19 @@ export function TasksClientView({
           }}
         />
       ) : (
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-xs">
-          <p className="text-xs font-semibold text-slate-500">
-            Liste Görünümü (Aşama 5)
-          </p>
-          <p className="mt-1 text-xs text-slate-400">
-            {filteredTasks.length} görev filtrelendi. Sıradaki aşamada tablo görünümü eklenecektir.
-          </p>
-        </div>
+        <TasksListView
+          tasks={filteredTasks}
+          employees={employees}
+          onTaskClick={(task) => {
+            // TaskDetailModal açılacak (Aşama 6)
+          }}
+          onEditClick={(task) => {
+            // EditTaskModal açılacak (Aşama 6)
+          }}
+          onDeleteClick={(task) => {
+            // DeleteTaskModal açılacak (Aşama 6)
+          }}
+        />
       )}
     </div>
   )
