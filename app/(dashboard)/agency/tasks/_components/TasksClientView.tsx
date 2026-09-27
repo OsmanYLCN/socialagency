@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { TasksHeader } from './TasksHeader'
 import { TasksMetricsRow } from './TasksMetricsRow'
 import { TasksFilterBar, TaskFilterState } from './TasksFilterBar'
+import { TasksKanbanView } from './TasksKanbanView'
 
 export interface TaskCommentItem {
   id: string
@@ -174,15 +175,31 @@ export function TasksClientView({
         filteredCount={filteredTasks.length}
       />
 
-      {/* 4. Görünüm Alanı (Aşama 4 ve 5'te Kanban ve Liste doldurulacak) */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs text-center">
-        <p className="text-xs font-semibold text-slate-500">
-          Görünüm modu: <span className="font-bold text-slate-800">{viewMode === 'kanban' ? 'Kanban Panosu' : 'Liste Görünümü'}</span>
-        </p>
-        <p className="mt-1 text-xs text-slate-400">
-          Toplam {filteredTasks.length} görev filtrelendi. Sıradaki aşamada 5 sütunlu Kanban panosu eklenecektir.
-        </p>
-      </div>
+      {/* 4. Görünüm Alanı */}
+      {viewMode === 'kanban' ? (
+        <TasksKanbanView
+          tasks={filteredTasks}
+          employees={employees}
+          onTaskClick={(task) => {
+            // TaskDetailModal açılacak (Aşama 6)
+          }}
+          onEditClick={(task) => {
+            // EditTaskModal açılacak (Aşama 6)
+          }}
+          onDeleteClick={(task) => {
+            // DeleteTaskModal açılacak (Aşama 6)
+          }}
+        />
+      ) : (
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-xs">
+          <p className="text-xs font-semibold text-slate-500">
+            Liste Görünümü (Aşama 5)
+          </p>
+          <p className="mt-1 text-xs text-slate-400">
+            {filteredTasks.length} görev filtrelendi. Sıradaki aşamada tablo görünümü eklenecektir.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
