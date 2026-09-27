@@ -137,6 +137,7 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
                     <option value="story">Story</option>
                     <option value="carousel">Carousel</option>
                     <option value="shorts">Shorts</option>
+                    <option value="tweet">Tweet / Metin</option>
                   </select>
                 </div>
               </div>

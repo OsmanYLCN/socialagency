@@ -61,6 +61,7 @@ export function UserProfileModal({
   const [avatarUrl, setAvatarUrl] = useState(initialData.avatarUrl || '')
   const [previewAvatar, setPreviewAvatar] = useState(initialData.avatarUrl || '')
   const [removeAvatar, setRemoveAvatar] = useState(false)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
   const [cropperOpen, setCropperOpen] = useState(false)
   const [cropperImageSrc, setCropperImageSrc] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -76,14 +77,15 @@ export function UserProfileModal({
   }
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAvatarError(null)
     const file = e.target.files?.[0]
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      alert('Lütfen geçerli bir görsel dosyası (PNG, JPG, WEBP) seçin.')
+      setAvatarError('Lütfen geçerli bir görsel dosyası (PNG, JPG, WEBP) seçin.')
       return
     }
     if (file.size > 15 * 1024 * 1024) {
-      alert('Fotoğraf boyutu en fazla 15MB olabilir.')
+      setAvatarError('Fotoğraf boyutu en fazla 15MB olabilir.')
       return
     }
 
@@ -241,6 +243,13 @@ export function UserProfileModal({
                 <div className="flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50/80 p-3 text-xs font-semibold text-rose-800">
                   <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
                   <span>{profileState.error}</span>
+                </div>
+              )}
+
+              {avatarError && (
+                <div className="flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50/80 p-3 text-xs font-semibold text-rose-800">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+                  <span>{avatarError}</span>
                 </div>
               )}
 

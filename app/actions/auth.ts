@@ -130,7 +130,7 @@ export async function registerAction(
   const passwordError = validatePassword(password)
   if (passwordError) return { error: passwordError }
 
-  const nameParts = fullName.split(' ')
+  const nameParts = fullName.trim().split(/\s+/).filter(Boolean)
   const firstName = nameParts[0] ?? fullName
   const lastName = nameParts.slice(1).join(' ') || ''
 
