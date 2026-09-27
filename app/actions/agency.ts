@@ -11,7 +11,7 @@ import {
   validateEmail,
   validatePassword,
 } from '@/lib/validation'
-import { content_type, platform_type } from '@prisma/client'
+import { content_type, platform_type, task_status, notification_type } from '@prisma/client'
 
 function isPlatform(value: string): value is platform_type {
   return Object.values(platform_type).includes(value as platform_type)
@@ -19,6 +19,10 @@ function isPlatform(value: string): value is platform_type {
 
 function isContentType(value: string): value is content_type {
   return Object.values(content_type).includes(value as content_type)
+}
+
+function isTaskStatus(value: string): value is task_status {
+  return Object.values(task_status).includes(value as task_status)
 }
 
 // Marka ve müşteri kullanıcısı oluşturur
@@ -237,6 +241,7 @@ export async function createTaskAction(
   const content = getFormString(formData, 'content')
   const dueDateStr = getFormString(formData, 'due_date')
   const note = getFormString(formData, 'note')
+  const contentUrl = getFormString(formData, 'content_url')
 
   if (!brandId || !platform || !content || !dueDateStr) {
     return { error: 'Marka, platform, içerik türü ve teslim tarihi zorunludur.' }
@@ -258,7 +263,7 @@ export async function createTaskAction(
 
   const brand = await prisma.brands.findFirst({
     where: { id: brandId, agency_id: agencyOwner.agencyId },
-    select: { id: true },
+    select: { id: true, name: true },
   })
 
   if (!brand) {
@@ -282,7 +287,7 @@ export async function createTaskAction(
   }
 
   try {
-    await prisma.tasks.create({
+    const task = await prisma.tasks.create({
       data: {
         agency_id: agencyOwner.agencyId,
         brand_id: brandId,
@@ -292,9 +297,26 @@ export async function createTaskAction(
         due_date: dueDate,
         status: assigneeId ? 'assigned' : 'unassigned',
         assignment_note: note || null,
+        content_url: contentUrl || null,
       },
     })
 
+    if (assigneeId) {
+      try {
+        await prisma.notifications.create({
+          data: {
+            profile_id: assigneeId,
+            task_id: task.id,
+            type: notification_type.assignment,
+            message: `${brand.name} markası için yeni bir ${content.toUpperCase()} (${platform}) görevi size atandı.`,
+          },
+        })
+      } catch {
+        // Bildirim hatası görev kaydını engellemez
+      }
+    }
+
+    revalidatePath('/agency/tasks')
     revalidatePath('/agency')
     return { success: true }
   } catch (err: unknown) {
@@ -302,6 +324,443 @@ export async function createTaskAction(
     return { error: msg }
   }
 }
+
+// Mevcut görevi günceller
+export async function updateTaskAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const taskId = getFormString(formData, 'task_id')
+  const brandId = getFormString(formData, 'brand_id')
+  const assigneeId = getFormString(formData, 'assignee_id') || null
+  const platform = getFormString(formData, 'platform')
+  const content = getFormString(formData, 'content')
+  const dueDateStr = getFormString(formData, 'due_date')
+  const note = getFormString(formData, 'note')
+  const contentUrl = getFormString(formData, 'content_url')
+
+  if (!taskId || !brandId || !platform || !content || !dueDateStr) {
+    return { error: 'Görev kimliği, marka, platform, içerik türü ve teslim tarihi zorunludur.' }
+  }
+
+  if (!isPlatform(platform) || !isContentType(content)) {
+    return { error: 'Geçersiz platform veya içerik türü seçildi.' }
+  }
+  const dateError = validateDate(dueDateStr)
+  if (dateError) return { error: dateError }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existingTask = await prisma.tasks.findFirst({
+    where: { id: taskId, agency_id: agencyOwner.agencyId },
+    select: { id: true, assignee_id: true, status: true },
+  })
+
+  if (!existingTask) {
+    return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  const brand = await prisma.brands.findFirst({
+    where: { id: brandId, agency_id: agencyOwner.agencyId },
+    select: { id: true, name: true },
+  })
+
+  if (!brand) {
+    return { error: 'Seçilen marka bu ajansa ait değil.' }
+  }
+
+  if (assigneeId) {
+    const assignee = await prisma.profiles.findFirst({
+      where: {
+        id: assigneeId,
+        agency_id: agencyOwner.agencyId,
+        role: 'employee',
+        is_active: true,
+      },
+      select: { id: true },
+    })
+
+    if (!assignee) {
+      return { error: 'Seçilen çalışan bu ajansa ait aktif bir çalışan değil.' }
+    }
+  }
+
+  const dueDate = new Date(`${dueDateStr}T00:00:00.000Z`)
+
+  let newStatus = existingTask.status
+  if (!assigneeId && existingTask.status === 'assigned') {
+    newStatus = 'unassigned'
+  } else if (assigneeId && existingTask.status === 'unassigned') {
+    newStatus = 'assigned'
+  }
+
+  try {
+    await prisma.tasks.update({
+      where: { id: taskId },
+      data: {
+        brand_id: brandId,
+        assignee_id: assigneeId,
+        platform,
+        content,
+        due_date: dueDate,
+        status: newStatus,
+        assignment_note: note || null,
+        content_url: contentUrl || null,
+      },
+    })
+
+    if (assigneeId && assigneeId !== existingTask.assignee_id) {
+      try {
+        await prisma.notifications.create({
+          data: {
+            profile_id: assigneeId,
+            task_id: taskId,
+            type: notification_type.assignment,
+            message: `${brand.name} markası için görev size devredildi / atandı.`,
+          },
+        })
+      } catch {
+      }
+    }
+
+    revalidatePath('/agency/tasks')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Görev güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Görevin çalışan atamasını hızlıca değiştirir veya iş havuzuna iade eder
+export async function assignTaskAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const taskId = getFormString(formData, 'task_id')
+  const assigneeId = getFormString(formData, 'assignee_id') || null
+
+  if (!taskId) return { error: 'Görev kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const task = await prisma.tasks.findFirst({
+    where: { id: taskId, agency_id: agencyOwner.agencyId },
+    include: { brands: { select: { name: true } } },
+  })
+
+  if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
+
+  if (assigneeId) {
+    const assignee = await prisma.profiles.findFirst({
+      where: {
+        id: assigneeId,
+        agency_id: agencyOwner.agencyId,
+        role: 'employee',
+        is_active: true,
+      },
+      select: { id: true, first_name: true, last_name: true },
+    })
+
+    if (!assignee) {
+      return { error: 'Seçilen çalışan bu ajansa ait aktif bir çalışan değil.' }
+    }
+
+    const newStatus = task.status === 'unassigned' ? 'assigned' : task.status
+
+    try {
+      await prisma.tasks.update({
+        where: { id: taskId },
+        data: { assignee_id: assigneeId, status: newStatus },
+      })
+
+      if (assigneeId !== task.assignee_id) {
+        try {
+          await prisma.notifications.create({
+            data: {
+              profile_id: assigneeId,
+              task_id: taskId,
+              type: notification_type.assignment,
+              message: `${task.brands.name} markası için görev size atandı.`,
+            },
+          })
+        } catch {
+        }
+      }
+
+      revalidatePath('/agency/tasks')
+      revalidatePath('/agency')
+      return { success: true }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Atama yapılırken hata oluştu.'
+      return { error: msg }
+    }
+  } else {
+    // İş havuzuna iade et
+    try {
+      await prisma.tasks.update({
+        where: { id: taskId },
+        data: {
+          assignee_id: null,
+          status: task.status === 'assigned' ? 'unassigned' : task.status,
+        },
+      })
+
+      revalidatePath('/agency/tasks')
+      revalidatePath('/agency')
+      return { success: true }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Görev havuza alınırken hata oluştu.'
+      return { error: msg }
+    }
+  }
+}
+
+// Görevin durumunu günceller (Kanban sütun geçişleri için)
+export async function updateTaskStatusAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const taskId = getFormString(formData, 'task_id')
+  const status = getFormString(formData, 'status')
+
+  if (!taskId || !status) return { error: 'Görev kimliği ve durum zorunludur.' }
+  if (!isTaskStatus(status)) return { error: 'Geçersiz görev durumu.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const task = await prisma.tasks.findFirst({
+    where: { id: taskId, agency_id: agencyOwner.agencyId },
+    select: { id: true, assignee_id: true, status: true },
+  })
+
+  if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
+
+  try {
+    const updateData: { status: task_status; assignee_id?: string | null } = {
+      status,
+    }
+
+    if (status === 'unassigned') {
+      updateData.assignee_id = null
+    }
+
+    await prisma.tasks.update({
+      where: { id: taskId },
+      data: updateData,
+    })
+
+    revalidatePath('/agency/tasks')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Durum güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Görevin içerik/medya bağlantısını günceller
+export async function updateTaskContentUrlAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const taskId = getFormString(formData, 'task_id')
+  const contentUrl = getFormString(formData, 'content_url')
+  const sendToApproval = getFormString(formData, 'send_to_approval') === 'true'
+
+  if (!taskId) return { error: 'Görev kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const task = await prisma.tasks.findFirst({
+    where: { id: taskId, agency_id: agencyOwner.agencyId },
+    select: { id: true, status: true },
+  })
+
+  if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
+
+  try {
+    await prisma.tasks.update({
+      where: { id: taskId },
+      data: {
+        content_url: contentUrl || null,
+        status: sendToApproval ? 'pending_approval' : task.status,
+      },
+    })
+
+    revalidatePath('/agency/tasks')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'İçerik linki güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Göreve revizyon talebi ekler
+export async function requestTaskRevisionAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const taskId = getFormString(formData, 'task_id')
+  const note = getFormString(formData, 'note')
+
+  if (!taskId || !note) {
+    return { error: 'Görev kimliği ve revizyon notu zorunludur.' }
+  }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const task = await prisma.tasks.findFirst({
+    where: { id: taskId, agency_id: agencyOwner.agencyId },
+    include: { brands: { select: { name: true } } },
+  })
+
+  if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
+
+  try {
+    await prisma.task_revisions.create({
+      data: {
+        task_id: taskId,
+        previous_url: task.content_url || '',
+        customer_note: note,
+      },
+    })
+
+    await prisma.tasks.update({
+      where: { id: taskId },
+      data: { status: 'revision_requested' },
+    })
+
+    if (task.assignee_id) {
+      try {
+        await prisma.notifications.create({
+          data: {
+            profile_id: task.assignee_id,
+            task_id: taskId,
+            type: notification_type.revision,
+            message: `${task.brands.name} görevi için revizyon talep edildi: "${note.slice(0, 80)}"`,
+          },
+        })
+      } catch {
+      }
+    }
+
+    revalidatePath('/agency/tasks')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Revizyon talebi eklenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Göreve ajans içi yorum ekler
+export async function addTaskCommentAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const taskId = getFormString(formData, 'task_id')
+  const commentText = getFormString(formData, 'comment_text')
+
+  if (!taskId || !commentText.trim()) {
+    return { error: 'Yorum metni boş bırakılamaz.' }
+  }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const task = await prisma.tasks.findFirst({
+    where: { id: taskId, agency_id: agencyOwner.agencyId },
+    select: { id: true, assignee_id: true },
+  })
+
+  if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
+
+  try {
+    await prisma.task_comments.create({
+      data: {
+        task_id: taskId,
+        profile_id: agencyOwner.id,
+        comment_text: commentText.trim(),
+      },
+    })
+
+    if (task.assignee_id && task.assignee_id !== agencyOwner.id) {
+      try {
+        await prisma.notifications.create({
+          data: {
+            profile_id: task.assignee_id,
+            task_id: taskId,
+            type: notification_type.comment,
+            message: `Görevinize yeni bir ajans içi yorum eklendi.`,
+          },
+        })
+      } catch {
+      }
+    }
+
+    revalidatePath('/agency/tasks')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Yorum eklenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Görevi ve bağlı kayıtları güvenle siler
+export async function deleteTaskAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const taskId = getFormString(formData, 'task_id')
+
+  if (!taskId) return { error: 'Görev kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const task = await prisma.tasks.findFirst({
+    where: { id: taskId, agency_id: agencyOwner.agencyId },
+    select: { id: true },
+  })
+
+  if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
+
+  try {
+    await prisma.notifications.deleteMany({ where: { task_id: taskId } })
+    await prisma.task_comments.deleteMany({ where: { task_id: taskId } })
+    await prisma.task_revisions.deleteMany({ where: { task_id: taskId } })
+    await prisma.tasks.delete({ where: { id: taskId } })
+
+    revalidatePath('/agency/tasks')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Görev silinirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
 
 // Müşteri markasının adını ve aylık ücretini günceller
 export async function updateCustomerAction(
