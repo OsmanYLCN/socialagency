@@ -16,37 +16,37 @@ function renderPlatformBadge(platform: string) {
   switch (p) {
     case 'instagram':
       return (
-        <span className="flex items-center gap-1 rounded-lg border border-rose-100 bg-rose-50/70 px-2 py-1 text-[10px] font-semibold text-rose-700">
-          <InstagramIcon className="h-3 w-3" />
-          <span>Instagram</span>
+        <span className="flex items-center gap-1 rounded-lg border border-rose-100 bg-rose-50/70 px-2 py-1 text-[10px] font-semibold text-rose-700 min-w-0">
+          <InstagramIcon className="h-3 w-3 shrink-0" />
+          <span className="truncate">Instagram</span>
         </span>
       )
     case 'tiktok':
       return (
-        <span className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-100/80 px-2 py-1 text-[10px] font-semibold text-slate-800">
-          <TikTokIcon className="h-3 w-3" />
-          <span>TikTok</span>
+        <span className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-100/80 px-2 py-1 text-[10px] font-semibold text-slate-800 min-w-0">
+          <TikTokIcon className="h-3 w-3 shrink-0" />
+          <span className="truncate">TikTok</span>
         </span>
       )
     case 'youtube':
       return (
-        <span className="flex items-center gap-1 rounded-lg border border-red-100 bg-red-50/70 px-2 py-1 text-[10px] font-semibold text-red-700">
-          <YoutubeIcon className="h-3 w-3" />
-          <span>YouTube</span>
+        <span className="flex items-center gap-1 rounded-lg border border-red-100 bg-red-50/70 px-2 py-1 text-[10px] font-semibold text-red-700 min-w-0">
+          <YoutubeIcon className="h-3 w-3 shrink-0" />
+          <span className="truncate">YouTube</span>
         </span>
       )
     case 'x':
       return (
-        <span className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-semibold text-slate-700">
-          <XTwitterIcon className="h-3 w-3" />
-          <span>X</span>
+        <span className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-semibold text-slate-700 min-w-0">
+          <XTwitterIcon className="h-3 w-3 shrink-0" />
+          <span className="truncate">X</span>
         </span>
       )
     case 'linkedin':
       return (
-        <span className="flex items-center gap-1 rounded-lg border border-sky-100 bg-sky-50/70 px-2 py-1 text-[10px] font-semibold text-sky-700">
-          <LinkedinIcon className="h-3 w-3" />
-          <span>LinkedIn</span>
+        <span className="flex items-center gap-1 rounded-lg border border-sky-100 bg-sky-50/70 px-2 py-1 text-[10px] font-semibold text-sky-700 min-w-0">
+          <LinkedinIcon className="h-3 w-3 shrink-0" />
+          <span className="truncate">LinkedIn</span>
         </span>
       )
     default:
@@ -85,11 +85,17 @@ export function AgencyContentCalendar({ weekSchedule = {} }: ContentCalendarProp
           return (
             <div
               key={day.num}
-              className="flex min-h-[140px] flex-col rounded-2xl border border-slate-200/80 bg-slate-50/40 p-3.5 transition-all hover:border-slate-300 hover:bg-white"
+              className="flex min-h-[140px] flex-col rounded-2xl border border-slate-200/80 bg-slate-50/40 p-3 transition-all hover:border-slate-300 hover:bg-white min-w-0"
             >
-              <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
-                <span className="text-xs font-bold text-slate-800">{day.name}</span>
-                <span className="text-[10px] font-semibold text-slate-400">{day.short}</span>
+              <div className="flex items-center justify-between gap-1 border-b border-slate-200/60 pb-2 min-w-0">
+                <span className="text-xs font-bold text-slate-800 truncate" title={day.name}>
+                  <span className="hidden 2xl:inline">{day.name}</span>
+                  <span className="2xl:hidden">{day.short}</span>
+                </span>
+                <span className="shrink-0 rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
+                  <span className="hidden 2xl:inline">{day.short}</span>
+                  <span className="2xl:hidden">#{day.num}</span>
+                </span>
               </div>
 
               <div className="mt-3 flex flex-1 flex-col gap-1.5">
