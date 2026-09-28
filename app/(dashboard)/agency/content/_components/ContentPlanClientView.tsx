@@ -7,6 +7,7 @@ import { ContentTemplateMatrix } from './ContentTemplateMatrix'
 import { CreateTemplateModal } from './CreateTemplateModal'
 import { EditTemplateModal } from './EditTemplateModal'
 import { DeleteTemplateModal } from './DeleteTemplateModal'
+import { GenerateTasksModal } from './GenerateTasksModal'
 
 export interface BrandOption {
   id: string
@@ -173,40 +174,14 @@ export function ContentPlanClientView({
         template={deletingTemplate}
       />
 
-      {/* Asama 4'te GenerateTasksModal buraya eklenecek, su an bilgilendirme */}
-      {isGenerateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
-            onClick={() => setIsGenerateModalOpen(false)}
-          />
-          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Haftalık Görevleri Üret</h3>
-                <p className="text-xs text-slate-500">Aşama 4 otomasyon modalı</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Bu modal, Aşama 4&apos;te seçtiğiniz haftaya (Bu Hafta / Gelecek Hafta) göre aktif şablonlardan tek tıkla toplu görev oluşturacaktır.
-            </p>
-            <div className="flex justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setIsGenerateModalOpen(false)}
-                className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 cursor-pointer"
-              >
-                Anladım
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 7. Haftalik Gorevleri Uret Modali */}
+      <GenerateTasksModal
+        isOpen={isGenerateModalOpen}
+        onClose={() => setIsGenerateModalOpen(false)}
+        brands={brands}
+        templates={templates}
+        initialBrandId={selectedBrandId}
+      />
     </div>
   )
 }
