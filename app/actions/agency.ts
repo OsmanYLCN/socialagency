@@ -1134,3 +1134,359 @@ export async function deleteEmployeeAction(
     return { error: msg }
   }
 }
+
+// Yeni içerik şablonu oluşturur
+export async function createContentTemplateAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const brandId = getFormString(formData, 'brand_id')
+  const dayOfWeekStr = getFormString(formData, 'day_of_week')
+  const platform = getFormString(formData, 'platform')
+  const content = getFormString(formData, 'content')
+  const quantityStr = getFormString(formData, 'quantity')
+  const defaultDescription = getFormString(formData, 'default_description')
+
+  if (!brandId) return { error: 'Lütfen bir marka seçin.' }
+
+  const dayOfWeek = parseInt(dayOfWeekStr, 10)
+  if (isNaN(dayOfWeek) || dayOfWeek < 1 || dayOfWeek > 7) {
+    return { error: 'Geçerli bir gün seçilmelidir (Pazartesi - Pazar).' }
+  }
+
+  if (!isPlatform(platform)) {
+    return { error: 'Geçersiz sosyal medya platformu.' }
+  }
+
+  if (!isContentType(content)) {
+    return { error: 'Geçersiz içerik formatı.' }
+  }
+
+  const quantity = quantityStr ? parseInt(quantityStr, 10) : 1
+  if (isNaN(quantity) || quantity < 1 || quantity > 20) {
+    return { error: 'İçerik adedi 1 ile 20 arasında olmalıdır.' }
+  }
+
+  if (defaultDescription.length > 500) {
+    return { error: 'Varsayılan açıklama en fazla 500 karakter olabilir.' }
+  }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const brand = await prisma.brands.findFirst({
+    where: { id: brandId, agency_id: agencyOwner.agencyId },
+    select: { id: true },
+  })
+
+  if (!brand) {
+    return { error: 'Seçilen marka bu ajansa ait değil veya bulunamadı.' }
+  }
+
+  try {
+    await prisma.content_templates.create({
+      data: {
+        brand_id: brandId,
+        day_of_week: dayOfWeek,
+        platform,
+        content,
+        quantity,
+        default_description: defaultDescription || null,
+        is_active: true,
+      },
+    })
+
+    revalidatePath('/agency/content')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'İçerik şablonu oluşturulurken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// İçerik şablonunu günceller
+export async function updateContentTemplateAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const templateId = getFormString(formData, 'template_id')
+  const brandId = getFormString(formData, 'brand_id')
+  const dayOfWeekStr = getFormString(formData, 'day_of_week')
+  const platform = getFormString(formData, 'platform')
+  const content = getFormString(formData, 'content')
+  const quantityStr = getFormString(formData, 'quantity')
+  const defaultDescription = getFormString(formData, 'default_description')
+
+  if (!templateId) return { error: 'Şablon kimliği gereklidir.' }
+  if (!brandId) return { error: 'Lütfen bir marka seçin.' }
+
+  const dayOfWeek = parseInt(dayOfWeekStr, 10)
+  if (isNaN(dayOfWeek) || dayOfWeek < 1 || dayOfWeek > 7) {
+    return { error: 'Geçerli bir gün seçilmelidir (Pazartesi - Pazar).' }
+  }
+
+  if (!isPlatform(platform)) {
+    return { error: 'Geçersiz sosyal medya platformu.' }
+  }
+
+  if (!isContentType(content)) {
+    return { error: 'Geçersiz içerik formatı.' }
+  }
+
+  const quantity = quantityStr ? parseInt(quantityStr, 10) : 1
+  if (isNaN(quantity) || quantity < 1 || quantity > 20) {
+    return { error: 'İçerik adedi 1 ile 20 arasında olmalıdır.' }
+  }
+
+  if (defaultDescription.length > 500) {
+    return { error: 'Varsayılan açıklama en fazla 500 karakter olabilir.' }
+  }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existing = await prisma.content_templates.findFirst({
+    where: {
+      id: templateId,
+      brands: { agency_id: agencyOwner.agencyId },
+    },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Şablon bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  const targetBrand = await prisma.brands.findFirst({
+    where: { id: brandId, agency_id: agencyOwner.agencyId },
+    select: { id: true },
+  })
+
+  if (!targetBrand) {
+    return { error: 'Hedef marka bu ajansa ait değil veya bulunamadı.' }
+  }
+
+  try {
+    await prisma.content_templates.update({
+      where: { id: templateId },
+      data: {
+        brand_id: brandId,
+        day_of_week: dayOfWeek,
+        platform,
+        content,
+        quantity,
+        default_description: defaultDescription || null,
+      },
+    })
+
+    revalidatePath('/agency/content')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Şablon güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// İçerik şablonunun aktiflik durumunu değiştirir
+export async function toggleContentTemplateStatusAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const templateId = getFormString(formData, 'template_id')
+  if (!templateId) return { error: 'Şablon kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existing = await prisma.content_templates.findFirst({
+    where: {
+      id: templateId,
+      brands: { agency_id: agencyOwner.agencyId },
+    },
+    select: { id: true, is_active: true },
+  })
+
+  if (!existing) {
+    return { error: 'Şablon bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  try {
+    await prisma.content_templates.update({
+      where: { id: templateId },
+      data: { is_active: !existing.is_active },
+    })
+
+    revalidatePath('/agency/content')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Şablon durumu güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// İçerik şablonunu siler; bağlı görevlerin template_id referansını güvenle temizler
+export async function deleteContentTemplateAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const templateId = getFormString(formData, 'template_id')
+  if (!templateId) return { error: 'Şablon kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existing = await prisma.content_templates.findFirst({
+    where: {
+      id: templateId,
+      brands: { agency_id: agencyOwner.agencyId },
+    },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Şablon bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  try {
+    // Bağlı görevlerin template_id ilişkisini null yap, görevleri koru
+    await prisma.tasks.updateMany({
+      where: { template_id: templateId },
+      data: { template_id: null },
+    })
+
+    await prisma.content_templates.delete({
+      where: { id: templateId },
+    })
+
+    revalidatePath('/agency/content')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Şablon silinirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Aktif içerik şablonlarından seçilen hafta için otomatik görevler üretir
+export async function generateTasksFromTemplatesAction(
+  prevState: { success?: boolean; error?: string; count?: number; skipped?: number } | null,
+  formData: FormData
+) {
+  const weekStartDate = getFormString(formData, 'week_start_date')
+  const brandId = getFormString(formData, 'brand_id')
+
+  const dateError = validateDate(weekStartDate)
+  if (dateError) {
+    return { error: 'Geçerli bir hafta başlangıç tarihi (YYYY-AA-GG) seçilmelidir.' }
+  }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  // Seçilen tarihi Pazartesi gününe hizala
+  const [y, m, d] = weekStartDate.split('-').map(Number)
+  const monday = new Date(Date.UTC(y, m - 1, d, 0, 0, 0))
+  const dayOfWeekIndex = monday.getUTCDay() // 0 = Pazar, 1 = Pazartesi, ..., 6 = Cumartesi
+  const diffToMonday = dayOfWeekIndex === 0 ? -6 : 1 - dayOfWeekIndex
+  monday.setUTCDate(monday.getUTCDate() + diffToMonday)
+
+  // Aktif şablonları çek
+  const templates = await prisma.content_templates.findMany({
+    where: {
+      brands: { agency_id: agencyOwner.agencyId },
+      is_active: true,
+      ...(brandId && brandId !== 'all' ? { brand_id: brandId } : {}),
+    },
+    include: {
+      brands: { select: { id: true, name: true } },
+    },
+  })
+
+  if (templates.length === 0) {
+    return { error: 'Seçili kriterlere uygun aktif bir içerik şablonu bulunamadı.' }
+  }
+
+  let generatedCount = 0
+  let skippedCount = 0
+
+  try {
+    for (const template of templates) {
+      // Şablonun gününe denk gelen hedef teslim tarihini hesapla (day_of_week: 1 = Pzt, ..., 7 = Paz)
+      const offsetDays = template.day_of_week - 1
+      const targetDueDate = new Date(monday.getTime())
+      targetDueDate.setUTCDate(monday.getUTCDate() + offsetDays)
+
+      // Mükerrer görev kontrolü: Bu şablon için bu tarihte zaten aktif bir görev açılmış mı?
+      const existingTask = await prisma.tasks.findFirst({
+        where: {
+          agency_id: agencyOwner.agencyId,
+          template_id: template.id,
+          due_date: targetDueDate,
+          is_active: true,
+        },
+        select: { id: true },
+      })
+
+      const qty = template.quantity && template.quantity > 0 ? template.quantity : 1
+
+      if (existingTask) {
+        skippedCount += qty
+        continue
+      }
+
+      // Yeni görevleri oluştur
+      const tasksToCreate = Array.from({ length: qty }).map(() => ({
+        agency_id: agencyOwner.agencyId,
+        brand_id: template.brand_id,
+        template_id: template.id,
+        platform: template.platform,
+        content: template.content,
+        due_date: targetDueDate,
+        status: task_status.unassigned,
+        assignment_note:
+          template.default_description ||
+          `${template.brands.name} - ${template.platform.toUpperCase()} ${template.content.toUpperCase()} Şablon İşi`,
+        is_active: true,
+      }))
+
+      await prisma.tasks.createMany({
+        data: tasksToCreate,
+      })
+
+      // Şablonun son üretilme tarihini güncelle
+      await prisma.content_templates.update({
+        where: { id: template.id },
+        data: { last_generated_at: new Date() },
+      })
+
+      generatedCount += qty
+    }
+
+    revalidatePath('/agency/content')
+    revalidatePath('/agency/tasks')
+    revalidatePath('/agency')
+
+    return {
+      success: true,
+      count: generatedCount,
+      skipped: skippedCount,
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Görevler üretilirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
