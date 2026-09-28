@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ContentPlanHeader } from './ContentPlanHeader'
 import { ContentPlanMetrics } from './ContentPlanMetrics'
 import { ContentTemplateMatrix } from './ContentTemplateMatrix'
+import { InteractiveContentCalendar } from './InteractiveContentCalendar'
 import { CreateTemplateModal } from './CreateTemplateModal'
 import { EditTemplateModal } from './EditTemplateModal'
 import { DeleteTemplateModal } from './DeleteTemplateModal'
@@ -57,6 +58,7 @@ export interface ContentPlanClientViewProps {
 export function ContentPlanClientView({
   brands,
   templates,
+  calendarTasks,
   weeklyTargetCount,
   activeTemplatesCount,
   totalTemplatesCount,
@@ -124,30 +126,10 @@ export function ContentPlanClientView({
           onOpenDeleteModal={(tpl) => setDeletingTemplate(tpl)}
         />
       ) : (
-        /* Asama 5'te InteractiveContentCalendar baglanacak */
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
-            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-slate-900">İnteraktif Canlı Takvim Görünümü</h3>
-            <p className="text-xs text-slate-500 max-w-sm mt-1">
-              Aylık ve haftalık canlı görev takvimi Aşama 5 kapsamında bu alana entegre edilecektir.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setViewMode('matrix')}
-            className="mt-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            Şablon Matrisine Dön
-          </button>
-        </div>
+        <InteractiveContentCalendar
+          tasks={calendarTasks}
+          selectedBrandId={selectedBrandId}
+        />
       )}
 
       {/* 4. Yeni Sablon Ekleme Modali */}
