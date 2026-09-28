@@ -123,10 +123,15 @@ export default async function AgencyPage() {
           select: { id: true, first_name: true, last_name: true, salary: true },
         }),
         prisma.tasks.findMany({
-          where: { agency_id: agencyId },
-          include: {
+          where: { agency_id: agencyId, is_active: true },
+          select: {
+            id: true,
+            platform: true,
+            content: true,
+            status: true,
+            due_date: true,
+            created_at: true,
             brands: { select: { name: true } },
-            profiles: { select: { first_name: true, last_name: true } },
           },
           orderBy: { created_at: 'desc' },
         }),
@@ -193,7 +198,7 @@ export default async function AgencyPage() {
     return { month: m.month, count: countInMonth }
   })
 
-  brandOverviewItems = brands.map((b) => {
+  brandOverviewItems = brands.slice(0, 8).map((b) => {
     const customerProfile = b.profiles?.[0]
     const manager = customerProfile
       ? [customerProfile.first_name, customerProfile.last_name].filter(Boolean).join(' ')

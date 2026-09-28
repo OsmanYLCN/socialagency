@@ -39,7 +39,7 @@ export default async function AgencyTasksPage() {
       orderBy: { first_name: 'asc' },
     }),
     prisma.tasks.findMany({
-      where: { agency_id: agencyId },
+      where: { agency_id: agencyId, is_active: true },
       include: {
         brands: { select: { id: true, name: true } },
         profiles: {

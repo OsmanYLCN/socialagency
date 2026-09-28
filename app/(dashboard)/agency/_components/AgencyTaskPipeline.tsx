@@ -1,4 +1,5 @@
 import { CheckSquare } from 'lucide-react'
+import Link from 'next/link'
 import {
   InstagramIcon,
   YoutubeIcon,
@@ -83,18 +84,28 @@ export function AgencyTaskPipeline({
           {pipeline.planned.length === 0 ? (
             <div className="py-8 text-center text-xs text-slate-400">Görev yok</div>
           ) : (
-            pipeline.planned.map((task) => (
-              <div
-                key={task.id}
-                className="rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs transition-all hover:border-slate-300"
-              >
-                <div className="flex items-center gap-1.5 text-slate-700">
-                  {renderPlatformIcon(task.platform)}
-                  <span className="text-[11px] font-bold capitalize">{task.platform}</span>
+            <>
+              {pipeline.planned.slice(0, 5).map((task) => (
+                <div
+                  key={task.id}
+                  className="rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs transition-all hover:border-slate-300"
+                >
+                  <div className="flex items-center gap-1.5 text-slate-700">
+                    {renderPlatformIcon(task.platform)}
+                    <span className="text-[11px] font-bold capitalize">{task.platform}</span>
+                  </div>
+                  <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
                 </div>
-                <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
-              </div>
-            ))
+              ))}
+              {pipeline.planned.length > 5 && (
+                <Link
+                  href="/agency/tasks"
+                  className="block rounded-xl border border-dashed border-slate-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-slate-500 hover:border-indigo-300 hover:bg-white hover:text-indigo-600 transition-colors"
+                >
+                  +{pipeline.planned.length - 5} daha fazla &rarr;
+                </Link>
+              )}
+            </>
           )}
         </div>
 
@@ -108,18 +119,28 @@ export function AgencyTaskPipeline({
           {pipeline.inProgress.length === 0 ? (
             <div className="py-8 text-center text-xs text-indigo-300">İşlem yok</div>
           ) : (
-            pipeline.inProgress.map((task) => (
-              <div
-                key={task.id}
-                className="rounded-xl border border-indigo-100 bg-white p-3 shadow-2xs transition-all hover:border-indigo-200"
-              >
-                <div className="flex items-center gap-1.5 text-indigo-600">
-                  {renderPlatformIcon(task.platform)}
-                  <span className="text-[11px] font-bold capitalize">{task.platform}</span>
+            <>
+              {pipeline.inProgress.slice(0, 5).map((task) => (
+                <div
+                  key={task.id}
+                  className="rounded-xl border border-indigo-100 bg-white p-3 shadow-2xs transition-all hover:border-indigo-200"
+                >
+                  <div className="flex items-center gap-1.5 text-indigo-600">
+                    {renderPlatformIcon(task.platform)}
+                    <span className="text-[11px] font-bold capitalize">{task.platform}</span>
+                  </div>
+                  <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
                 </div>
-                <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
-              </div>
-            ))
+              ))}
+              {pipeline.inProgress.length > 5 && (
+                <Link
+                  href="/agency/tasks"
+                  className="block rounded-xl border border-dashed border-indigo-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-indigo-600 hover:border-indigo-400 hover:bg-white transition-colors"
+                >
+                  +{pipeline.inProgress.length - 5} daha fazla &rarr;
+                </Link>
+              )}
+            </>
           )}
         </div>
 
@@ -133,18 +154,28 @@ export function AgencyTaskPipeline({
           {pipeline.shared.length === 0 ? (
             <div className="py-8 text-center text-xs text-emerald-400/80">Tamamlanan yok</div>
           ) : (
-            pipeline.shared.map((task) => (
-              <div
-                key={task.id}
-                className="rounded-xl border border-emerald-100 bg-white p-3 shadow-2xs transition-all hover:border-emerald-200"
-              >
-                <div className="flex items-center gap-1.5 text-emerald-600">
-                  {renderPlatformIcon(task.platform)}
-                  <span className="text-[11px] font-bold capitalize">{task.platform}</span>
+            <>
+              {pipeline.shared.slice(0, 5).map((task) => (
+                <div
+                  key={task.id}
+                  className="rounded-xl border border-emerald-100 bg-white p-3 shadow-2xs transition-all hover:border-emerald-200"
+                >
+                  <div className="flex items-center gap-1.5 text-emerald-600">
+                    {renderPlatformIcon(task.platform)}
+                    <span className="text-[11px] font-bold capitalize">{task.platform}</span>
+                  </div>
+                  <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
                 </div>
-                <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
-              </div>
-            ))
+              ))}
+              {pipeline.shared.length > 5 && (
+                <Link
+                  href="/agency/tasks"
+                  className="block rounded-xl border border-dashed border-emerald-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-emerald-700 hover:border-emerald-400 hover:bg-white transition-colors"
+                >
+                  +{pipeline.shared.length - 5} daha fazla &rarr;
+                </Link>
+              )}
+            </>
           )}
         </div>
 
@@ -158,18 +189,28 @@ export function AgencyTaskPipeline({
           {pipeline.pendingApproval.length === 0 ? (
             <div className="py-8 text-center text-xs text-amber-400/80">Bekleyen yok</div>
           ) : (
-            pipeline.pendingApproval.map((task) => (
-              <div
-                key={task.id}
-                className="rounded-xl border border-amber-100 bg-white p-3 shadow-2xs transition-all hover:border-amber-200"
-              >
-                <div className="flex items-center gap-1.5 text-amber-600">
-                  {renderPlatformIcon(task.platform)}
-                  <span className="text-[11px] font-bold capitalize">{task.platform}</span>
+            <>
+              {pipeline.pendingApproval.slice(0, 5).map((task) => (
+                <div
+                  key={task.id}
+                  className="rounded-xl border border-amber-100 bg-white p-3 shadow-2xs transition-all hover:border-amber-200"
+                >
+                  <div className="flex items-center gap-1.5 text-amber-600">
+                    {renderPlatformIcon(task.platform)}
+                    <span className="text-[11px] font-bold capitalize">{task.platform}</span>
+                  </div>
+                  <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
                 </div>
-                <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
-              </div>
-            ))
+              ))}
+              {pipeline.pendingApproval.length > 5 && (
+                <Link
+                  href="/agency/tasks"
+                  className="block rounded-xl border border-dashed border-amber-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-amber-700 hover:border-amber-400 hover:bg-white transition-colors"
+                >
+                  +{pipeline.pendingApproval.length - 5} daha fazla &rarr;
+                </Link>
+              )}
+            </>
           )}
         </div>
       </div>
