@@ -1,7 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { ContentPlanHeader } from './ContentPlanHeader'
 import { ContentPlanMetrics } from './ContentPlanMetrics'
+import { ContentTemplateMatrix } from './ContentTemplateMatrix'
+import { CreateTemplateModal } from './CreateTemplateModal'
+import { EditTemplateModal } from './EditTemplateModal'
+import { DeleteTemplateModal } from './DeleteTemplateModal'
 
 export interface BrandOption {
   id: string
@@ -62,15 +67,43 @@ export function ContentPlanClientView({
   const [selectedBrandId, setSelectedBrandId] = useState<string>('all')
   const [viewMode, setViewMode] = useState<'matrix' | 'calendar'>('matrix')
 
+  // Modallar icin durumlar
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [preselectedDay, setPreselectedDay] = useState(1)
+  const [editingTemplate, setEditingTemplate] = useState<ContentTemplateItem | null>(null)
+  const [deletingTemplate, setDeletingTemplate] = useState<ContentTemplateItem | null>(null)
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false)
+
   // Markaya gore filtrelenmis sablonlar
   const filteredTemplates = templates.filter((tpl) => {
     if (selectedBrandId === 'all') return true
     return tpl.brand_id === selectedBrandId
   })
 
+  const handleOpenCreateWithDay = (day: number) => {
+    setPreselectedDay(day)
+    setIsCreateModalOpen(true)
+  }
+
+  const handleOpenGeneralCreate = () => {
+    setPreselectedDay(1)
+    setIsCreateModalOpen(true)
+  }
+
   return (
     <div className="space-y-6">
-      {/* 4 Ozet KPI Metrik Karti */}
+      {/* 1. Baslik, Marka Filtresi ve Aksiyon Butonlari */}
+      <ContentPlanHeader
+        brands={brands}
+        selectedBrandId={selectedBrandId}
+        onSelectBrand={setSelectedBrandId}
+        viewMode={viewMode}
+        onChangeViewMode={setViewMode}
+        onOpenCreateModal={handleOpenGeneralCreate}
+        onOpenGenerateModal={() => setIsGenerateModalOpen(true)}
+      />
+
+      {/* 2. 4 Ozet KPI Metrik Karti */}
       <ContentPlanMetrics
         weeklyTargetCount={weeklyTargetCount}
         activeTemplatesCount={activeTemplatesCount}
@@ -81,26 +114,99 @@ export function ContentPlanClientView({
         topPlatform={topPlatform}
       />
 
-      {/* Gecici Asama 2 Bilgilendirme Alani */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center sm:p-12">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
-          <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-          </svg>
+      {/* 3. Ana Icerik Gorunumu */}
+      {viewMode === 'matrix' ? (
+        <ContentTemplateMatrix
+          templates={filteredTemplates}
+          onOpenCreateModalWithDay={handleOpenCreateWithDay}
+          onOpenEditModal={(tpl) => setEditingTemplate(tpl)}
+          onOpenDeleteModal={(tpl) => setDeletingTemplate(tpl)}
+        />
+      ) : (
+        /* Asama 5'te InteractiveContentCalendar baglanacak */
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">İnteraktif Canlı Takvim Görünümü</h3>
+            <p className="text-xs text-slate-500 max-w-sm mt-1">
+              Aylık ve haftalık canlı görev takvimi Aşama 5 kapsamında bu alana entegre edilecektir.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setViewMode('matrix')}
+            className="mt-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            Şablon Matrisine Dön
+          </button>
         </div>
-        <div className="space-y-1">
-          <h3 className="text-base font-semibold text-slate-900">
-            Aşama 2 Veri Altyapısı Aktif
-          </h3>
-          <p className="text-sm text-slate-500 max-w-lg mx-auto">
-            {brands.length} marka ve {filteredTemplates.length} şablon için veritabanı bağlantısı sağlandı.
-            Aşama 3&apos;te Haftalık Şablon Matrisi ve Şablon Yönetim modalları eklenecektir.
-          </p>
+      )}
+
+      {/* 4. Yeni Sablon Ekleme Modali */}
+      <CreateTemplateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        brands={brands}
+        initialDay={preselectedDay}
+        initialBrandId={selectedBrandId}
+      />
+
+      {/* 5. Sablon Duzenleme Modali */}
+      <EditTemplateModal
+        isOpen={Boolean(editingTemplate)}
+        onClose={() => setEditingTemplate(null)}
+        brands={brands}
+        template={editingTemplate}
+      />
+
+      {/* 6. Sablon Silme Onay Modali */}
+      <DeleteTemplateModal
+        isOpen={Boolean(deletingTemplate)}
+        onClose={() => setDeletingTemplate(null)}
+        template={deletingTemplate}
+      />
+
+      {/* Asama 4'te GenerateTasksModal buraya eklenecek, su an bilgilendirme */}
+      {isGenerateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsGenerateModalOpen(false)}
+          />
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Haftalık Görevleri Üret</h3>
+                <p className="text-xs text-slate-500">Aşama 4 otomasyon modalı</p>
+              </div>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Bu modal, Aşama 4&apos;te seçtiğiniz haftaya (Bu Hafta / Gelecek Hafta) göre aktif şablonlardan tek tıkla toplu görev oluşturacaktır.
+            </p>
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setIsGenerateModalOpen(false)}
+                className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 cursor-pointer"
+              >
+                Anladım
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
