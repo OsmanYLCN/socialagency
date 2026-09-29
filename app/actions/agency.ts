@@ -1434,56 +1434,94 @@ export async function generateTasksFromTemplatesAction(
   let skippedCount = 0
 
   try {
+    const sunday = new Date(monday.getTime())
+    sunday.setUTCDate(monday.getUTCDate() + 6)
+
+    const templateIds = templates.map((t) => t.id)
+
+    // 1. Haftanın mevcut görevlerini tek seferde çek (N+1 sorgusunu önler)
+    const existingTasks = await prisma.tasks.findMany({
+      where: {
+        agency_id: agencyOwner.agencyId,
+        template_id: { in: templateIds },
+        due_date: {
+          gte: monday,
+          lte: sunday,
+        },
+        is_active: true,
+      },
+      select: {
+        template_id: true,
+        due_date: true,
+      },
+    })
+
+    const existingKeys = new Set(
+      existingTasks.map(
+        (t) => `${t.template_id}_${t.due_date.toISOString().slice(0, 10)}`
+      )
+    )
+
+    const allTasksToCreate: {
+      agency_id: string
+      brand_id: string
+      template_id: string
+      platform: platform_type
+      content: content_type
+      due_date: Date
+      status: task_status
+      assignment_note: string
+      is_active: boolean
+    }[] = []
+
+    const processedTemplateIds: string[] = []
+
     for (const template of templates) {
-      // Şablonun gününe denk gelen hedef teslim tarihini hesapla (day_of_week: 1 = Pzt, ..., 7 = Paz)
       const offsetDays = template.day_of_week - 1
       const targetDueDate = new Date(monday.getTime())
       targetDueDate.setUTCDate(monday.getUTCDate() + offsetDays)
-
-      // Mükerrer görev kontrolü: Bu şablon için bu tarihte zaten aktif bir görev açılmış mı?
-      const existingTask = await prisma.tasks.findFirst({
-        where: {
-          agency_id: agencyOwner.agencyId,
-          template_id: template.id,
-          due_date: targetDueDate,
-          is_active: true,
-        },
-        select: { id: true },
-      })
+      const dateKey = `${template.id}_${targetDueDate.toISOString().slice(0, 10)}`
 
       const qty = template.quantity && template.quantity > 0 ? template.quantity : 1
 
-      if (existingTask) {
+      if (existingKeys.has(dateKey)) {
         skippedCount += qty
         continue
       }
 
-      // Yeni görevleri oluştur
-      const tasksToCreate = Array.from({ length: qty }).map(() => ({
-        agency_id: agencyOwner.agencyId,
-        brand_id: template.brand_id,
-        template_id: template.id,
-        platform: template.platform,
-        content: template.content,
-        due_date: targetDueDate,
-        status: task_status.unassigned,
-        assignment_note:
-          template.default_description ||
-          `${template.brands.name} - ${template.platform.toUpperCase()} ${template.content.toUpperCase()} Şablon İşi`,
-        is_active: true,
-      }))
+      for (let i = 0; i < qty; i++) {
+        allTasksToCreate.push({
+          agency_id: agencyOwner.agencyId,
+          brand_id: template.brand_id,
+          template_id: template.id,
+          platform: template.platform,
+          content: template.content,
+          due_date: targetDueDate,
+          status: task_status.unassigned,
+          assignment_note:
+            template.default_description ||
+            `${template.brands.name} - ${template.platform.toUpperCase()} ${template.content.toUpperCase()} Şablon İşi`,
+          is_active: true,
+        })
+      }
 
+      processedTemplateIds.push(template.id)
+      generatedCount += qty
+    }
+
+    // 2. Yeni görevleri tek seferde topluca oluştur
+    if (allTasksToCreate.length > 0) {
       await prisma.tasks.createMany({
-        data: tasksToCreate,
+        data: allTasksToCreate,
       })
+    }
 
-      // Şablonun son üretilme tarihini güncelle
-      await prisma.content_templates.update({
-        where: { id: template.id },
+    // 3. Şablonların son üretilme tarihlerini tek seferde güncelle
+    if (processedTemplateIds.length > 0) {
+      await prisma.content_templates.updateMany({
+        where: { id: { in: processedTemplateIds } },
         data: { last_generated_at: new Date() },
       })
-
-      generatedCount += qty
     }
 
     revalidatePath('/agency/content')

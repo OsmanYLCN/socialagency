@@ -11,6 +11,8 @@ export interface AuthenticatedUser {
   brandId: string | null
   firstName: string | null
   lastName: string | null
+  email: string | null
+  phone: string | null
 }
 
 export type AgencyOwner = AuthenticatedUser & {
@@ -58,6 +60,8 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     brandId: profile.brand_id,
     firstName: profile.first_name,
     lastName: profile.last_name,
+    email: authData.user.email ?? null,
+    phone: authData.user.phone || (authData.user.user_metadata?.phone as string) || null,
   }
 }
 

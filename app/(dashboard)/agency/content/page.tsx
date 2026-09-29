@@ -17,6 +17,11 @@ export default async function AgencyContentPage() {
   const agencyOwner = await requireAgencyOwner()
   const agencyId = agencyOwner.agencyId
 
+  // Takvim ve aylik metrikler icin makul tarih penceresi (-3 ay ile +5 ay arasi)
+  const now = new Date()
+  const windowStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 3, 1))
+  const windowEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 5, 0))
+
   const [agency, brandsData, templatesData, tasksData] = await Promise.all([
     prisma.agencies.findUnique({
       where: { id: agencyId },
@@ -35,7 +40,14 @@ export default async function AgencyContentPage() {
       orderBy: [{ day_of_week: 'asc' }, { created_at: 'desc' }],
     }),
     prisma.tasks.findMany({
-      where: { agency_id: agencyId, is_active: true },
+      where: {
+        agency_id: agencyId,
+        is_active: true,
+        due_date: {
+          gte: windowStart,
+          lte: windowEnd,
+        },
+      },
       select: {
         id: true,
         brand_id: true,
@@ -95,7 +107,6 @@ export default async function AgencyContentPage() {
   )
 
   // Bu ayki gorevler ve tamamlanma orani
-  const now = new Date()
   const currentMonth = now.getUTCMonth()
   const currentYear = now.getUTCFullYear()
 

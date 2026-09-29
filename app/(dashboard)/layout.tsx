@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
-import { prisma } from '@/lib/prisma'
 import { requireAuthenticatedUser } from '@/lib/auth'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { Topbar } from '@/components/dashboard/Topbar'
@@ -19,28 +18,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     [user.firstName, user.lastName].filter(Boolean).join(' ') ||
     cookieStore.get('user-name')?.value ||
     ''
-  let userEmail = cookieStore.get('user-email')?.value ?? ''
-  let userPhone = cookieStore.get('user-phone')?.value ?? ''
+  const userEmail = cookieStore.get('user-email')?.value || user.email || ''
+  const userPhone = cookieStore.get('user-phone')?.value || user.phone || ''
   const userAvatar = cookieStore.get('user-avatar')?.value ?? ''
-  const userId = user.id
-
-  if (!userEmail) {
-    try {
-      const profile = await prisma.profiles.findUnique({
-        where: { id: userId },
-        include: {
-          users: { select: { email: true, phone: true } },
-          agencies: { select: { contact_email: true } },
-        },
-      })
-
-      if (profile) {
-        userEmail = profile.users?.email || profile.agencies?.contact_email || ''
-        userPhone = profile.users?.phone || userPhone
-      }
-    } catch {
-    }
-  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50">
