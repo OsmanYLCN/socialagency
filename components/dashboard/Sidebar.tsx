@@ -17,7 +17,6 @@ import {
   Building2,
   FileImage,
   ChevronLeft,
-  ChevronRight,
 } from 'lucide-react'
 
 interface NavItem {
@@ -61,7 +60,7 @@ interface SidebarProps {
   role: string
 }
 
-// Açılır kapanır sol menüyü gösterir
+// Açılır kapanır sol menüyü akıcı animasyonlarla gösterir
 export function Sidebar({ role }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const pathname = usePathname()
@@ -70,62 +69,88 @@ export function Sidebar({ role }: SidebarProps) {
 
   return (
     <aside
-      className={`relative flex h-full shrink-0 flex-col border-r border-slate-200/80 bg-white transition-all duration-300 ease-in-out ${
+      className={`relative flex h-full shrink-0 flex-col border-r border-slate-200/80 bg-white transition-[width] duration-300 ease-in-out select-none will-change-[width] ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
+      {/* Daraltma / Genişletme butonu */}
       <button
         type="button"
         onClick={() => setIsCollapsed((prev) => !prev)}
         aria-label={isCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
         title={isCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
-        className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900 focus:outline-none cursor-pointer"
+        className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95 focus:outline-none cursor-pointer"
       >
-        {isCollapsed ? (
-          <ChevronRight className="h-3.5 w-3.5" />
-        ) : (
-          <ChevronLeft className="h-3.5 w-3.5" />
-        )}
+        <ChevronLeft
+          className={`h-3.5 w-3.5 transition-transform duration-300 ease-in-out ${
+            isCollapsed ? 'rotate-180 text-slate-700' : 'rotate-0 text-slate-500'
+          }`}
+        />
       </button>
 
-      <div
-        className={`flex h-16 items-center border-b border-slate-100 transition-all duration-200 ${
-          isCollapsed ? 'justify-center px-2' : 'px-5'
-        }`}
-      >
+      {/* Üst Logo ve Başlık Alanı */}
+      <div className="flex h-16 items-center border-b border-slate-100/80 px-3">
         <Link
           href={homeHref}
           title="SMAUP"
-          className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-700 text-white shadow-sm transition-all hover:bg-slate-600 hover:scale-105 active:scale-95"
+          className="flex w-full items-center overflow-hidden rounded-xl py-1.5 focus:outline-none"
         >
-          <svg
-            className="h-5 w-5 text-slate-100 transition-transform group-hover:scale-110"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          <div className="flex h-10 w-14 shrink-0 items-center justify-center">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-white shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95">
+              <svg
+                className="h-5 w-5 text-slate-100"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m12 3-8 4.5v9L12 21l8-4.5v-9L12 3Z" />
+                <path d="M12 12 4 7.5" />
+                <path d="m12 12 8-4.5" />
+                <path d="M12 12v9" />
+              </svg>
+            </div>
+          </div>
+          <div
+            className={`flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
+              isCollapsed
+                ? 'max-w-0 opacity-0 -translate-x-3 pointer-events-none'
+                : 'max-w-[160px] opacity-100 translate-x-0'
+            }`}
           >
-            <path d="m12 3-8 4.5v9L12 21l8-4.5v-9L12 3Z" />
-            <path d="M12 12 4 7.5" />
-            <path d="m12 12 8-4.5" />
-            <path d="M12 12v9" />
-          </svg>
+            <span className="text-base font-black tracking-wider text-slate-800 leading-none whitespace-nowrap">
+              SMAUP
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mt-1 whitespace-nowrap">
+              Agency Suite
+            </span>
+          </div>
         </Link>
       </div>
 
+      {/* Navigasyon Linkleri */}
       <nav
-        className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4"
+        className="flex flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden px-3 py-4 no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         aria-label="Ana navigasyon"
       >
-        {!isCollapsed && (
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isCollapsed
+              ? 'max-h-0 opacity-0 mb-0 -translate-x-2 pointer-events-none'
+              : 'max-h-6 opacity-100 mb-2 translate-x-0'
+          }`}
+        >
+          <p className="px-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">
             Menü
           </p>
-        )}
+        </div>
+
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/agency' && pathname.startsWith(item.href))
+          const isActive =
+            pathname === item.href ||
+            (item.href !== '/agency' && pathname.startsWith(item.href))
           const Icon = item.icon
 
           return (
@@ -133,38 +158,63 @@ export function Sidebar({ role }: SidebarProps) {
               key={item.href}
               href={item.href}
               title={isCollapsed ? item.label : undefined}
-              className={`group relative flex items-center rounded-xl py-2.5 text-sm font-medium transition-all duration-150 ${
-                isCollapsed ? 'justify-center px-2' : 'gap-3 px-3'
-              } ${
+              className={`group relative flex h-10 w-full items-center rounded-xl transition-colors duration-200 ${
                 isActive
-                  ? 'bg-indigo-50/80 font-semibold text-indigo-700 shadow-sm shadow-indigo-100/50'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-indigo-50/90 font-semibold text-indigo-700 shadow-sm shadow-indigo-100/50'
+                  : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'
               }`}
             >
-              <Icon
-                className={`h-4.5 w-4.5 shrink-0 transition-colors duration-150 ${
-                  isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'
+              <div className="flex h-10 w-14 shrink-0 items-center justify-center">
+                <Icon
+                  className={`h-4.5 w-4.5 transition-colors duration-200 ${
+                    isActive
+                      ? 'text-indigo-600'
+                      : 'text-slate-400 group-hover:text-slate-600'
+                  }`}
+                />
+              </div>
+
+              <div
+                className={`flex flex-1 items-center justify-between overflow-hidden pr-3 transition-all duration-300 ease-in-out ${
+                  isCollapsed
+                    ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none'
+                    : 'max-w-[180px] opacity-100 translate-x-0'
                 }`}
-              />
-              {!isCollapsed && <span className="truncate">{item.label}</span>}
-              {isActive && !isCollapsed && (
-                <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-600" />
-              )}
+              >
+                <span className="truncate text-sm font-medium whitespace-nowrap">
+                  {item.label}
+                </span>
+                {isActive && (
+                  <span className="ml-2 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-600" />
+                )}
+              </div>
             </Link>
           )
         })}
       </nav>
 
-      <div className="border-t border-slate-100/80 px-4 py-4">
+      {/* Alt Marka Alanı */}
+      <div className="border-t border-slate-100/80 p-3">
         <div
           title="SMAUP"
-          className={`flex items-center transition-all ${
-            isCollapsed ? 'justify-center' : 'px-1'
-          }`}
+          className="flex h-10 w-full items-center overflow-hidden rounded-xl"
         >
-          <span className="text-base font-black tracking-[0.2em] text-slate-700 select-none">
-            {isCollapsed ? 'S' : 'SMAUP'}
-          </span>
+          <div className="flex h-10 w-14 shrink-0 items-center justify-center">
+            <span className="text-base font-black text-slate-700 select-none">
+              S
+            </span>
+          </div>
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isCollapsed
+                ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none'
+                : 'max-w-[140px] opacity-100 translate-x-0'
+            }`}
+          >
+            <span className="text-base font-black tracking-[0.2em] text-slate-700 select-none whitespace-nowrap">
+              MAUP
+            </span>
+          </div>
         </div>
       </div>
     </aside>
