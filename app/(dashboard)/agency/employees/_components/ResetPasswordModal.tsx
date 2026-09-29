@@ -82,10 +82,13 @@ export function ResetPasswordModal({ isOpen, employee, onClose }: ResetPasswordM
 
   const handleCopy = useCallback(() => {
     if (!password) return
-    navigator.clipboard.writeText(password).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+    navigator.clipboard
+      .writeText(password)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      })
+      .catch(() => {})
   }, [password])
 
   if (!isOpen || !employee) return null

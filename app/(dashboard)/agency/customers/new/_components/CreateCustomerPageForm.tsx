@@ -94,10 +94,13 @@ export function CreateCustomerPageForm() {
 
   const handleCopy = useCallback(() => {
     if (!password) return
-    navigator.clipboard.writeText(password).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+    navigator.clipboard
+      .writeText(password)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      })
+      .catch(() => {})
   }, [password])
 
   return (

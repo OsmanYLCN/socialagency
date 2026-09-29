@@ -520,8 +520,9 @@ export function TaskDetailModal({
                   <div className="mt-2 rounded-xl border border-slate-200 bg-white p-2 shadow-lg animate-in fade-in">
                     <button
                       type="button"
+                      disabled={isPending}
                       onClick={() => handleAssign('')}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-100 cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-100 disabled:opacity-50 cursor-pointer"
                     >
                       <span>📋 İş Havuzuna Gönder</span>
                     </button>
@@ -529,8 +530,9 @@ export function TaskDetailModal({
                       <button
                         key={emp.id}
                         type="button"
+                        disabled={isPending}
                         onClick={() => handleAssign(emp.id)}
-                        className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium cursor-pointer ${
+                        className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium disabled:opacity-50 cursor-pointer ${
                           task.assigneeId === emp.id
                             ? 'bg-indigo-50 font-bold text-indigo-700'
                             : 'text-slate-700 hover:bg-slate-100'
@@ -550,8 +552,9 @@ export function TaskDetailModal({
                 <div className="grid grid-cols-2 gap-1.5">
                   <button
                     type="button"
+                    disabled={isPending}
                     onClick={() => handleStatusChange('assigned')}
-                    className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all disabled:opacity-50 cursor-pointer ${
                       task.status === 'assigned'
                         ? 'border-blue-300 bg-blue-50 text-blue-700'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
@@ -561,8 +564,9 @@ export function TaskDetailModal({
                   </button>
                   <button
                     type="button"
+                    disabled={isPending}
                     onClick={() => handleStatusChange('pending_approval')}
-                    className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all disabled:opacity-50 cursor-pointer ${
                       task.status === 'pending_approval'
                         ? 'border-amber-300 bg-amber-50 text-amber-700'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
@@ -572,8 +576,9 @@ export function TaskDetailModal({
                   </button>
                   <button
                     type="button"
+                    disabled={isPending}
                     onClick={() => handleStatusChange('completed')}
-                    className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all disabled:opacity-50 cursor-pointer ${
                       task.status === 'completed'
                         ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
@@ -583,8 +588,9 @@ export function TaskDetailModal({
                   </button>
                   <button
                     type="button"
+                    disabled={isPending}
                     onClick={() => handleStatusChange('unassigned')}
-                    className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all disabled:opacity-50 cursor-pointer ${
                       task.status === 'unassigned'
                         ? 'border-slate-300 bg-slate-200 text-slate-800'
                         : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'

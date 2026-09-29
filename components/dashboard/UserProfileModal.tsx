@@ -101,6 +101,9 @@ export function UserProfileModal({
 
   const handleCropComplete = (croppedBlob: Blob, previewUrl: string) => {
     const file = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' })
+    if (previewAvatar && previewAvatar.startsWith('blob:')) {
+      URL.revokeObjectURL(previewAvatar)
+    }
     setPreviewAvatar(previewUrl)
     setRemoveAvatar(false)
     setCropperOpen(false)
@@ -116,6 +119,9 @@ export function UserProfileModal({
   }
 
   const handleRemoveAvatar = () => {
+    if (previewAvatar && previewAvatar.startsWith('blob:')) {
+      URL.revokeObjectURL(previewAvatar)
+    }
     setPreviewAvatar('')
     setCropperImageSrc('')
     setRemoveAvatar(true)
@@ -123,6 +129,14 @@ export function UserProfileModal({
       fileInputRef.current.value = ''
     }
   }
+
+  useEffect(() => {
+    return () => {
+      if (previewAvatar && previewAvatar.startsWith('blob:')) {
+        URL.revokeObjectURL(previewAvatar)
+      }
+    }
+  }, [previewAvatar])
 
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
