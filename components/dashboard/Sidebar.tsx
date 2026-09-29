@@ -175,7 +175,7 @@ export function Sidebar({ role }: SidebarProps) {
               </div>
 
               <div
-                className={`flex flex-1 items-center justify-between overflow-hidden pr-3 transition-all duration-300 ease-in-out ${
+                className={`flex flex-1 items-center overflow-hidden pr-3 transition-all duration-300 ease-in-out ${
                   isCollapsed
                     ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none'
                     : 'max-w-[180px] opacity-100 translate-x-0'
@@ -184,9 +184,6 @@ export function Sidebar({ role }: SidebarProps) {
                 <span className="truncate text-sm font-medium whitespace-nowrap">
                   {item.label}
                 </span>
-                {isActive && (
-                  <span className="ml-2 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-600" />
-                )}
               </div>
             </Link>
           )
@@ -194,25 +191,34 @@ export function Sidebar({ role }: SidebarProps) {
       </nav>
 
       {/* Alt Marka Alanı */}
-      <div className="border-t border-slate-100/80 p-3">
+      <div className="border-t border-slate-100/80 px-3 py-3.5">
         <div
           title="SMAUP"
-          className="flex h-10 w-full items-center overflow-hidden rounded-xl"
+          className="relative flex h-8 items-center overflow-hidden"
         >
-          <div className="flex h-10 w-14 shrink-0 items-center justify-center">
-            <span className="text-base font-black text-slate-700 select-none">
+          {/* Daraltılmış durum: Ortalanmış 'S' */}
+          <div
+            className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${
+              isCollapsed
+                ? 'opacity-100 scale-100 pointer-events-auto'
+                : 'opacity-0 scale-90 pointer-events-none'
+            }`}
+          >
+            <span className="text-base font-black tracking-[0.2em] text-slate-700 select-none">
               S
             </span>
           </div>
+
+          {/* Genişletilmiş durum: Birleşik ve hizalı 'SMAUP' */}
           <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            className={`flex items-center px-4 transition-all duration-300 ease-in-out ${
               isCollapsed
-                ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none'
-                : 'max-w-[140px] opacity-100 translate-x-0'
+                ? 'opacity-0 -translate-x-3 pointer-events-none'
+                : 'opacity-100 translate-x-0'
             }`}
           >
             <span className="text-base font-black tracking-[0.2em] text-slate-700 select-none whitespace-nowrap">
-              MAUP
+              SMAUP
             </span>
           </div>
         </div>
