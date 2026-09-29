@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { cookies } from 'next/headers'
 import { requireAuthenticatedUser } from '@/lib/auth'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { Topbar } from '@/components/dashboard/Topbar'
+import { RouteProgressBar } from '@/components/dashboard/RouteProgressBar'
 
 export const metadata: Metadata = {
   title: 'Panel – SMAUP',
@@ -24,6 +26,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50">
+      <Suspense fallback={null}>
+        <RouteProgressBar />
+      </Suspense>
       <Sidebar role={userRole} />
 
       <div className="flex flex-1 flex-col overflow-hidden">
