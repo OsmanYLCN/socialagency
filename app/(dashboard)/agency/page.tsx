@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { requireAgencyOwner } from '@/lib/auth'
+import { getLocalDateString } from '@/lib/utils'
 import { AgencyMetricsRow } from './_components/AgencyMetricsRow'
 import { AgencyChartsRow } from './_components/AgencyChartsRow'
 import { AgencyActionButtons } from './_components/AgencyActionButtons'
@@ -153,19 +154,11 @@ export default async function AgencyPage() {
   activeBrandsCount = brands.length
   employeeCount = employees.length
 
-  const now = new Date()
-  const todayYear = now.getFullYear()
-  const todayMonth = String(now.getMonth() + 1).padStart(2, '0')
-  const todayDay = String(now.getDate()).padStart(2, '0')
-  const todayStr = `${todayYear}-${todayMonth}-${todayDay}`
+  const todayStr = getLocalDateString()
 
   todayTasksCount = tasks.filter((t) => {
     if (!t.due_date) return false
-    const d = new Date(t.due_date)
-    const y = d.getFullYear()
-    const m = String(d.getMonth() + 1).padStart(2, '0')
-    const day = String(d.getDate()).padStart(2, '0')
-    return `${y}-${m}-${day}` === todayStr
+    return t.due_date.toISOString().slice(0, 10) === todayStr
   }).length
 
   pendingApprovalCount = tasks.filter((t) => t.status === 'pending_approval').length

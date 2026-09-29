@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import type { TaskItem, EmployeeOption } from './TasksClientView'
 import { updateTaskStatusAction, assignTaskAction } from '@/app/actions/agency'
+import { getTaskDueStatus } from '@/lib/utils'
 
 interface TaskCardProps {
   task: TaskItem
@@ -93,14 +94,8 @@ export function TaskCard({
     dot: 'bg-slate-500',
   }
 
-  // Tarih ve gecikme hesabı
-  const now = new Date()
-  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-  const dueDateTime = new Date(task.dueDate).getTime()
-  const isCompleted = task.status === 'completed'
-  const isOverdue = !isCompleted && dueDateTime > 0 && dueDateTime < todayMidnight
-  const isToday =
-    !isCompleted && dueDateTime >= todayMidnight && dueDateTime < todayMidnight + 86400000
+  // Tarih ve gecikme hesabı (saat dilimi kayması olmadan kesin hesaplama)
+  const { isOverdue, isToday, isCompleted } = getTaskDueStatus(task.dueDate, task.status)
 
   // Hızlı Durum Değiştirme
   const handleStatusChange = (newStatus: TaskItem['status']) => {

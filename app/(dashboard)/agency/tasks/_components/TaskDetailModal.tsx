@@ -34,6 +34,7 @@ import {
   requestTaskRevisionAction,
   addTaskCommentAction,
 } from '@/app/actions/agency'
+import { getTaskDueStatus } from '@/lib/utils'
 
 interface TaskDetailModalProps {
   task: TaskItem | null
@@ -147,13 +148,8 @@ export function TaskDetailModal({
   }
   const statusInfo = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.unassigned
 
-  const now = new Date()
-  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-  const dueDateTime = new Date(task.dueDate).getTime()
-  const isCompleted = task.status === 'completed'
-  const isOverdue = !isCompleted && dueDateTime > 0 && dueDateTime < todayMidnight
-  const isToday =
-    !isCompleted && dueDateTime >= todayMidnight && dueDateTime < todayMidnight + 86400000
+  // Tarih ve gecikme hesabı (saat dilimi kayması olmadan kesin kontrol)
+  const { isOverdue, isToday } = getTaskDueStatus(task.dueDate, task.status)
 
   // Durum Değiştirme
   const handleStatusChange = (newStatus: TaskItem['status']) => {

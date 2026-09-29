@@ -58,12 +58,16 @@ export async function loginAction(
     const serviceClient = getServiceClient()
     const { data, error: profileError } = await serviceClient
       .from('profiles')
-      .select('role, agency_id, first_name, last_name, avatar_url')
+      .select('role, agency_id, first_name, last_name, avatar_url, is_active')
       .eq('id', authData.user.id)
       .maybeSingle()
 
     if (profileError || !data) {
       return { error: 'Profil bilgisi bulunamadı. Lütfen yöneticinizle iletişime geçin.' }
+    }
+
+    if (data.is_active === false) {
+      return { error: 'Hesabınız askıya alınmıştır veya aktif değildir. Lütfen yöneticinizle iletişime geçin.' }
     }
     profile = data
   } catch (err: unknown) {

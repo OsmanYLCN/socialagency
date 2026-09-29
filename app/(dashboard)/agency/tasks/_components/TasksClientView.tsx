@@ -10,6 +10,7 @@ import { CreateTaskModal } from './CreateTaskModal'
 import { TaskDetailModal } from './TaskDetailModal'
 import { EditTaskModal } from './EditTaskModal'
 import { DeleteTaskModal } from './DeleteTaskModal'
+import { getLocalDateString } from '@/lib/utils'
 
 export interface TaskCommentItem {
   id: string
@@ -115,9 +116,11 @@ export function TasksClientView({
   // Filtrelenmiş görevleri hesapla (Türkçe locale duyarlı)
   const filteredTasks = useMemo(() => {
     const query = filters.search.trim().toLocaleLowerCase('tr-TR')
+    const todayStr = getLocalDateString()
     const now = new Date()
-    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-    const oneDayMs = 24 * 60 * 60 * 1000
+    const endOfWeek = new Date(now)
+    endOfWeek.setDate(now.getDate() + 7)
+    const endOfWeekStr = getLocalDateString(endOfWeek)
 
     return tasks.filter((t) => {
       // 1. Metin Arama
@@ -156,15 +159,16 @@ export function TasksClientView({
         return false
       }
 
-      // 6. Zaman Filtresi
+      // 6. Zaman Filtresi (Saat dilimi kayması olmadan string bazlı kesin eşleşme)
       if (filters.timeFilter) {
-        const dueTime = new Date(t.dueDate).getTime()
+        if (!t.dueDate) return false
+        const dueStr = t.dueDate.slice(0, 10)
         if (filters.timeFilter === 'overdue') {
-          if (t.status === 'completed' || dueTime >= todayMidnight) return false
+          if (t.status === 'completed' || dueStr >= todayStr) return false
         } else if (filters.timeFilter === 'today') {
-          if (dueTime < todayMidnight || dueTime >= todayMidnight + oneDayMs) return false
+          if (dueStr !== todayStr) return false
         } else if (filters.timeFilter === 'this_week') {
-          if (dueTime < todayMidnight || dueTime >= todayMidnight + 7 * oneDayMs) return false
+          if (dueStr < todayStr || dueStr > endOfWeekStr) return false
         }
       }
 

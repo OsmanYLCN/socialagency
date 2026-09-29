@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getServiceClient } from '@/lib/supabase/server'
-import { requireAuthenticatedUser } from '@/lib/auth'
+import { getAuthenticatedUser, requireAuthenticatedUser } from '@/lib/auth'
 import {
   getFormString,
   normalizeTurkishPhone,
@@ -25,39 +25,15 @@ export interface ProfileDetails {
 
 // Kullanıcının profil bilgilerini getirir
 export async function getProfileDetailsAction(): Promise<ProfileDetails | null> {
-  const cookieStore = await cookies()
-  let userId = cookieStore.get('user-id')?.value
-  const token = cookieStore.get('sb-access-token')?.value
-  const userRole = cookieStore.get('user-role')?.value ?? 'agency_owner'
-
-  const agencyId = cookieStore.get('agency-id')?.value
-
-  const serviceClient = getServiceClient()
-
-  if (!userId && token) {
-    try {
-      const { data } = await serviceClient.auth.getUser(token)
-      if (data?.user) {
-        userId = data.user.id
-      }
-    } catch {
-    }
-  }
-
-  if (!userId && agencyId) {
-    try {
-      const p = await prisma.profiles.findFirst({
-        where: { agency_id: agencyId },
-        select: { id: true },
-      })
-      if (p?.id) userId = p.id
-    } catch {
-    }
-  }
-
-  if (!userId) {
+  const user = await getAuthenticatedUser()
+  if (!user) {
     return null
   }
+
+  const userId = user.id
+  const userRole = user.role
+  const cookieStore = await cookies()
+  const serviceClient = getServiceClient()
 
   let email = cookieStore.get('user-email')?.value ?? ''
   let phone = cookieStore.get('user-phone')?.value ?? ''

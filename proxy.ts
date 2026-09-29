@@ -14,23 +14,30 @@ export function proxy(request: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix))
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
 
-  // 1. Korumalı rotaya erişmeye çalışan oturumsuz kullanıcılar
-  if (isProtected && !token) {
-    const refreshToken = request.cookies.get('sb-refresh-token')?.value
-    if (refreshToken) {
-      const refreshUrl = new URL('/auth/refresh', request.url)
-      refreshUrl.searchParams.set('next', pathname)
-      return NextResponse.redirect(refreshUrl)
+  // 1. Korumalı rotaya erişen kullanıcıların oturum ve rol denetimi
+  if (isProtected) {
+    if (!token) {
+      const refreshToken = request.cookies.get('sb-refresh-token')?.value
+      if (refreshToken) {
+        const refreshUrl = new URL('/auth/refresh', request.url)
+        refreshUrl.searchParams.set('next', pathname)
+        return NextResponse.redirect(refreshUrl)
+      }
+
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('from', pathname)
+      return NextResponse.redirect(loginUrl)
     }
 
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('from', pathname)
-    return NextResponse.redirect(loginUrl)
-  }
+    // Token var ancak rol çerezi eksik veya geçersizse girişe yönlendir
+    if (!role || !ROLE_REDIRECT[role]) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('from', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
 
-  // 2. Korumalı rotaya erişen oturumlu kullanıcıların rol denetimi (Middleware Route Guard)
-  if (isProtected && token && role) {
-    const defaultHome = ROLE_REDIRECT[role] ?? '/login'
+    // 2. Korumalı rotaya erişen oturumlu kullanıcıların rol denetimi (Middleware Route Guard)
+    const defaultHome = ROLE_REDIRECT[role]
 
     if (pathname.startsWith('/admin') && role !== 'super_admin') {
       return NextResponse.redirect(new URL(defaultHome, request.url))

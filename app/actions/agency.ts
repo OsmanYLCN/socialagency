@@ -356,7 +356,7 @@ export async function updateTaskAction(
 
   const existingTask = await prisma.tasks.findFirst({
     where: { id: taskId, agency_id: agencyOwner.agencyId },
-    select: { id: true, assignee_id: true, status: true },
+    select: { id: true, brand_id: true, assignee_id: true, status: true },
   })
 
   if (!existingTask) {
@@ -409,6 +409,7 @@ export async function updateTaskAction(
         status: newStatus,
         assignment_note: note || null,
         content_url: contentUrl || null,
+        ...(brandId !== existingTask.brand_id ? { template_id: null } : {}),
       },
     })
 
@@ -883,12 +884,22 @@ export async function deleteCustomerAction(
       await prisma.profiles.deleteMany({ where: { id: targetCustomerProfile.id } })
     }
 
-    // İlişkili profillerin brand_id bağlantısını çöz (foreign key kısıt ihlalini önler)
+    // 1. Markaya ait görevlerin template_id bağlantısını çöz ve görevleri temizle (Foreign Key kısıt ihlalini önler)
+    await prisma.tasks.updateMany({
+      where: { brand_id: brandId },
+      data: { template_id: null },
+    })
+    await prisma.tasks.deleteMany({
+      where: { brand_id: brandId },
+    })
+
+    // 2. İlişkili profillerin brand_id bağlantısını çöz
     await prisma.profiles.updateMany({
       where: { brand_id: brandId },
       data: { brand_id: null },
     })
 
+    // 3. Markayı güvenle sil (şablonlar cascade ile silinir)
     await prisma.brands.delete({ where: { id: brandId } })
 
     revalidatePath('/agency/customers')

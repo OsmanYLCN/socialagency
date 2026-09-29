@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import { requireAgencyOwner } from '@/lib/auth'
+import { getLocalDateString, getTaskDueStatus } from '@/lib/utils'
 import {
   TasksClientView,
   TaskItem,
@@ -84,9 +85,8 @@ export default async function AgencyTasksPage() {
     }
   })
 
-  // Bugün başlangıcı (gecikme hesabı için)
-  const now = new Date()
-  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+  // Bugünün yerel tarihi (saat dilimi kayması olmadan kesin kontrol için)
+  const todayStr = getLocalDateString()
 
   // Metrik hesaplamaları
   let inProgressTasks = 0
@@ -103,8 +103,8 @@ export default async function AgencyTasksPage() {
       : null
     const assigneeEmail = assignee?.users?.email ?? null
 
-    const dueDateTime = t.due_date ? new Date(t.due_date).getTime() : 0
-    const isOverdue = status !== 'completed' && dueDateTime > 0 && dueDateTime < todayMidnight
+    const dueDateStr = t.due_date ? t.due_date.toISOString().slice(0, 10) : ''
+    const { isOverdue } = getTaskDueStatus(dueDateStr, status, todayStr)
 
     if (isOverdue) overdueTasks++
     if (status === 'unassigned') unassignedTasks++

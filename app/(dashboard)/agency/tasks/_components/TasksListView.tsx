@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import type { TaskItem, EmployeeOption } from './TasksClientView'
 import { updateTaskStatusAction, assignTaskAction } from '@/app/actions/agency'
+import { getTaskDueStatus } from '@/lib/utils'
 
 interface TasksListViewProps {
   tasks: TaskItem[]
@@ -168,9 +169,6 @@ export function TasksListView({
     })
   }
 
-  const now = new Date()
-  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
       <div className="overflow-x-auto">
@@ -242,11 +240,7 @@ export function TasksListView({
                 }
                 const statusInfo = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.unassigned
 
-                const dueDateTime = new Date(task.dueDate).getTime()
-                const isCompleted = task.status === 'completed'
-                const isOverdue = !isCompleted && dueDateTime > 0 && dueDateTime < todayMidnight
-                const isToday =
-                  !isCompleted && dueDateTime >= todayMidnight && dueDateTime < todayMidnight + 86400000
+                const { isOverdue, isToday, isCompleted } = getTaskDueStatus(task.dueDate, task.status)
 
                 return (
                   <tr

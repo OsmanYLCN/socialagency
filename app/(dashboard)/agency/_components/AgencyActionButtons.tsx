@@ -4,6 +4,7 @@ import { useState, useActionState } from 'react'
 import Link from 'next/link'
 import { CheckSquare, Building2, X, Loader2, Check } from 'lucide-react'
 import { createTaskAction } from '@/app/actions/agency'
+import { getLocalDateString } from '@/lib/utils'
 
 interface BrandOption {
   id: string
@@ -149,7 +150,7 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
                     type="date"
                     name="due_date"
                     required
-                    defaultValue={new Date().toISOString().split('T')[0]}
+                    defaultValue={getLocalDateString()}
                     className="h-10 w-full rounded-xl border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
                   />
                 </div>
