@@ -16,6 +16,7 @@ import {
   DEFAULT_SETTINGS,
   getSavedSettings,
   saveSettings,
+  applyAllPreferences,
 } from '@/lib/settings'
 import { AppearanceTab } from './AppearanceTab'
 import { LocalizationTab } from './LocalizationTab'
@@ -92,12 +93,20 @@ export function SettingsShell({ children }: SettingsShellProps) {
     setSettings(loaded)
     setSavedSettings(loaded)
     setIsLoaded(true)
+    applyAllPreferences(loaded)
   }, [])
 
   const hasChanges = JSON.stringify(settings) !== JSON.stringify(savedSettings)
 
   const updateSetting = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
-    setSettings((prev) => ({ ...prev, [key]: value }))
+    setSettings((prev) => {
+      const next = { ...prev, [key]: value }
+      // Anında canlı görsel önizleme uygula (Tema, Yoğunluk, Animasyon)
+      if (key === 'theme' || key === 'density' || key === 'animations') {
+        applyAllPreferences(next)
+      }
+      return next
+    })
   }
 
   const handleSave = () => {
@@ -112,6 +121,7 @@ export function SettingsShell({ children }: SettingsShellProps) {
     setSettings(DEFAULT_SETTINGS)
     saveSettings(DEFAULT_SETTINGS)
     setSavedSettings(DEFAULT_SETTINGS)
+    applyAllPreferences(DEFAULT_SETTINGS)
     setToastMessage('Ayarlar varsayılan değerlere sıfırlandı.')
     setShowToast(true)
     setTimeout(() => setShowToast(false), 3000)
@@ -122,12 +132,12 @@ export function SettingsShell({ children }: SettingsShellProps) {
   return (
     <div className="mx-auto max-w-7xl space-y-6 pb-20 select-none">
       {/* Başlık Alanı */}
-      <div className="flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
             Sistem Ayarları
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Arayüz görünümünü, bölgesel tercihleri ve bildirim kanallarını yapılandırın.
           </p>
         </div>
@@ -138,9 +148,9 @@ export function SettingsShell({ children }: SettingsShellProps) {
             type="button"
             onClick={handleReset}
             title="Tüm ayarları sıfırla"
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 shadow-xs transition-all hover:bg-slate-50 hover:text-slate-900 cursor-pointer"
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 shadow-xs transition-all hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 cursor-pointer"
           >
-            <RotateCcw className="h-3.5 w-3.5 text-slate-400" />
+            <RotateCcw className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
             Sıfırla
           </button>
 
@@ -150,8 +160,8 @@ export function SettingsShell({ children }: SettingsShellProps) {
             disabled={!hasChanges && isLoaded}
             className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold shadow-xs transition-all cursor-pointer ${
               hasChanges
-                ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200 active:scale-95'
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200 dark:shadow-none active:scale-95'
+                : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-600 cursor-not-allowed'
             }`}
           >
             <Save className="h-3.5 w-3.5" />
@@ -176,15 +186,15 @@ export function SettingsShell({ children }: SettingsShellProps) {
                   onClick={() => setActiveTab(tab.id)}
                   className={`group flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left transition-all cursor-pointer shrink-0 lg:w-full ${
                     isActive
-                      ? 'bg-indigo-50/90 text-indigo-700 shadow-xs'
-                      : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'
+                      ? 'bg-indigo-50/90 text-indigo-700 shadow-xs dark:bg-indigo-950/40 dark:text-indigo-300'
+                      : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-200'
                   }`}
                 >
                   <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
                       isActive
                         ? 'bg-indigo-600 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700'
+                        : 'bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700 dark:group-hover:text-slate-200'
                     }`}
                   >
                     <Icon className="h-4.5 w-4.5" />
@@ -201,11 +211,11 @@ export function SettingsShell({ children }: SettingsShellProps) {
 
         {/* Sağ İçerik Alanı */}
         <main className="lg:col-span-8 xl:col-span-9">
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-8">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs sm:p-8 dark:border-slate-800 dark:bg-slate-900">
             {/* Sekme Başlığı */}
-            <div className="border-b border-slate-100 pb-5 mb-6">
-              <h2 className="text-lg font-bold text-slate-900">{activeTabMeta.label}</h2>
-              <p className="text-xs text-slate-500 mt-1">{activeTabMeta.description}</p>
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">{activeTabMeta.label}</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{activeTabMeta.description}</p>
             </div>
 
             {/* İçerik */}
@@ -232,10 +242,10 @@ export function SettingsShell({ children }: SettingsShellProps) {
 
       {/* Kaydedilmemiş Değişiklik Bildirim Çubuğu (Floating Bar) */}
       {hasChanges && (
-        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-4 rounded-2xl border border-slate-200 bg-white/95 px-5 py-3.5 shadow-xl shadow-slate-900/10 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-4 rounded-2xl border border-slate-200 bg-white/95 px-5 py-3.5 shadow-xl shadow-slate-900/10 backdrop-blur-md dark:border-slate-700 dark:bg-slate-800/95 dark:shadow-black/40 animate-in fade-in slide-in-from-bottom-4 duration-200">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-            <p className="text-xs font-semibold text-slate-700">
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">
               Kaydedilmemiş değişiklikleriniz var.
             </p>
           </div>
@@ -253,7 +263,7 @@ export function SettingsShell({ children }: SettingsShellProps) {
 
       {/* Başarı Toast Bildirimi */}
       {showToast && (
-        <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2.5 rounded-2xl bg-slate-900/95 px-4 py-3 text-white shadow-xl shadow-slate-900/20 backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2.5 rounded-2xl bg-slate-900/95 px-4 py-3 text-white shadow-xl shadow-slate-900/20 backdrop-blur-md dark:bg-slate-800/95 dark:border dark:border-slate-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white">
             <Check className="h-3 w-3 stroke-[3]" />
           </div>
@@ -263,3 +273,4 @@ export function SettingsShell({ children }: SettingsShellProps) {
     </div>
   )
 }
+

@@ -94,8 +94,8 @@ export function AppearanceTab({ settings, updateSetting }: AppearanceTabProps) {
       {/* 1. Tema Seçimi */}
       <section className="space-y-3">
         <div>
-          <h3 className="text-sm font-bold text-slate-900">Arayüz Teması</h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Arayüz Teması</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Platformun genel renk temasını ve gece/gündüz görünümünü seçin.
           </p>
         </div>
@@ -112,8 +112,8 @@ export function AppearanceTab({ settings, updateSetting }: AppearanceTabProps) {
                 onClick={() => updateSetting('theme', opt.id)}
                 className={`relative flex flex-col gap-3 rounded-2xl border p-4 text-left transition-all cursor-pointer ${
                   isSelected
-                    ? 'border-indigo-600 bg-indigo-50/20 ring-2 ring-indigo-600/20 shadow-xs'
-                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                    ? 'border-indigo-600 bg-indigo-50/20 ring-2 ring-indigo-600/20 shadow-xs dark:bg-indigo-950/30 dark:border-indigo-500 dark:ring-indigo-500/20'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/60 dark:hover:border-slate-700 dark:hover:bg-slate-800'
                 }`}
               >
                 {/* Canlı Önizleme */}
@@ -122,10 +122,10 @@ export function AppearanceTab({ settings, updateSetting }: AppearanceTabProps) {
                 <div className="flex items-start justify-between gap-2 pt-1">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <Icon className="h-4 w-4 text-slate-600" />
-                      <p className="text-xs font-bold text-slate-900">{opt.title}</p>
+                      <Icon className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+                      <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{opt.title}</p>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{opt.description}</p>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{opt.description}</p>
                   </div>
 
                   {isSelected && (
@@ -141,10 +141,10 @@ export function AppearanceTab({ settings, updateSetting }: AppearanceTabProps) {
       </section>
 
       {/* 2. Arayüz Yoğunluğu */}
-      <section className="space-y-3 border-t border-slate-100 pt-6">
+      <section className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-6">
         <div>
-          <h3 className="text-sm font-bold text-slate-900">Arayüz Yoğunluğu</h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Arayüz Yoğunluğu</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Tablo ve listelerdeki satır aralıklarını ve veri sıkışıklığını ayarlayın.
           </p>
         </div>
@@ -160,20 +160,20 @@ export function AppearanceTab({ settings, updateSetting }: AppearanceTabProps) {
                 onClick={() => updateSetting('density', opt.id)}
                 className={`flex items-start justify-between rounded-xl border p-4 text-left transition-all cursor-pointer ${
                   isSelected
-                    ? 'border-indigo-600 bg-indigo-50/20 ring-2 ring-indigo-600/20'
-                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                    ? 'border-indigo-600 bg-indigo-50/20 ring-2 ring-indigo-600/20 dark:bg-indigo-950/30 dark:border-indigo-500 dark:ring-indigo-500/20'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/60 dark:hover:border-slate-700 dark:hover:bg-slate-800'
                 }`}
               >
                 <div>
-                  <p className="text-xs font-bold text-slate-900">{opt.title}</p>
-                  <p className="text-[11px] text-slate-500 mt-1">{opt.description}</p>
+                  <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{opt.title}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">{opt.description}</p>
                 </div>
 
                 <div
                   className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
                     isSelected
                       ? 'border-indigo-600 bg-indigo-600 text-white'
-                      : 'border-slate-300 bg-white'
+                      : 'border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800'
                   }`}
                 >
                   {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
@@ -185,14 +185,14 @@ export function AppearanceTab({ settings, updateSetting }: AppearanceTabProps) {
       </section>
 
       {/* 3. Akıcı Animasyonlar */}
-      <section className="flex items-center justify-between border-t border-slate-100 pt-6">
+      <section className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-6">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
             <Sparkles className="h-4.5 w-4.5" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-slate-900">Akıcı Animasyonlar</h3>
-            <p className="text-[11px] text-slate-500 mt-0.5">
+            <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100">Akıcı Animasyonlar</h3>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               Sayfa geçişleri, menü daralma ve mikro etkileşim animasyonlarını etkinleştirir.
             </p>
           </div>
@@ -205,7 +205,7 @@ export function AppearanceTab({ settings, updateSetting }: AppearanceTabProps) {
             onChange={(e) => updateSetting('animations', e.target.checked)}
             className="sr-only peer"
           />
-          <div className="h-6 w-11 rounded-full bg-slate-200 peer peer-checked:bg-indigo-600 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white focus:outline-none" />
+          <div className="h-6 w-11 rounded-full bg-slate-200 dark:bg-slate-700 peer peer-checked:bg-indigo-600 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white focus:outline-none" />
         </label>
       </section>
     </div>

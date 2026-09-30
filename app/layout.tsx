@@ -9,6 +9,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ['300', '400', '500', '600', '700', '800'],
 })
 
+import { ThemeListener } from '@/components/dashboard/ThemeListener'
+
 export const metadata: Metadata = {
   title: 'Ajans Sistemi – B2B Sosyal Medya Yönetim Platformu',
   description:
@@ -17,8 +19,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" className={`${plusJakartaSans.variable} h-full antialiased`}>
-      <body className="min-h-full bg-gray-50 font-sans text-slate-900 antialiased selection:bg-indigo-500 selection:text-white">
+    <html
+      lang="tr"
+      suppressHydrationWarning
+      className={`${plusJakartaSans.variable} h-full antialiased`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('smaup_user_settings');if(s){var c=JSON.parse(s);var d=c.theme==='dark'||(c.theme==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}if(c.density==='compact'){document.documentElement.classList.add('compact-mode')}if(c.animations===false){document.documentElement.classList.add('reduce-motion')}}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-full bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-150">
+        <ThemeListener />
         {children}
       </body>
     </html>

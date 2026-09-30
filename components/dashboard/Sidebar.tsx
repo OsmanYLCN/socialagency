@@ -60,7 +60,7 @@ export function Sidebar({ role }: SidebarProps) {
 
   return (
     <aside
-      className={`relative flex h-full shrink-0 flex-col border-r border-slate-200/80 bg-white transition-[width] duration-300 ease-in-out select-none will-change-[width] ${
+      className={`relative flex h-full shrink-0 flex-col border-r border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 transition-[width] duration-300 ease-in-out select-none will-change-[width] ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
@@ -70,24 +70,24 @@ export function Sidebar({ role }: SidebarProps) {
         onClick={() => setIsCollapsed((prev) => !prev)}
         aria-label={isCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
         title={isCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
-        className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95 focus:outline-none cursor-pointer"
+        className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-200 active:scale-95 focus:outline-none cursor-pointer"
       >
         <ChevronLeft
           className={`h-3.5 w-3.5 transition-transform duration-300 ease-in-out ${
-            isCollapsed ? 'rotate-180 text-slate-700' : 'rotate-0 text-slate-500'
+            isCollapsed ? 'rotate-180 text-slate-700 dark:text-slate-300' : 'rotate-0 text-slate-500 dark:text-slate-400'
           }`}
         />
       </button>
 
       {/* Üst Logo ve Başlık Alanı */}
-      <div className="flex h-16 items-center border-b border-slate-100/80 px-3">
+      <div className="flex h-16 items-center border-b border-slate-100/80 dark:border-slate-800 px-3">
         <Link
           href={homeHref}
           title="SMAUP"
           className="flex w-full items-center overflow-hidden rounded-xl py-1.5 focus:outline-none"
         >
           <div className="flex h-10 w-14 shrink-0 items-center justify-center">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-white shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 dark:bg-indigo-600 text-white shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95">
               <svg
                 className="h-5 w-5 text-slate-100"
                 viewBox="0 0 24 24"
@@ -111,10 +111,10 @@ export function Sidebar({ role }: SidebarProps) {
                 : 'max-w-[160px] opacity-100 translate-x-0'
             }`}
           >
-            <span className="text-base font-black tracking-wider text-slate-800 leading-none whitespace-nowrap">
+            <span className="text-base font-black tracking-wider text-slate-800 dark:text-slate-100 leading-none whitespace-nowrap">
               SMAUP
             </span>
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mt-1 whitespace-nowrap">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1 whitespace-nowrap">
               Agency Suite
             </span>
           </div>
@@ -133,7 +133,7 @@ export function Sidebar({ role }: SidebarProps) {
               : 'max-h-6 opacity-100 mb-2 translate-x-0'
           }`}
         >
-          <p className="px-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400 whitespace-nowrap">
+          <p className="px-4 text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 whitespace-nowrap">
             Menü
           </p>
         </div>
@@ -151,16 +151,16 @@ export function Sidebar({ role }: SidebarProps) {
               title={isCollapsed ? item.label : undefined}
               className={`group relative flex h-10 w-full items-center rounded-xl transition-colors duration-200 ${
                 isActive
-                  ? 'bg-indigo-50/90 font-semibold text-indigo-700 shadow-sm shadow-indigo-100/50'
-                  : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900'
+                  ? 'bg-indigo-50/90 font-semibold text-indigo-700 shadow-sm shadow-indigo-100/50 dark:bg-indigo-950/40 dark:text-indigo-300 dark:shadow-none'
+                  : 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-200'
               }`}
             >
               <div className="flex h-10 w-14 shrink-0 items-center justify-center">
                 <Icon
                   className={`h-4.5 w-4.5 transition-colors duration-200 ${
                     isActive
-                      ? 'text-indigo-600'
-                      : 'text-slate-400 group-hover:text-slate-600'
+                      ? 'text-indigo-600 dark:text-indigo-400'
+                      : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300'
                   }`}
                 />
               </div>
@@ -182,7 +182,7 @@ export function Sidebar({ role }: SidebarProps) {
       </nav>
 
       {/* Alt Marka Alanı */}
-      <div className="border-t border-slate-100/80 px-3 py-3.5">
+      <div className="border-t border-slate-100/80 dark:border-slate-800 px-3 py-3.5">
         <div
           title="SMAUP"
           className="relative flex h-8 items-center overflow-hidden"
@@ -195,7 +195,7 @@ export function Sidebar({ role }: SidebarProps) {
                 : 'opacity-0 scale-90 pointer-events-none'
             }`}
           >
-            <span className="text-base font-black tracking-[0.2em] text-slate-700 select-none">
+            <span className="text-base font-black tracking-[0.2em] text-slate-700 dark:text-slate-300 select-none">
               S
             </span>
           </div>
@@ -208,7 +208,7 @@ export function Sidebar({ role }: SidebarProps) {
                 : 'opacity-100 translate-x-0'
             }`}
           >
-            <span className="text-base font-black tracking-[0.2em] text-slate-700 select-none whitespace-nowrap">
+            <span className="text-base font-black tracking-[0.2em] text-slate-700 dark:text-slate-300 select-none whitespace-nowrap">
               SMAUP
             </span>
           </div>

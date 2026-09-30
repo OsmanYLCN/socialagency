@@ -76,8 +76,8 @@ export function saveSettings(settings: UserSettings): void {
   if (typeof window === 'undefined') return
   try {
     localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings))
-    // Tema değişikliğini anında HTML sınıflarına yansıt
-    applyThemePreference(settings.theme)
+    // Tüm tercihleri anında HTML sınıflarına yansıt
+    applyAllPreferences(settings)
   } catch (error) {
     console.error('Ayarlar kaydedilirken hata oluştu:', error)
   }
@@ -93,11 +93,40 @@ export function applyThemePreference(theme: ThemeMode): void {
     root.classList.remove('dark')
   } else {
     // Sistem tercihini dinle
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
     if (isDark) {
       root.classList.add('dark')
     } else {
       root.classList.remove('dark')
     }
   }
+}
+
+// Yoğunluk tercihini HTML elementine uygular
+export function applyDensityPreference(density: DensityMode): void {
+  if (typeof document === 'undefined') return
+  const root = document.documentElement
+  if (density === 'compact') {
+    root.classList.add('compact-mode')
+  } else {
+    root.classList.remove('compact-mode')
+  }
+}
+
+// Animasyon tercihini HTML elementine uygular
+export function applyAnimationPreference(animations: boolean): void {
+  if (typeof document === 'undefined') return
+  const root = document.documentElement
+  if (animations === false) {
+    root.classList.add('reduce-motion')
+  } else {
+    root.classList.remove('reduce-motion')
+  }
+}
+
+// Tüm tercihleri tek seferde HTML elementine uygular
+export function applyAllPreferences(settings: UserSettings): void {
+  applyThemePreference(settings.theme)
+  applyDensityPreference(settings.density)
+  applyAnimationPreference(settings.animations)
 }

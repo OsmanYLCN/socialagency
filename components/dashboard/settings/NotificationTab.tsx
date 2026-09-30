@@ -54,18 +54,18 @@ export function NotificationTab({ settings, updateSetting }: NotificationTabProp
       {/* 1. E-posta Bildirimleri */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
             <Mail className="h-3.5 w-3.5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900">E-posta Bildirimleri</h3>
-            <p className="text-xs text-slate-500">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">E-posta Bildirimleri</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Hangi durumlarda e-posta adresinize anlık bildirim gönderileceğini seçin.
             </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/80 bg-white divide-y divide-slate-100 overflow-hidden shadow-xs">
+        <div className="rounded-2xl border border-slate-200/80 bg-white divide-y divide-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:divide-slate-800 overflow-hidden shadow-xs">
           {EMAIL_NOTIFICATIONS.map((item) => {
             const Icon = item.icon
             const isChecked = settings[item.key]
@@ -73,17 +73,17 @@ export function NotificationTab({ settings, updateSetting }: NotificationTabProp
             return (
               <div
                 key={item.key}
-                className="flex items-center justify-between p-4 transition-colors hover:bg-slate-50/50"
+                className="flex items-center justify-between p-4 transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/40"
               >
                 <div className="flex items-start gap-3.5 pr-4">
                   <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.color}`}
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.color} dark:bg-opacity-20`}
                   >
                     <Icon className="h-4.5 w-4.5" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-900">{item.title}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">{item.description}</p>
+                    <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{item.title}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{item.description}</p>
                   </div>
                 </div>
 
@@ -94,7 +94,7 @@ export function NotificationTab({ settings, updateSetting }: NotificationTabProp
                     onChange={(e) => updateSetting(item.key, e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="h-6 w-11 rounded-full bg-slate-200 peer peer-checked:bg-indigo-600 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white focus:outline-none" />
+                  <div className="h-6 w-11 rounded-full bg-slate-200 dark:bg-slate-700 peer peer-checked:bg-indigo-600 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white focus:outline-none" />
                 </label>
               </div>
             )
@@ -103,29 +103,29 @@ export function NotificationTab({ settings, updateSetting }: NotificationTabProp
       </section>
 
       {/* 2. Sistem ve Masaüstü Bildirimleri */}
-      <section className="space-y-3 border-t border-slate-100 pt-6">
+      <section className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-6">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
             <Volume2 className="h-3.5 w-3.5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900">Uygulama İçi ve Masaüstü Bildirimleri</h3>
-            <p className="text-xs text-slate-500">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Uygulama İçi ve Masaüstü Bildirimleri</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Tarayıcı açıkken sesli ve görsel bildirimlerin nasıl davranacağını belirleyin.
             </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/80 bg-white divide-y divide-slate-100 overflow-hidden shadow-xs">
+        <div className="rounded-2xl border border-slate-200/80 bg-white divide-y divide-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:divide-slate-800 overflow-hidden shadow-xs">
           {/* Bildirim Sesleri */}
-          <div className="flex items-center justify-between p-4 transition-colors hover:bg-slate-50/50">
+          <div className="flex items-center justify-between p-4 transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
             <div className="flex items-start gap-3.5 pr-4">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <Volume2 className="h-4.5 w-4.5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-900">Bildirim Sesleri</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-xs font-bold text-slate-900 dark:text-slate-100">Bildirim Sesleri</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   Yeni bir mesaj, görev veya bildirim geldiğinde hafif bir ses uyarısı çal.
                 </p>
               </div>
@@ -138,19 +138,19 @@ export function NotificationTab({ settings, updateSetting }: NotificationTabProp
                 onChange={(e) => updateSetting('soundEnabled', e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="h-6 w-11 rounded-full bg-slate-200 peer peer-checked:bg-indigo-600 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white focus:outline-none" />
+              <div className="h-6 w-11 rounded-full bg-slate-200 dark:bg-slate-700 peer peer-checked:bg-indigo-600 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white focus:outline-none" />
             </label>
           </div>
 
           {/* Masaüstü Anlık Bildirimleri */}
-          <div className="flex items-center justify-between p-4 transition-colors hover:bg-slate-50/50">
+          <div className="flex items-center justify-between p-4 transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
             <div className="flex items-start gap-3.5 pr-4">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                 <Bell className="h-4.5 w-4.5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-900">Masaüstü Anlık Bildirimleri</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-xs font-bold text-slate-900 dark:text-slate-100">Masaüstü Anlık Bildirimleri</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   Platform sekmesi arka planda kalsa dahi masaüstünüze anlık bildirim kutucuğu gönder.
                 </p>
               </div>
@@ -163,7 +163,7 @@ export function NotificationTab({ settings, updateSetting }: NotificationTabProp
                 onChange={(e) => handleDesktopNotificationToggle(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="h-6 w-11 rounded-full bg-slate-200 peer peer-checked:bg-indigo-600 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white focus:outline-none" />
+              <div className="h-6 w-11 rounded-full bg-slate-200 dark:bg-slate-700 peer peer-checked:bg-indigo-600 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white focus:outline-none" />
             </label>
           </div>
         </div>
