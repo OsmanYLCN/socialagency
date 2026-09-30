@@ -9,11 +9,8 @@ import {
   UserCheck,
   CheckSquare,
   Calendar,
-  Megaphone,
   MessageSquare,
   Video,
-  Bell,
-  Settings,
   Building2,
   FileImage,
   ChevronLeft,
@@ -30,7 +27,6 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { label: 'Ajanslar', href: '/admin/agencies', icon: Building2 },
     { label: 'Kullanıcılar', href: '/admin/users', icon: Users },
-    { label: 'Ayarlar', href: '/admin/settings', icon: Settings },
   ],
   agency_owner: [
     { label: 'Dashboard', href: '/agency', icon: LayoutDashboard },
@@ -38,21 +34,16 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
     { label: 'Çalışanlar', href: '/agency/employees', icon: UserCheck },
     { label: 'Görev Yönetimi', href: '/agency/tasks', icon: CheckSquare },
     { label: 'İçerik Planı', href: '/agency/content', icon: Calendar },
-    { label: 'İlanlar', href: '/agency/announcements', icon: Megaphone },
     { label: 'Mesajlar', href: '/agency/messages', icon: MessageSquare },
     { label: 'Toplantılar', href: '/agency/meetings', icon: Video },
-    { label: 'Bildirimler', href: '/agency/notifications', icon: Bell },
-    { label: 'Ayarlar', href: '/agency/settings', icon: Settings },
   ],
   employee: [
     { label: 'Dashboard', href: '/employee', icon: LayoutDashboard },
     { label: 'Görevlerim', href: '/employee/tasks', icon: CheckSquare },
-    { label: 'Ayarlar', href: '/employee/settings', icon: Settings },
   ],
   customer: [
     { label: 'Dashboard', href: '/customer', icon: LayoutDashboard },
     { label: 'İçeriklerim', href: '/customer/content', icon: FileImage },
-    { label: 'Ayarlar', href: '/customer/settings', icon: Settings },
   ],
 }
 
