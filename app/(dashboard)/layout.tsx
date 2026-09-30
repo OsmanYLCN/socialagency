@@ -25,7 +25,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const userAvatar = cookieStore.get('user-avatar')?.value ?? ''
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-150">
+    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#0e1015] transition-colors duration-150">
       <Suspense fallback={null}>
         <RouteProgressBar />
       </Suspense>

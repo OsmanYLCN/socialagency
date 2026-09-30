@@ -20,14 +20,14 @@ export function CustomersMetricsRow({
       value: totalBrands,
       sub: `${activeBrands} aktif`,
       icon: Building2,
-      iconBg: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+      iconBg: 'bg-indigo-50 text-indigo-600 border-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-400 dark:border-indigo-900/50',
     },
     {
       label: 'Aktif Markalar',
       value: activeBrands,
       sub: totalBrands > 0 ? `%${Math.round((activeBrands / totalBrands) * 100)} aktiflik` : '-',
       icon: TrendingUp,
-      iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+      iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-900/50',
     },
     {
       label: 'Aylık Toplam Gelir',
@@ -36,7 +36,7 @@ export function CustomersMetricsRow({
         ? `Ortalama ${Math.round(monthlyRevenue / totalBrands).toLocaleString('tr-TR')} ₺`
         : '-',
       icon: DollarSign,
-      iconBg: 'bg-sky-50 text-sky-600 border-sky-100',
+      iconBg: 'bg-sky-50 text-sky-600 border-sky-100 dark:bg-sky-950/50 dark:text-sky-400 dark:border-sky-900/50',
       isText: true,
     },
     {
@@ -44,7 +44,7 @@ export function CustomersMetricsRow({
       value: activeTasksCount,
       sub: 'Üretim / Onay bekleyen',
       icon: CheckSquare,
-      iconBg: 'bg-amber-50 text-amber-600 border-amber-100',
+      iconBg: 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900/50',
     },
   ]
 
@@ -55,18 +55,18 @@ export function CustomersMetricsRow({
         return (
           <div
             key={item.label}
-            className="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:border-slate-300"
+            className="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:border-slate-300 dark:border-[#272b37] dark:bg-[#16181f] dark:hover:border-slate-700"
           >
             <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border ${item.iconBg}`}>
               <Icon className="h-6 w-6" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-medium text-slate-500">{item.label}</p>
-              <p className="mt-0.5 truncate text-2xl font-black tracking-tight text-slate-900">
+              <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">{item.label}</p>
+              <p className="mt-0.5 truncate text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100">
                 {item.value}
               </p>
               {item.sub && (
-                <p className="mt-0.5 truncate text-[11px] text-slate-400">{item.sub}</p>
+                <p className="mt-0.5 truncate text-[11px] text-slate-400 dark:text-slate-500">{item.sub}</p>
               )}
             </div>
           </div>

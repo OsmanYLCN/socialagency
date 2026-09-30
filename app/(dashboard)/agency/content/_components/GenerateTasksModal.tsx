@@ -141,28 +141,28 @@ export function GenerateTasksModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Arka Plan Karartmasi */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Penceresi */}
-      <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl transition-all">
+      <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl transition-all dark:border dark:border-[#272b37] dark:bg-[#16181f]">
         {/* Baslik */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#272b37] px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">Haftalık Görevleri Üret</h2>
-              <p className="text-xs text-slate-500">Rutin şablonlardan tek tıkla operasyonel görevler açın</p>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Haftalık Görevleri Üret</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Rutin şablonlardan tek tıkla operasyonel görevler açın</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#222632] dark:hover:text-slate-300 transition-colors cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -171,26 +171,26 @@ export function GenerateTasksModal({
         {/* Eger Islem Basariyla Tamamlandiysa Ozet Ekrani Goster */}
         {state?.success ? (
           <div className="space-y-4 px-6 py-6 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
               <CheckCircle2 className="h-8 w-8" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-slate-900">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
                 Görevler Başarıyla Oluşturuldu!
               </h3>
-              <p className="text-xs text-slate-600 max-w-sm mx-auto">
-                <span className="font-semibold text-emerald-600">{state.count} yeni görev</span> başarıyla açılarak <strong>İş Havuzu</strong>&apos;na aktarıldı.
+              <p className="text-xs text-slate-600 dark:text-slate-300 max-w-sm mx-auto">
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">{state.count} yeni görev</span> başarıyla açılarak <strong>İş Havuzu</strong>&apos;na aktarıldı.
                 {state.skipped && state.skipped > 0 ? (
-                  <span className="block mt-1 text-slate-400">
+                  <span className="block mt-1 text-slate-400 dark:text-slate-500">
                     ({state.skipped} görev bu hafta için daha önce açılmış olduğu için mükerrer olmaması adına atlandı)
                   </span>
                 ) : null}
               </p>
             </div>
 
-            <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4 text-left text-xs text-emerald-800 space-y-1">
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4 text-left text-xs text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300 space-y-1">
               <p className="font-semibold">Sırada Ne Var?</p>
-              <p className="text-[11px] text-emerald-700">
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
                 Görev Yönetimi sayfasındaki &quot;İş Havuzu&quot; sütunundan yeni üretilen bu içerikleri ekip üyelerinize atayabilir veya ekiplerin kendi görevlerini havuzdan almasını sağlayabilirsiniz.
               </p>
             </div>
@@ -199,7 +199,7 @@ export function GenerateTasksModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full sm:w-auto rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="w-full sm:w-auto rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632] transition-colors cursor-pointer"
               >
                 Kapat
               </button>
@@ -216,7 +216,7 @@ export function GenerateTasksModal({
           /* Form Ekrani */
           <form action={formAction} className="space-y-4 px-6 py-5">
             {state?.error && (
-              <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700">
+              <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/50 dark:text-rose-300">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{state.error}</span>
               </div>
@@ -224,7 +224,7 @@ export function GenerateTasksModal({
 
             {/* Hedef Hafta Secimi */}
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+              <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Görevlerin Açılacağı Hedef Hafta
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -238,16 +238,16 @@ export function GenerateTasksModal({
                       onChange={() => setSelectedWeekDate(opt.startDate)}
                       className="peer sr-only"
                     />
-                    <div className="flex flex-col justify-between rounded-xl border border-slate-200 p-3 text-left transition-all hover:bg-slate-50 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/60 peer-checked:text-indigo-950">
+                    <div className="flex flex-col justify-between rounded-xl border border-slate-200 p-3 text-left transition-all hover:bg-slate-50 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/60 peer-checked:text-indigo-950 dark:border-[#272b37] dark:bg-[#1a1d25] dark:hover:bg-[#222632] dark:peer-checked:border-indigo-500 dark:peer-checked:bg-indigo-950/40 dark:peer-checked:text-indigo-200">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold">{opt.label}</span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-slate-200">{opt.label}</span>
                         {opt.isRecommended && (
-                          <span className="rounded-md bg-indigo-100 px-1 py-0.2 text-[9px] font-bold text-indigo-700">
+                          <span className="rounded-md bg-indigo-100 px-1 py-0.2 text-[9px] font-bold text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
                             Önerilen
                           </span>
                         )}
                       </div>
-                      <span className="mt-1 text-[11px] text-slate-500 font-medium">
+                      <span className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                         {opt.rangeText}
                       </span>
                     </div>
@@ -258,16 +258,16 @@ export function GenerateTasksModal({
 
             {/* Marka Secimi */}
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Kapsam Marka
               </label>
               <div className="relative">
-                <Building2 className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Building2 className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
                 <select
                   name="brand_id"
                   value={selectedBrand}
                   onChange={(e) => setSelectedBrand(e.target.value)}
-                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-8 text-xs font-medium text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-8 text-xs font-medium text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
                 >
                   <option value="all">Tüm Markalar ({brands.length} Marka)</option>
                   {brands.map((b) => (
@@ -280,31 +280,31 @@ export function GenerateTasksModal({
             </div>
 
             {/* Ozet Kart / Bilgilendirme */}
-            <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-3.5 space-y-2 text-xs">
+            <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-3.5 space-y-2 text-xs dark:border-[#272b37] dark:bg-[#1a1d25]">
               <div className="flex items-center justify-between">
-                <span className="text-slate-500">Kapsamdaki Aktif Şablonlar:</span>
-                <span className="font-semibold text-slate-900">{activeTemplates.length} Şablon</span>
+                <span className="text-slate-500 dark:text-slate-400">Kapsamdaki Aktif Şablonlar:</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{activeTemplates.length} Şablon</span>
               </div>
-              <div className="flex items-center justify-between border-t border-slate-200/60 pt-2">
-                <span className="text-slate-500">Üretilecek Toplam Görev Sayısı:</span>
-                <span className="text-sm font-black text-indigo-600">{estimatedTasksCount} Görev</span>
+              <div className="flex items-center justify-between border-t border-slate-200/60 dark:border-[#272b37] pt-2">
+                <span className="text-slate-500 dark:text-slate-400">Üretilecek Toplam Görev Sayısı:</span>
+                <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">{estimatedTasksCount} Görev</span>
               </div>
             </div>
 
             {/* Guvenlik ve Mukerrer Koruma Notu */}
-            <div className="flex items-start gap-2.5 rounded-xl border border-indigo-100 bg-indigo-50/40 p-3 text-[11px] text-indigo-900">
-              <ShieldCheck className="h-4 w-4 shrink-0 text-indigo-600 mt-0.5" />
+            <div className="flex items-start gap-2.5 rounded-xl border border-indigo-100 bg-indigo-50/40 p-3 text-[11px] text-indigo-900 dark:border-indigo-900/50 dark:bg-indigo-950/30 dark:text-indigo-300">
+              <ShieldCheck className="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-400 mt-0.5" />
               <p className="leading-relaxed">
                 <strong>Akıllı Mükerrer Koruması:</strong> Hedef hafta için daha önce açılmış görevler otomatik tespit edilir ve çift görev açılması engellenir. Üretilen tüm işler &quot;İş Havuzu&quot;nda bekler.
               </p>
             </div>
 
             {/* Butonlar */}
-            <div className="flex items-center justify-end gap-2.5 border-t border-slate-100 pt-4">
+            <div className="flex items-center justify-end gap-2.5 border-t border-slate-100 dark:border-[#272b37] pt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632] transition-colors cursor-pointer"
               >
                 Vazgeç
               </button>

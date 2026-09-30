@@ -50,27 +50,27 @@ export function DeleteEmployeeModal({ isOpen, employee, onClose }: DeleteEmploye
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="w-full max-w-md rounded-2xl border border-rose-200/80 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150">
+      <div className="w-full max-w-md rounded-2xl border border-rose-200/80 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-[#272b37] dark:bg-[#16181f]">
         {/* Baslik */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100 dark:border-rose-900/50 dark:bg-rose-950/50 dark:text-rose-400">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Çalışanı Sil</h3>
-              <p className="text-xs text-slate-500">Bu işlem geri alınamaz</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Çalışanı Sil</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Bu işlem geri alınamaz</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors dark:hover:bg-[#222632] dark:hover:text-slate-200"
           >
             <X className="h-5 w-5" />
           </button>
@@ -78,25 +78,25 @@ export function DeleteEmployeeModal({ isOpen, employee, onClose }: DeleteEmploye
 
         {/* Hata bildirimi */}
         {state?.error && (
-          <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs text-rose-700">
+          <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{state.error}</span>
           </div>
         )}
 
         {/* Bilgilendirme Uyarisi */}
-        <div className="mb-4 rounded-xl border border-amber-200/80 bg-amber-50/70 p-3.5 text-xs text-amber-900 space-y-1.5">
-          <p className="font-semibold text-amber-950">
+        <div className="mb-4 rounded-xl border border-amber-200/80 bg-amber-50/70 p-3.5 text-xs text-amber-900 space-y-1.5 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+          <p className="font-semibold text-amber-950 dark:text-amber-200">
             <span className="font-bold underline">{fullName}</span> adlı çalışanı silmek üzeresiniz.
           </p>
-          <ul className="list-disc list-inside space-y-0.5 text-amber-800">
+          <ul className="list-disc list-inside space-y-0.5 text-amber-800 dark:text-amber-300">
             <li>Çalışanın giriş hesabı kalıcı olarak silinir.</li>
             <li>
               Üzerindeki tüm aktif ve bekleyen görevler{' '}
               <span className="font-semibold">atanmamış iş havuzuna</span> iade edilir; görevler silinmez.
             </li>
             {employee.activeTaskCount > 0 && (
-              <li className="font-semibold text-amber-950">
+              <li className="font-semibold text-amber-950 dark:text-amber-100">
                 Bu çalışanın {employee.activeTaskCount} aktif görevi iş havuzuna düşecek.
               </li>
             )}
@@ -108,9 +108,9 @@ export function DeleteEmployeeModal({ isOpen, employee, onClose }: DeleteEmploye
 
           {/* Onay Metni Girisi */}
           <div>
-            <label htmlFor="confirm-employee-name" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="confirm-employee-name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Onaylamak için{' '}
-              <span className="font-black text-rose-600 select-all">{fullName}</span>{' '}
+              <span className="font-black text-rose-600 dark:text-rose-400 select-all">{fullName}</span>{' '}
               yazın:
             </label>
             <input
@@ -121,16 +121,16 @@ export function DeleteEmployeeModal({ isOpen, employee, onClose }: DeleteEmploye
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder={fullName}
-              className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-rose-400 focus:bg-white focus:ring-2 focus:ring-rose-100"
+              className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-rose-400 focus:bg-white focus:ring-2 focus:ring-rose-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-rose-500"
             />
           </div>
 
           {/* Aksiyon Butonlari */}
-          <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-100 pt-4">
+          <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-[#272b37]">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
+              className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors dark:text-slate-300 dark:hover:bg-[#222632]"
             >
               Vazgeç
             </button>

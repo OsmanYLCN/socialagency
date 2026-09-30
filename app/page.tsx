@@ -68,40 +68,40 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="relative hidden w-px bg-slate-200 md:flex md:items-center md:justify-center">
-        <div className="h-16 w-px bg-slate-300" />
+      <div className="relative hidden w-px bg-slate-200 md:flex md:items-center md:justify-center dark:bg-[#272b37]">
+        <div className="h-16 w-px bg-slate-300 dark:bg-[#323746]" />
       </div>
 
       <Link
         id="customer-portal-link"
         href="/login"
-        className="group/client relative flex h-1/2 w-full flex-col items-center justify-center overflow-hidden bg-white px-8 md:h-full md:w-1/2 md:px-14 lg:px-20 cursor-pointer"
+        className="group/client relative flex h-1/2 w-full flex-col items-center justify-center overflow-hidden bg-white dark:bg-[#0e1015] px-8 md:h-full md:w-1/2 md:px-14 lg:px-20 cursor-pointer"
       >
-        <div className="pointer-events-none absolute -right-32 -top-32 h-[500px] w-[500px] rounded-full bg-blue-50/80 blur-3xl transition-all duration-500 group-hover/client:scale-110" />
+        <div className="pointer-events-none absolute -right-32 -top-32 h-[500px] w-[500px] rounded-full bg-blue-50/80 dark:bg-blue-950/20 blur-3xl transition-all duration-500 group-hover/client:scale-110" />
 
         <div className="absolute right-8 top-8 hidden md:block">
-          <span className="text-[11px] font-semibold tracking-[0.25em] text-slate-400 uppercase">
+          <span className="text-[11px] font-semibold tracking-[0.25em] text-slate-400 dark:text-slate-500 uppercase">
             SMAUP // CLIENT
           </span>
         </div>
 
         <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 leading-tight transition-transform duration-300 group-hover/client:scale-[1.02]">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-tight transition-transform duration-300 group-hover/client:scale-[1.02]">
             MÜŞTERİ
-            <span className="block font-light text-blue-600">& ÇALIŞAN</span>
+            <span className="block font-light text-blue-600 dark:text-blue-400">& ÇALIŞAN</span>
           </h2>
 
-          <div className="group/link mt-10 inline-flex items-center gap-2 text-base sm:text-lg font-semibold text-slate-900 transition-colors hover:text-blue-600">
-            <span className="relative pb-0.5 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blue-600 after:transition-all after:duration-300 group-hover/link:after:w-full">
+          <div className="group/link mt-10 inline-flex items-center gap-2 text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 transition-colors hover:text-blue-600 dark:hover:text-blue-400">
+            <span className="relative pb-0.5 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blue-600 dark:after:bg-blue-400 after:transition-all after:duration-300 group-hover/link:after:w-full">
               Giriş Yap
             </span>
-            <ArrowRight className="h-4 w-4 text-slate-400 transition-all duration-300 group-hover/link:translate-x-1.5 group-hover/link:text-blue-600" />
+            <ArrowRight className="h-4 w-4 text-slate-400 transition-all duration-300 group-hover/link:translate-x-1.5 group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400" />
           </div>
         </div>
 
         <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-1.5 opacity-60">
-          <span className="h-0.5 w-1.5 rounded-full bg-slate-300" />
-          <span className="h-0.5 w-3.5 rounded-full bg-slate-300" />
+          <span className="h-0.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700" />
+          <span className="h-0.5 w-3.5 rounded-full bg-slate-300 dark:bg-slate-700" />
           <span className="h-0.5 w-7 rounded-full bg-blue-500" />
         </div>
       </Link>

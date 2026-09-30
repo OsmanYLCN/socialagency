@@ -18,24 +18,24 @@ export function TasksHeader({
   return (
     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>
-        <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+        <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">
           Görev Yönetimi
         </h1>
-        <p className="mt-0.5 text-xs text-slate-500">
-          <span className="font-semibold text-slate-700">{agencyName}</span> bünyesinde üretilen tüm içerikler ve operasyonel iş akışı
+        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+          <span className="font-semibold text-slate-700 dark:text-slate-200">{agencyName}</span> bünyesinde üretilen tüm içerikler ve operasyonel iş akışı
         </p>
       </div>
 
       <div className="flex items-center gap-3">
         {/* Görünüm Değiştirici: Kanban / Liste */}
-        <div className="flex items-center rounded-xl border border-slate-200/90 bg-slate-100/80 p-1">
+        <div className="flex items-center rounded-xl border border-slate-200/90 bg-slate-100/80 p-1 dark:border-[#272b37] dark:bg-[#16181f]">
           <button
             type="button"
             onClick={() => onViewModeChange('kanban')}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'kanban'
-                ? 'bg-white text-indigo-600 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-indigo-600 shadow-xs dark:bg-[#1e212b] dark:text-indigo-400'
+                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
             title="Kanban Panosu Görünümü"
           >
@@ -47,8 +47,8 @@ export function TasksHeader({
             onClick={() => onViewModeChange('list')}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'list'
-                ? 'bg-white text-indigo-600 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-indigo-600 shadow-xs dark:bg-[#1e212b] dark:text-indigo-400'
+                : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
             title="Liste / Tablo Görünümü"
           >

@@ -99,13 +99,13 @@ export function Topbar({
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 px-6">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white dark:border-[#262a36] dark:bg-[#14161d] px-6">
         <div className="relative w-72 max-w-sm">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input
             type="text"
             placeholder="Ara... (Müşteri, çalışan, görev)"
-            className="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 text-xs text-slate-800 placeholder-slate-400 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:bg-slate-800 transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/40"
+            className="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 text-xs text-slate-800 placeholder-slate-400 dark:border-[#2a2f3d] dark:bg-[#1a1d26] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:bg-[#1e222d] transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/40"
           />
         </div>
 
@@ -113,21 +113,21 @@ export function Topbar({
           <button
             id="topbar-notifications"
             aria-label="Bildirimler"
-            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition-all cursor-pointer"
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:border-[#262a36] dark:bg-[#1e212b] dark:text-slate-400 dark:hover:bg-[#252935] dark:hover:text-slate-200 transition-all cursor-pointer"
           >
             <Bell className="h-4 w-4" />
-            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900" />
+            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#14161d]" />
           </button>
 
           <Link
             href={ROLE_SETTINGS[role] ?? '/agency/settings'}
             aria-label="Ayarlar"
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition-all"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:border-[#262a36] dark:bg-[#1e212b] dark:text-slate-400 dark:hover:bg-[#252935] dark:hover:text-slate-200 transition-all"
           >
             <Settings className="h-4 w-4" />
           </Link>
 
-          <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-slate-700" />
+          <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-[#262a36]" />
 
           <div className="relative" ref={menuRef}>
             <button
@@ -135,7 +135,7 @@ export function Topbar({
               aria-label="Kullanıcı menüsü"
               aria-expanded={isOpen}
               onClick={() => setIsOpen((prev) => !prev)}
-              className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/80 dark:hover:border-slate-600 dark:hover:bg-slate-800 transition-all cursor-pointer"
+              className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 hover:border-slate-300 hover:bg-slate-100 dark:border-[#262a36] dark:bg-[#1a1d26] dark:hover:border-[#383d4e] dark:hover:bg-[#222632] transition-all cursor-pointer"
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-[11px] font-bold text-white shadow-xs">
                 {currentAvatar ? (
@@ -166,8 +166,8 @@ export function Topbar({
             </button>
 
             {isOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200/90 bg-white p-1.5 shadow-xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-800 dark:shadow-black/50 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="flex items-start gap-3 p-3 border-b border-slate-100 bg-slate-50/50 dark:border-slate-700/60 dark:bg-slate-900/50 rounded-xl mb-1">
+              <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200/90 bg-white p-1.5 shadow-xl shadow-slate-900/10 dark:border-[#262a36] dark:bg-[#16181f] dark:shadow-black/60 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="flex items-start gap-3 p-3 border-b border-slate-100 bg-slate-50/50 dark:border-[#262a36] dark:bg-[#1e212b]/60 rounded-xl mb-1">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-600 text-xs font-bold text-white shadow-xs">
                     {currentAvatar ? (
                       <Image

@@ -1,18 +1,18 @@
 export default function RootLoading() {
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 select-none"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 select-none dark:bg-[#0e1015]"
       aria-busy="true"
       aria-label="Yükleniyor"
     >
       <div className="flex flex-col items-center gap-4">
         {/* Üstte: Sol alttakiyle birebir aynı font, aynı renk ve harf aralığında SMAUP */}
-        <span className="text-2xl sm:text-3xl font-black tracking-[0.2em] text-slate-700 select-none">
+        <span className="text-2xl sm:text-3xl font-black tracking-[0.2em] text-slate-700 select-none dark:text-slate-100">
           SMAUP
         </span>
 
         {/* Dümdüz Yükleniyor yazısı */}
-        <span className="text-xs sm:text-sm font-medium tracking-[0.15em] text-slate-400 select-none">
+        <span className="text-xs sm:text-sm font-medium tracking-[0.15em] text-slate-400 select-none dark:text-slate-500">
           Yükleniyor
         </span>
 

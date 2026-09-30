@@ -272,15 +272,15 @@ export default async function AgencyPage() {
     <div className="mx-auto max-w-7xl space-y-6 pb-12">
       <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+          <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
             {agencyName} Genel Bakış
           </h1>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Hoş geldiniz, <span className="font-semibold text-slate-700">{userName}</span>. Günlük ajans operasyonlarınızın anlık durumu:
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+            Hoş geldiniz, <span className="font-semibold text-slate-700 dark:text-slate-200">{userName}</span>. Günlük ajans operasyonlarınızın anlık durumu:
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-2xs">
+          <span className="rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-2xs dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-300">
             {currentDateStr}
           </span>
         </div>

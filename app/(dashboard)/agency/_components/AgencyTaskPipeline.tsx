@@ -57,50 +57,50 @@ export function AgencyTaskPipeline({
     pipeline.pendingApproval.length
 
   return (
-    <div className="w-full rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
+    <div className="w-full rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <h3 className="text-base font-bold text-slate-900">Görev Durumu</h3>
-          <p className="text-xs text-slate-400">İçerik üretim, atama, paylaşım ve onay aşamaları</p>
+          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Görev Durumu</h3>
+          <p className="text-xs text-slate-400 dark:text-slate-400">İçerik üretim, atama, paylaşım ve onay aşamaları</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:border dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300">
             Toplam: {totalInPipeline} Görev
           </span>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 text-sky-600 dark:border dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-400">
             <CheckSquare className="h-4 w-4" />
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="flex flex-col gap-2.5 rounded-2xl bg-slate-50/80 p-3.5 border border-slate-100">
-          <div className="flex items-center justify-between border-b border-slate-200/70 pb-2">
-            <span className="text-xs font-bold text-slate-700">Planlandı</span>
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-700">
+        <div className="flex flex-col gap-2.5 rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5 dark:border-[#272b37] dark:bg-[#14161d]">
+          <div className="flex items-center justify-between border-b border-slate-200/70 pb-2 dark:border-[#272b37]">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Planlandı</span>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-700 dark:bg-[#272b37] dark:text-slate-300">
               {pipeline.planned.length}
             </span>
           </div>
           {pipeline.planned.length === 0 ? (
-            <div className="py-8 text-center text-xs text-slate-400">Görev yok</div>
+            <div className="py-8 text-center text-xs text-slate-400 dark:text-slate-500">Görev yok</div>
           ) : (
             <>
               {pipeline.planned.slice(0, 5).map((task) => (
                 <div
                   key={task.id}
-                  className="rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs transition-all hover:border-slate-300"
+                  className="rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs transition-all hover:border-slate-300 dark:border-[#272b37] dark:bg-[#1a1d25] dark:hover:border-[#383d4e]"
                 >
-                  <div className="flex items-center gap-1.5 text-slate-700">
+                  <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
                     {renderPlatformIcon(task.platform)}
                     <span className="text-[11px] font-bold capitalize">{task.platform}</span>
                   </div>
-                  <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
+                  <p className="mt-1 text-xs font-medium text-slate-800 dark:text-slate-100">{task.title}</p>
                 </div>
               ))}
               {pipeline.planned.length > 5 && (
                 <Link
                   href="/agency/tasks"
-                  className="block rounded-xl border border-dashed border-slate-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-slate-500 hover:border-indigo-300 hover:bg-white hover:text-indigo-600 transition-colors"
+                  className="block rounded-xl border border-dashed border-slate-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-slate-500 hover:border-indigo-300 hover:bg-white hover:text-indigo-600 transition-colors dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-400 dark:hover:border-indigo-500/50 dark:hover:text-indigo-400"
                 >
                   +{pipeline.planned.length - 5} daha fazla &rarr;
                 </Link>
@@ -109,33 +109,33 @@ export function AgencyTaskPipeline({
           )}
         </div>
 
-        <div className="flex flex-col gap-2.5 rounded-2xl bg-indigo-50/40 p-3.5 border border-indigo-100/60">
-          <div className="flex items-center justify-between border-b border-indigo-100 pb-2">
-            <span className="text-xs font-bold text-indigo-900">Hazırlanıyor</span>
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700">
+        <div className="flex flex-col gap-2.5 rounded-2xl border border-indigo-100/60 bg-indigo-50/40 p-3.5 dark:border-[#272b37] dark:bg-[#14161d]">
+          <div className="flex items-center justify-between border-b border-indigo-100 pb-2 dark:border-[#272b37]">
+            <span className="text-xs font-bold text-indigo-900 dark:text-indigo-300">Hazırlanıyor</span>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700 dark:border dark:border-indigo-800/40 dark:bg-indigo-950/60 dark:text-indigo-300">
               {pipeline.inProgress.length}
             </span>
           </div>
           {pipeline.inProgress.length === 0 ? (
-            <div className="py-8 text-center text-xs text-indigo-300">İşlem yok</div>
+            <div className="py-8 text-center text-xs text-indigo-300 dark:text-slate-500">İşlem yok</div>
           ) : (
             <>
               {pipeline.inProgress.slice(0, 5).map((task) => (
                 <div
                   key={task.id}
-                  className="rounded-xl border border-indigo-100 bg-white p-3 shadow-2xs transition-all hover:border-indigo-200"
+                  className="rounded-xl border border-indigo-100 bg-white p-3 shadow-2xs transition-all hover:border-indigo-200 dark:border-[#272b37] dark:bg-[#1a1d25] dark:hover:border-[#383d4e]"
                 >
-                  <div className="flex items-center gap-1.5 text-indigo-600">
+                  <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
                     {renderPlatformIcon(task.platform)}
                     <span className="text-[11px] font-bold capitalize">{task.platform}</span>
                   </div>
-                  <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
+                  <p className="mt-1 text-xs font-medium text-slate-800 dark:text-slate-100">{task.title}</p>
                 </div>
               ))}
               {pipeline.inProgress.length > 5 && (
                 <Link
                   href="/agency/tasks"
-                  className="block rounded-xl border border-dashed border-indigo-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-indigo-600 hover:border-indigo-400 hover:bg-white transition-colors"
+                  className="block rounded-xl border border-dashed border-indigo-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-indigo-600 hover:border-indigo-400 hover:bg-white transition-colors dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-indigo-400 dark:hover:border-indigo-500/50"
                 >
                   +{pipeline.inProgress.length - 5} daha fazla &rarr;
                 </Link>
@@ -144,33 +144,33 @@ export function AgencyTaskPipeline({
           )}
         </div>
 
-        <div className="flex flex-col gap-2.5 rounded-2xl bg-emerald-50/40 p-3.5 border border-emerald-100/60">
-          <div className="flex items-center justify-between border-b border-emerald-100 pb-2">
-            <span className="text-xs font-bold text-emerald-900">Paylaşıldı</span>
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">
+        <div className="flex flex-col gap-2.5 rounded-2xl border border-emerald-100/60 bg-emerald-50/40 p-3.5 dark:border-[#272b37] dark:bg-[#14161d]">
+          <div className="flex items-center justify-between border-b border-emerald-100 pb-2 dark:border-[#272b37]">
+            <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300">Paylaşıldı</span>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700 dark:border dark:border-emerald-800/40 dark:bg-emerald-950/60 dark:text-emerald-300">
               {pipeline.shared.length}
             </span>
           </div>
           {pipeline.shared.length === 0 ? (
-            <div className="py-8 text-center text-xs text-emerald-400/80">Tamamlanan yok</div>
+            <div className="py-8 text-center text-xs text-emerald-400/80 dark:text-slate-500">Tamamlanan yok</div>
           ) : (
             <>
               {pipeline.shared.slice(0, 5).map((task) => (
                 <div
                   key={task.id}
-                  className="rounded-xl border border-emerald-100 bg-white p-3 shadow-2xs transition-all hover:border-emerald-200"
+                  className="rounded-xl border border-emerald-100 bg-white p-3 shadow-2xs transition-all hover:border-emerald-200 dark:border-[#272b37] dark:bg-[#1a1d25] dark:hover:border-[#383d4e]"
                 >
-                  <div className="flex items-center gap-1.5 text-emerald-600">
+                  <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
                     {renderPlatformIcon(task.platform)}
                     <span className="text-[11px] font-bold capitalize">{task.platform}</span>
                   </div>
-                  <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
+                  <p className="mt-1 text-xs font-medium text-slate-800 dark:text-slate-100">{task.title}</p>
                 </div>
               ))}
               {pipeline.shared.length > 5 && (
                 <Link
                   href="/agency/tasks"
-                  className="block rounded-xl border border-dashed border-emerald-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-emerald-700 hover:border-emerald-400 hover:bg-white transition-colors"
+                  className="block rounded-xl border border-dashed border-emerald-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-emerald-700 hover:border-emerald-400 hover:bg-white transition-colors dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-emerald-400 dark:hover:border-emerald-500/50"
                 >
                   +{pipeline.shared.length - 5} daha fazla &rarr;
                 </Link>
@@ -179,33 +179,33 @@ export function AgencyTaskPipeline({
           )}
         </div>
 
-        <div className="flex flex-col gap-2.5 rounded-2xl bg-amber-50/40 p-3.5 border border-amber-100/60">
-          <div className="flex items-center justify-between border-b border-amber-100 pb-2">
-            <span className="text-xs font-bold text-amber-900">Onay Bekliyor</span>
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-700">
+        <div className="flex flex-col gap-2.5 rounded-2xl border border-amber-100/60 bg-amber-50/40 p-3.5 dark:border-[#272b37] dark:bg-[#14161d]">
+          <div className="flex items-center justify-between border-b border-amber-100 pb-2 dark:border-[#272b37]">
+            <span className="text-xs font-bold text-amber-900 dark:text-amber-300">Onay Bekliyor</span>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-700 dark:border dark:border-amber-800/40 dark:bg-amber-950/60 dark:text-amber-300">
               {pipeline.pendingApproval.length}
             </span>
           </div>
           {pipeline.pendingApproval.length === 0 ? (
-            <div className="py-8 text-center text-xs text-amber-400/80">Bekleyen yok</div>
+            <div className="py-8 text-center text-xs text-amber-400/80 dark:text-slate-500">Bekleyen yok</div>
           ) : (
             <>
               {pipeline.pendingApproval.slice(0, 5).map((task) => (
                 <div
                   key={task.id}
-                  className="rounded-xl border border-amber-100 bg-white p-3 shadow-2xs transition-all hover:border-amber-200"
+                  className="rounded-xl border border-amber-100 bg-white p-3 shadow-2xs transition-all hover:border-amber-200 dark:border-[#272b37] dark:bg-[#1a1d25] dark:hover:border-[#383d4e]"
                 >
-                  <div className="flex items-center gap-1.5 text-amber-600">
+                  <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
                     {renderPlatformIcon(task.platform)}
                     <span className="text-[11px] font-bold capitalize">{task.platform}</span>
                   </div>
-                  <p className="mt-1 text-xs font-medium text-slate-800">{task.title}</p>
+                  <p className="mt-1 text-xs font-medium text-slate-800 dark:text-slate-100">{task.title}</p>
                 </div>
               ))}
               {pipeline.pendingApproval.length > 5 && (
                 <Link
                   href="/agency/tasks"
-                  className="block rounded-xl border border-dashed border-amber-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-amber-700 hover:border-amber-400 hover:bg-white transition-colors"
+                  className="block rounded-xl border border-dashed border-amber-200 bg-white/70 p-2 text-center text-[11px] font-semibold text-amber-700 hover:border-amber-400 hover:bg-white transition-colors dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-amber-400 dark:hover:border-amber-500/50"
                 >
                   +{pipeline.pendingApproval.length - 5} daha fazla &rarr;
                 </Link>

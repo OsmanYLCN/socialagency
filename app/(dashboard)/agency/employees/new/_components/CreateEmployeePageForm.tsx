@@ -115,15 +115,15 @@ export function CreateEmployeePageForm() {
         <div>
           <Link
             href="/agency/employees"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors mb-2"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors mb-2"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Ekip Listesine Dön
           </Link>
-          <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+          <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white sm:text-2xl">
             Yeni Çalışan & Personel Kaydı
           </h1>
-          <p className="mt-0.5 text-xs text-slate-500">
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
             Ajans kadronuza yeni bir ekip üyesi ekleyin, görev pozisyonunu ve portal giriş yetkilerini belirleyin.
           </p>
         </div>
@@ -131,7 +131,7 @@ export function CreateEmployeePageForm() {
         <div className="flex items-center gap-3">
           <Link
             href="/agency/employees"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-300 dark:hover:bg-[#222632] transition-colors"
           >
             Vazgeç
           </Link>
@@ -162,28 +162,28 @@ export function CreateEmployeePageForm() {
 
       {/* Hata ve Başarı Bildirimleri */}
       {state?.error && (
-        <div className="flex items-start gap-2.5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs font-semibold text-rose-800 animate-in fade-in">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+        <div className="flex items-start gap-2.5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs font-semibold text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300 animate-in fade-in">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
           <span>{state.error}</span>
         </div>
       )}
 
       {isSuccess && (
-        <div className="flex items-center gap-2.5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 animate-in fade-in">
-          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+        <div className="flex items-center gap-2.5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300 animate-in fade-in">
+          <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <span>Çalışan hesabı başarıyla oluşturuldu! Ekip sayfasına yönlendiriliyorsunuz...</span>
         </div>
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* KART 1: Kişisel Bilgiler */}
-        <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+        <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
+          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-[#272b37] pb-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
               <User className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Kişisel & İletişim Bilgileri</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Kişisel & İletişim Bilgileri</h2>
               <p className="text-[11px] text-slate-400">Çalışanın kimlik ve iletişim detayları</p>
             </div>
           </div>
@@ -191,11 +191,11 @@ export function CreateEmployeePageForm() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {/* Ad */}
             <div>
-              <label htmlFor="first_name" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              <label htmlFor="first_name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Ad <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <input
                   id="first_name"
                   name="first_name"
@@ -203,18 +203,18 @@ export function CreateEmployeePageForm() {
                   required
                   autoComplete="given-name"
                   placeholder="Örn: Berkay"
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
                 />
               </div>
             </div>
 
             {/* Soyad */}
             <div>
-              <label htmlFor="last_name" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              <label htmlFor="last_name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Soyad <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <input
                   id="last_name"
                   name="last_name"
@@ -222,7 +222,7 @@ export function CreateEmployeePageForm() {
                   required
                   autoComplete="family-name"
                   placeholder="Örn: Yılmaz"
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
                 />
               </div>
             </div>
@@ -230,11 +230,11 @@ export function CreateEmployeePageForm() {
 
           {/* Telefon Numarası */}
           <div>
-            <label htmlFor="phone" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="phone" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Telefon Numarası
             </label>
             <div className="relative">
-              <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="phone"
                 name="phone"
@@ -242,7 +242,7 @@ export function CreateEmployeePageForm() {
                 autoComplete="tel"
                 placeholder="5XX XXX XX XX"
                 maxLength={15}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
               />
             </div>
           </div>
@@ -250,33 +250,33 @@ export function CreateEmployeePageForm() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {/* Şehir / Lokasyon */}
             <div>
-              <label htmlFor="city" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              <label htmlFor="city" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Şehir / İkamet
               </label>
               <div className="relative">
-                <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <input
                   id="city"
                   name="city"
                   type="text"
                   placeholder="Örn: İstanbul / Kadıköy"
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
                 />
               </div>
             </div>
 
             {/* İşe Başlama Tarihi */}
             <div>
-              <label htmlFor="start_date" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              <label htmlFor="start_date" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 İşe Başlama Tarihi
               </label>
               <div className="relative">
-                <Calendar className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Calendar className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <input
                   id="start_date"
                   name="start_date"
                   type="date"
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
                 />
               </div>
             </div>
@@ -284,28 +284,28 @@ export function CreateEmployeePageForm() {
         </div>
 
         {/* KART 2: Departman & Görev Bilgileri */}
-        <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+        <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
+          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-[#272b37] pb-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
               <Briefcase className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Departman & Görev Pozisyonu</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Departman & Görev Pozisyonu</h2>
               <p className="text-[11px] text-slate-400">Ajans içi çalışma rolü ve uzmanlığı</p>
             </div>
           </div>
 
           {/* Departman */}
           <div>
-            <label htmlFor="department" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="department" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Departman / Uzmanlık Alanı
             </label>
             <div className="relative">
-              <Users className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Users className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <select
                 id="department"
                 name="department"
-                className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+                className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
               >
                 <option value="">Departman Seçiniz (Opsiyonel)</option>
                 {DEPARTMENTS.map((d) => (
@@ -317,30 +317,30 @@ export function CreateEmployeePageForm() {
 
           {/* Görev Unvanı */}
           <div>
-            <label htmlFor="title" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="title" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Görev Unvanı / Pozisyon
             </label>
             <div className="relative">
-              <Briefcase className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Briefcase className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="title"
                 name="title"
                 type="text"
                 placeholder="Örn: Kıdemli Sosyal Medya Yöneticisi, Lead Video Editor"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
               />
             </div>
           </div>
 
           {/* Çalışma Modeli */}
           <div>
-            <label htmlFor="work_type" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="work_type" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Çalışma Şekli & Modeli
             </label>
             <select
               id="work_type"
               name="work_type"
-              className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+              className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
             >
               <option value="">Çalışma Modeli Seçiniz</option>
               {WORK_MODELS.map((m) => (
@@ -351,24 +351,24 @@ export function CreateEmployeePageForm() {
         </div>
 
         {/* KART 3: Maaş, Bordro & Acil Durum */}
-        <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 text-sky-600">
+        <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
+          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-[#272b37] pb-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 text-sky-600 dark:bg-sky-950/40 dark:text-sky-400">
               <DollarSign className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Maaş & İK Bilgileri</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Maaş & İK Bilgileri</h2>
               <p className="text-[11px] text-slate-400">Aylık bordro ve kurumsal kayıtlar</p>
             </div>
           </div>
 
           {/* Aylık Maaş */}
           <div>
-            <label htmlFor="salary" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="salary" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Aylık Net Maaş (₺)
             </label>
             <div className="relative">
-              <DollarSign className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <DollarSign className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="salary"
                 name="salary"
@@ -376,86 +376,86 @@ export function CreateEmployeePageForm() {
                 min="0"
                 step="1"
                 placeholder="Örn: 42000"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
               />
             </div>
-            <p className="mt-1 text-[11px] text-slate-400">
+            <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
               Bu bilgi yalnızca ajans sahibi tarafından görüntülenebilir; çalışan göremez.
             </p>
           </div>
 
           {/* Banka IBAN */}
           <div>
-            <label htmlFor="iban" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="iban" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Banka IBAN Numarası
             </label>
             <div className="relative">
-              <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="iban"
                 name="iban"
                 type="text"
                 placeholder="TR00 0000 0000 0000 0000 0000 00"
                 maxLength={32}
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
               />
             </div>
           </div>
 
           {/* Acil Durum İletişimi */}
           <div>
-            <label htmlFor="emergency_contact" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="emergency_contact" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Acil Durum İletişim Kişisi & Tel
             </label>
             <div className="relative">
-              <HeartHandshake className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <HeartHandshake className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="emergency_contact"
                 name="emergency_contact"
                 type="text"
                 placeholder="Örn: Ayşe Yılmaz (Eşi) - 0532 XXX XX XX"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
               />
             </div>
           </div>
 
           {/* Ek Notlar */}
           <div>
-            <label htmlFor="notes" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="notes" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Personel Notları & Portfolyo
             </label>
             <div className="relative">
-              <FileText className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              <FileText className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400 dark:text-slate-500" />
               <textarea
                 id="notes"
                 name="notes"
                 rows={2}
                 placeholder="Kullandığı yazılımlar, portfolyo linki, özel yetkinlikler..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
               />
             </div>
           </div>
         </div>
 
         {/* KART 4: Çalışan Giriş Portalı */}
-        <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
-          <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+        <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
+          <div className="flex items-center gap-2.5 border-b border-slate-100 dark:border-[#272b37] pb-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
               <Lock className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Çalışan Giriş Hesabı</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Çalışan Giriş Hesabı</h2>
               <p className="text-[11px] text-slate-400">Çalışanın sisteme erişeceği giriş bilgileri</p>
             </div>
           </div>
 
           {/* Giriş E-postası */}
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="email" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Giriş E-postası <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input
                 id="email"
                 name="email"
@@ -463,19 +463,19 @@ export function CreateEmployeePageForm() {
                 required
                 autoComplete="off"
                 placeholder="calisan@ajans.com"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
               />
             </div>
           </div>
 
           {/* Giriş Şifresi */}
           <div>
-            <label htmlFor="password" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="password" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Giriş Şifresi <span className="text-rose-500">*</span>
             </label>
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <input
                   id="password"
                   name="password"
@@ -485,12 +485,12 @@ export function CreateEmployeePageForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="En az 6 karakter"
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-10 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-10 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -501,7 +501,7 @@ export function CreateEmployeePageForm() {
                 type="button"
                 onClick={handleGenerate}
                 title="Güvenli şifre üret"
-                className="flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer transition-colors"
+                className="flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:border-indigo-500 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400 cursor-pointer transition-colors"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
                 Üret
@@ -515,8 +515,8 @@ export function CreateEmployeePageForm() {
                   title="Şifreyi kopyala"
                   className={`flex h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold cursor-pointer transition-all ${
                     copied
-                      ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
-                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600'
+                      ? 'border-emerald-300 bg-emerald-50 text-emerald-600 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:border-indigo-500 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400'
                   }`}
                 >
                   {copied ? <Check className="h-3.5 w-3.5" /> : null}
@@ -524,14 +524,14 @@ export function CreateEmployeePageForm() {
                 </button>
               )}
             </div>
-            <p className="mt-1.5 text-[11px] text-slate-400">
+            <p className="mt-1.5 text-[11px] text-slate-400 dark:text-slate-500">
               Bu şifreyi personele ileterek görev paneline giriş yapmasını sağlayabilirsiniz.
             </p>
           </div>
 
-          <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-3 text-xs text-indigo-900">
+          <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-3 text-xs text-indigo-900 dark:border-indigo-900/40 dark:bg-indigo-950/20 dark:text-indigo-300">
             <p className="font-semibold">Personel Yetkilendirmesi:</p>
-            <p className="mt-0.5 text-indigo-700 text-[11px]">
+            <p className="mt-0.5 text-indigo-700 dark:text-indigo-400 text-[11px]">
               Oluşturulan çalışan hesabı ile personel, kendi paneline giriş yapabilir; kendine atanmış iş havuzundaki görevleri üretir ve onaya sunar.
             </p>
           </div>
@@ -539,10 +539,10 @@ export function CreateEmployeePageForm() {
       </div>
 
       {/* Alt Aksiyon Butonları */}
-      <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-6">
+      <div className="flex items-center justify-end gap-3 border-t border-slate-200 dark:border-[#272b37] pt-6">
         <Link
           href="/agency/employees"
-          className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+          className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-300 dark:hover:bg-[#222632] transition-colors"
         >
           Vazgeç
         </Link>

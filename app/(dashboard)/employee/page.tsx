@@ -7,14 +7,14 @@ export default async function EmployeePage() {
 
   return (
     <div className="flex flex-1 items-center justify-center py-20">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-200/80 bg-white p-10 text-center shadow-sm">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50">
-          <UserCircle className="h-8 w-8 text-emerald-600" />
+      <div className="w-full max-w-lg rounded-2xl border border-slate-200/80 bg-white p-10 text-center shadow-sm dark:border-[#272b37] dark:bg-[#16181f]">
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-950/30">
+          <UserCircle className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
         </div>
-        <h1 className="mb-2 text-xl font-extrabold tracking-tight text-slate-900">
+        <h1 className="mb-2 text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
           Çalışan Paneli
         </h1>
-        <p className="text-sm leading-relaxed text-slate-500">
+        <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">
           Hoş Geldiniz, Çalışan Paneline giriş yaptınız. İçerikler buraya eklenecektir.
         </p>
       </div>

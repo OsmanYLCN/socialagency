@@ -48,7 +48,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
             className={`flex items-center justify-between rounded-xl border p-4 text-left transition-all cursor-pointer ${
               settings.language === 'tr'
                 ? 'border-indigo-600 bg-indigo-50/20 ring-2 ring-indigo-600/20 shadow-xs dark:bg-indigo-950/30 dark:border-indigo-500 dark:ring-indigo-500/20'
-                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/60 dark:hover:border-slate-700 dark:hover:bg-slate-800'
+                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:hover:border-[#383d4e] dark:hover:bg-[#222632]'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
               </span>
               <div>
                 <p className="text-xs font-bold text-slate-900 dark:text-slate-100">Türkçe</p>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500">Varsayılan sistem dili</p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-400">Varsayılan sistem dili</p>
               </div>
             </div>
 
@@ -75,7 +75,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
             className={`flex items-center justify-between rounded-xl border p-4 text-left transition-all cursor-pointer ${
               settings.language === 'en'
                 ? 'border-indigo-600 bg-indigo-50/20 ring-2 ring-indigo-600/20 shadow-xs dark:bg-indigo-950/30 dark:border-indigo-500 dark:ring-indigo-500/20'
-                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/60 dark:hover:border-slate-700 dark:hover:bg-slate-800'
+                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:hover:border-[#383d4e] dark:hover:bg-[#222632]'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -84,7 +84,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
               </span>
               <div>
                 <p className="text-xs font-bold text-slate-900 dark:text-slate-100">English</p>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500">International English</p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-400">International English</p>
               </div>
             </div>
 
@@ -98,7 +98,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
       </section>
 
       {/* 2. Saat Dilimi */}
-      <section className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-6">
+      <section className="space-y-3 border-t border-slate-100 dark:border-[#272b37] pt-6">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Saat Dilimi (Timezone)</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -113,7 +113,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
           <select
             value={settings.timezone}
             onChange={(e) => updateSetting('timezone', e.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-xs font-semibold text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 shadow-xs transition-colors focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 cursor-pointer"
+            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-xs font-semibold text-slate-800 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 shadow-xs transition-colors focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 cursor-pointer"
           >
             {TIMEZONES.map((tz) => (
               <option key={tz.value} value={tz.value}>
@@ -125,7 +125,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
       </section>
 
       {/* 3. Tarih Formatı */}
-      <section className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-6">
+      <section className="space-y-3 border-t border-slate-100 dark:border-[#272b37] pt-6">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Tarih Formatı</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -145,7 +145,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
                 className={`flex flex-col gap-1 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
                   isSelected
                     ? 'border-indigo-600 bg-indigo-50/20 ring-2 ring-indigo-600/20 shadow-xs dark:bg-indigo-950/30 dark:border-indigo-500 dark:ring-indigo-500/20'
-                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 dark:border-slate-800 dark:bg-slate-800/60 dark:hover:border-slate-700 dark:hover:bg-slate-800'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:hover:border-[#383d4e] dark:hover:bg-[#222632]'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -164,7 +164,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
       </section>
 
       {/* 4. Haftanın Başlangıç Günü */}
-      <section className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-6">
+      <section className="space-y-3 border-t border-slate-100 dark:border-[#272b37] pt-6">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Haftanın Başlangıç Günü</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -179,7 +179,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
             className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold transition-all cursor-pointer ${
               settings.weekStart === 'monday'
                 ? 'border-indigo-600 bg-indigo-50/30 text-indigo-700 ring-2 ring-indigo-600/20 dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-indigo-300'
-                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632]'
             }`}
           >
             <CalendarDays className="h-3.5 w-3.5" />
@@ -192,7 +192,7 @@ export function LocalizationTab({ settings, updateSetting }: LocalizationTabProp
             className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold transition-all cursor-pointer ${
               settings.weekStart === 'sunday'
                 ? 'border-indigo-600 bg-indigo-50/30 text-indigo-700 ring-2 ring-indigo-600/20 dark:border-indigo-500 dark:bg-indigo-950/40 dark:text-indigo-300'
-                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632]'
             }`}
           >
             <CalendarDays className="h-3.5 w-3.5" />

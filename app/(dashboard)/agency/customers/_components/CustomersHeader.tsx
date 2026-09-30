@@ -11,11 +11,11 @@ export function CustomersHeader({ agencyName }: CustomersHeaderProps) {
   return (
     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>
-        <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+        <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl dark:text-slate-100">
           Müşteriler
         </h1>
-        <p className="mt-0.5 text-xs text-slate-500">
-          <span className="font-semibold text-slate-700">{agencyName}</span>{' '}
+        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+          <span className="font-semibold text-slate-700 dark:text-slate-200">{agencyName}</span>{' '}
           bünyesinde yönetilen markalar ve müşteri hesapları
         </p>
       </div>

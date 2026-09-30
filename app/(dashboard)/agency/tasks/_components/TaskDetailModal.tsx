@@ -48,27 +48,27 @@ interface TaskDetailModalProps {
 const PLATFORM_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
   instagram: {
     label: 'Instagram',
-    badge: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200/80',
+    badge: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200/80 dark:bg-fuchsia-950/40 dark:text-fuchsia-300 dark:border-fuchsia-900/40',
     dot: 'bg-fuchsia-500',
   },
   tiktok: {
     label: 'TikTok',
-    badge: 'bg-slate-900 text-white border-slate-900',
+    badge: 'bg-slate-900 text-white border-slate-900 dark:bg-black dark:border-slate-800 dark:text-slate-200',
     dot: 'bg-cyan-400',
   },
   linkedin: {
     label: 'LinkedIn',
-    badge: 'bg-blue-50 text-blue-700 border-blue-200/80',
+    badge: 'bg-blue-50 text-blue-700 border-blue-200/80 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900/40',
     dot: 'bg-blue-600',
   },
   youtube: {
     label: 'YouTube',
-    badge: 'bg-rose-50 text-rose-700 border-rose-200/80',
+    badge: 'bg-rose-50 text-rose-700 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/40',
     dot: 'bg-rose-600',
   },
   x: {
     label: 'X (Twitter)',
-    badge: 'bg-slate-100 text-slate-800 border-slate-200',
+    badge: 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-[#1a1d25] dark:text-slate-300 dark:border-[#272b37]',
     dot: 'bg-slate-700',
   },
 }
@@ -76,27 +76,27 @@ const PLATFORM_CONFIG: Record<string, { label: string; badge: string; dot: strin
 const STATUS_CONFIG: Record<TaskItem['status'], { label: string; badge: string; dot: string }> = {
   unassigned: {
     label: 'İş Havuzu',
-    badge: 'bg-slate-100 text-slate-700 border-slate-200',
+    badge: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-[#1a1d25] dark:text-slate-300 dark:border-[#272b37]',
     dot: 'bg-slate-400',
   },
   assigned: {
     label: 'Üretimde',
-    badge: 'bg-blue-50 text-blue-700 border-blue-200/80',
+    badge: 'bg-blue-50 text-blue-700 border-blue-200/80 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900/40',
     dot: 'bg-blue-500',
   },
   pending_approval: {
     label: 'Onay Bekliyor',
-    badge: 'bg-amber-50 text-amber-700 border-amber-200/80',
+    badge: 'bg-amber-50 text-amber-700 border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/40',
     dot: 'bg-amber-500',
   },
   revision_requested: {
     label: 'Revizyonda',
-    badge: 'bg-rose-50 text-rose-700 border-rose-200/80',
+    badge: 'bg-rose-50 text-rose-700 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/40',
     dot: 'bg-rose-500',
   },
   completed: {
     label: 'Tamamlandı',
-    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/40',
     dot: 'bg-emerald-500',
   },
 }
@@ -143,7 +143,7 @@ export function TaskDetailModal({
 
   const platformInfo = PLATFORM_CONFIG[task.platform] ?? {
     label: task.platform,
-    badge: 'bg-slate-100 text-slate-700 border-slate-200',
+    badge: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-[#1a1d25] dark:text-slate-300 dark:border-[#272b37]',
     dot: 'bg-slate-500',
   }
   const statusInfo = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.unassigned
@@ -229,14 +229,14 @@ export function TaskDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="flex flex-col w-full max-w-4xl max-h-[92vh] rounded-2xl border border-slate-200 bg-white shadow-2xl animate-in zoom-in-95 duration-150 overflow-hidden">
+      <div className="flex flex-col w-full max-w-4xl max-h-[92vh] rounded-2xl border border-slate-200 bg-white shadow-2xl animate-in zoom-in-95 duration-150 overflow-hidden dark:border-[#272b37] dark:bg-[#16181f]">
         {/* 1. Üst Başlık Barı */}
-        <div className="flex items-center justify-between border-b border-slate-200/80 bg-slate-50/60 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-slate-200/80 bg-slate-50/60 px-6 py-4 dark:border-[#272b37] dark:bg-[#14161d]">
           <div className="flex items-center gap-3 flex-wrap">
             <span
               className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${platformInfo.badge}`}
@@ -245,7 +245,7 @@ export function TaskDetailModal({
               {platformInfo.label}
             </span>
 
-            <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 uppercase">
+            <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 uppercase dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300">
               {task.content}
             </span>
 
@@ -256,7 +256,7 @@ export function TaskDetailModal({
               {statusInfo.label}
             </span>
 
-            <h2 className="text-base font-bold text-slate-900 ml-1">
+            <h2 className="text-base font-bold text-slate-900 ml-1 dark:text-slate-100">
               {task.brandName}
             </h2>
           </div>
@@ -265,7 +265,7 @@ export function TaskDetailModal({
             <button
               type="button"
               onClick={() => onEditClick(task)}
-              className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632]"
             >
               <Pencil className="h-3.5 w-3.5" />
               <span>Düzenle</span>
@@ -274,7 +274,7 @@ export function TaskDetailModal({
             <button
               type="button"
               onClick={() => onDeleteClick(task)}
-              className="rounded-xl border border-slate-200 bg-white p-2 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer"
+              className="rounded-xl border border-slate-200 bg-white p-2 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-400 dark:hover:border-rose-900/50 dark:hover:bg-rose-950/40 dark:hover:text-rose-400"
               title="Görevi Sil"
             >
               <Trash2 className="h-4 w-4" />
@@ -283,7 +283,7 @@ export function TaskDetailModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer ml-1"
+              className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer ml-1 dark:hover:bg-[#222632] dark:hover:text-slate-200"
             >
               <X className="h-5 w-5" />
             </button>
@@ -292,8 +292,8 @@ export function TaskDetailModal({
 
         {/* Hata Bildirimi */}
         {actionError && (
-          <div className="mx-6 mt-4 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-800">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+          <div className="mx-6 mt-4 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
             <span>{actionError}</span>
           </div>
         )}
@@ -303,25 +303,25 @@ export function TaskDetailModal({
           {/* Sol Kolon (2 Birim): Brief, İçerik Linki, Revizyon Geçmişi */}
           <div className="lg:col-span-2 space-y-6">
             {/* Brief & Açıklama */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-800 border-b border-slate-100 pb-2.5 mb-3">
-                <FileText className="h-4 w-4 text-indigo-600" />
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-[#272b37] dark:bg-[#1a1d25]">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-800 border-b border-slate-100 pb-2.5 mb-3 dark:border-[#272b37] dark:text-slate-200">
+                <FileText className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 <span>Kreatif Brief & Prodüksiyon Notu</span>
               </div>
               {task.assignmentNote ? (
-                <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
+                <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed dark:text-slate-300">
                   {task.assignmentNote}
                 </p>
               ) : (
-                <p className="text-xs italic text-slate-400">Bu görev için brief açıklaması girilmemiş.</p>
+                <p className="text-xs italic text-slate-400 dark:text-slate-500">Bu görev için brief açıklaması girilmemiş.</p>
               )}
             </div>
 
             {/* İçerik & Tasarım Bağlantısı */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                  <LinkIcon className="h-4 w-4 text-indigo-600" />
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3 dark:border-[#272b37] dark:bg-[#1a1d25]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 dark:border-[#272b37]">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+                  <LinkIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                   <span>Üretilen İçerik / Tasarım Bağlantısı</span>
                 </div>
                 {task.contentUrl && (
@@ -329,7 +329,7 @@ export function TaskDetailModal({
                     href={task.contentUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
                   >
                     <span>Bağlantıyı Aç</span>
                     <ExternalLink className="h-3 w-3" />
@@ -344,12 +344,12 @@ export function TaskDetailModal({
                     value={contentUrlInput}
                     onChange={(e) => setContentUrlInput(e.target.value)}
                     placeholder="https://drive.google.com/... veya Canva / Figma linki"
-                    className="h-10 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                    className="h-10 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
                   />
                   <button
                     type="submit"
                     disabled={isPending}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-800 px-4 py-2 text-xs font-bold text-white hover:bg-slate-900 transition-colors disabled:opacity-50 cursor-pointer shrink-0"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-800 px-4 py-2 text-xs font-bold text-white hover:bg-slate-900 transition-colors disabled:opacity-50 cursor-pointer shrink-0 dark:bg-indigo-600 dark:hover:bg-indigo-700"
                   >
                     {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     <span>Kaydet</span>
@@ -361,9 +361,9 @@ export function TaskDetailModal({
                     type="checkbox"
                     checked={sendToApproval}
                     onChange={(e) => setSendToApproval(e.target.checked)}
-                    className="h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-[#272b37] dark:bg-[#16181f]"
                   />
-                  <span className="text-[11px] font-medium text-slate-600">
+                  <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
                     Kaydedildiğinde görevi doğrudan &quot;Onay Bekliyor&quot; aşamasına taşı
                   </span>
                 </label>
@@ -371,17 +371,17 @@ export function TaskDetailModal({
             </div>
 
             {/* Revizyon Geçmişi & Talep Alanı */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                  <RotateCcw className="h-4 w-4 text-rose-600" />
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-4 dark:border-[#272b37] dark:bg-[#1a1d25]">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 dark:border-[#272b37]">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+                  <RotateCcw className="h-4 w-4 text-rose-600 dark:text-rose-400" />
                   <span>Revizyon Geçmişi ({task.revisionsCount})</span>
                 </div>
                 {!isRevisionOpen && (
                   <button
                     type="button"
                     onClick={() => setIsRevisionOpen(true)}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 hover:text-rose-700 cursor-pointer dark:text-rose-400 dark:hover:text-rose-300"
                   >
                     <span>+ Revizyon Talep Et</span>
                   </button>
@@ -392,14 +392,14 @@ export function TaskDetailModal({
               {isRevisionOpen && (
                 <form
                   onSubmit={handleRequestRevision}
-                  className="rounded-xl border border-rose-200 bg-rose-50/40 p-3.5 space-y-2.5 animate-in fade-in"
+                  className="rounded-xl border border-rose-200 bg-rose-50/40 p-3.5 space-y-2.5 animate-in fade-in dark:border-rose-900/50 dark:bg-rose-950/30"
                 >
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-rose-900">Revizyon Notu Yazın</p>
+                    <p className="text-xs font-bold text-rose-900 dark:text-rose-200">Revizyon Notu Yazın</p>
                     <button
                       type="button"
                       onClick={() => setIsRevisionOpen(false)}
-                      className="text-xs text-rose-500 hover:text-rose-700"
+                      className="text-xs text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 cursor-pointer"
                     >
                       İptal
                     </button>
@@ -409,7 +409,7 @@ export function TaskDetailModal({
                     value={revisionNote}
                     onChange={(e) => setRevisionNote(e.target.value)}
                     placeholder="Müşterinin veya ajansın talep ettiği düzeltmeler (örn: kapak görseli fontu değişecek, saniye 5'teki logo büyütülecek)..."
-                    className="w-full rounded-lg border border-rose-200 bg-white p-2.5 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-200"
+                    className="w-full rounded-lg border border-rose-200 bg-white p-2.5 text-xs text-slate-900 placeholder-slate-400 outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-200 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-rose-500"
                   />
                   <div className="flex justify-end">
                     <button
@@ -417,7 +417,7 @@ export function TaskDetailModal({
                       disabled={isPending || !revisionNote.trim()}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-rose-700 transition-colors disabled:opacity-50 cursor-pointer"
                     >
-                      {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                      {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                       <span>Revizyona Gönder</span>
                     </button>
                   </div>
@@ -426,30 +426,30 @@ export function TaskDetailModal({
 
               {/* Revizyon Listesi */}
               {task.revisions.length === 0 ? (
-                <p className="text-xs italic text-slate-400 py-1">Bu görev için henüz revizyon talebi girilmemiş.</p>
+                <p className="text-xs italic text-slate-400 dark:text-slate-500 py-1">Bu görev için henüz revizyon talebi girilmemiş.</p>
               ) : (
                 <div className="space-y-3">
                   {task.revisions.map((rev, idx) => (
                     <div
                       key={rev.id}
-                      className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 space-y-1.5 text-xs"
+                      className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 space-y-1.5 text-xs dark:border-[#272b37] dark:bg-[#16181f]"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-rose-700">
+                        <span className="font-bold text-rose-700 dark:text-rose-400">
                           Revizyon #{task.revisions.length - idx}
                         </span>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">
                           {new Date(rev.createdAt).toLocaleDateString('tr-TR')}
                         </span>
                       </div>
-                      <p className="text-slate-700 whitespace-pre-wrap">{rev.customerNote}</p>
+                      <p className="text-slate-700 whitespace-pre-wrap dark:text-slate-300">{rev.customerNote}</p>
                       {rev.previousUrl && (
                         <div className="pt-1">
                           <a
                             href={rev.previousUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-indigo-600 hover:underline"
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-indigo-600 hover:underline dark:text-slate-400 dark:hover:text-indigo-400"
                           >
                             <ExternalLink className="h-2.5 w-2.5" />
                             <span>Önceki Tasarım Bağlantısı</span>
@@ -466,21 +466,21 @@ export function TaskDetailModal({
           {/* Sağ Kolon (1 Birim): Bilgiler, Hızlı Aşamalar, Yorumlar */}
           <div className="space-y-6">
             {/* Görev Meta Bilgileri */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3.5">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3.5 dark:border-[#272b37] dark:bg-[#1a1d25]">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Görev Bilgileri
               </h3>
 
               {/* Teslim Tarihi */}
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">Teslim Tarihi:</span>
+                <span className="text-slate-500 dark:text-slate-400">Teslim Tarihi:</span>
                 <span
                   className={`inline-flex items-center gap-1 font-bold ${
                     isOverdue
-                      ? 'text-rose-600'
+                      ? 'text-rose-600 dark:text-rose-400'
                       : isToday
-                      ? 'text-amber-700'
-                      : 'text-slate-800'
+                      ? 'text-amber-700 dark:text-amber-400'
+                      : 'text-slate-800 dark:text-slate-200'
                   }`}
                 >
                   <Calendar className="h-3.5 w-3.5" />
@@ -489,40 +489,40 @@ export function TaskDetailModal({
               </div>
 
               {/* Görevli Personel */}
-              <div className="text-xs space-y-1.5 pt-2 border-t border-slate-100">
+              <div className="text-xs space-y-1.5 pt-2 border-t border-slate-100 dark:border-[#272b37]">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Görevli:</span>
+                  <span className="text-slate-500 dark:text-slate-400">Görevli:</span>
                   <button
                     type="button"
                     onClick={() => setIsAssignOpen((v) => !v)}
-                    className="text-[11px] font-bold text-indigo-600 hover:underline cursor-pointer"
+                    className="text-[11px] font-bold text-indigo-600 hover:underline cursor-pointer dark:text-indigo-400"
                   >
                     Değiştir
                   </button>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-[11px] font-bold text-indigo-700 shrink-0">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-[11px] font-bold text-indigo-700 shrink-0 dark:bg-indigo-950/60 dark:text-indigo-300">
                     {task.assigneeName ? task.assigneeName.slice(0, 2).toUpperCase() : '?'}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-slate-800 truncate">
+                    <p className="font-semibold text-slate-800 truncate dark:text-slate-200">
                       {task.assigneeName ?? 'İş Havuzunda (Atanmamış)'}
                     </p>
                     {task.assigneeEmail && (
-                      <p className="text-[11px] text-slate-400 truncate">{task.assigneeEmail}</p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{task.assigneeEmail}</p>
                     )}
                   </div>
                 </div>
 
                 {/* Hızlı Atama Dropdown */}
                 {isAssignOpen && (
-                  <div className="mt-2 rounded-xl border border-slate-200 bg-white p-2 shadow-lg animate-in fade-in">
+                  <div className="mt-2 rounded-xl border border-slate-200 bg-white p-2 shadow-lg animate-in fade-in dark:border-[#272b37] dark:bg-[#16181f]">
                     <button
                       type="button"
                       disabled={isPending}
                       onClick={() => handleAssign('')}
-                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-100 disabled:opacity-50 cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-100 disabled:opacity-50 cursor-pointer dark:text-slate-400 dark:hover:bg-[#222632]"
                     >
                       <span>📋 İş Havuzuna Gönder</span>
                     </button>
@@ -534,11 +534,11 @@ export function TaskDetailModal({
                         onClick={() => handleAssign(emp.id)}
                         className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium disabled:opacity-50 cursor-pointer ${
                           task.assigneeId === emp.id
-                            ? 'bg-indigo-50 font-bold text-indigo-700'
-                            : 'text-slate-700 hover:bg-slate-100'
+                            ? 'bg-indigo-50 font-bold text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-400'
+                            : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-[#222632]'
                         }`}
                       >
-                        <User className="h-3 w-3 text-slate-400" />
+                        <User className="h-3 w-3 text-slate-400 dark:text-slate-500" />
                         <span className="truncate">{emp.name}</span>
                       </button>
                     ))}
@@ -547,8 +547,8 @@ export function TaskDetailModal({
               </div>
 
               {/* Hızlı Aşama Butonları */}
-              <div className="pt-2 border-t border-slate-100">
-                <span className="block text-[11px] font-bold text-slate-500 mb-2">Aşama Değiştir:</span>
+              <div className="pt-2 border-t border-slate-100 dark:border-[#272b37]">
+                <span className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2">Aşama Değiştir:</span>
                 <div className="grid grid-cols-2 gap-1.5">
                   <button
                     type="button"
@@ -556,8 +556,8 @@ export function TaskDetailModal({
                     onClick={() => handleStatusChange('assigned')}
                     className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all disabled:opacity-50 cursor-pointer ${
                       task.status === 'assigned'
-                        ? 'border-blue-300 bg-blue-50 text-blue-700'
-                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                        ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-300'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-400 dark:hover:bg-[#222632]'
                     }`}
                   >
                     ⏳ Üretimde
@@ -568,8 +568,8 @@ export function TaskDetailModal({
                     onClick={() => handleStatusChange('pending_approval')}
                     className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all disabled:opacity-50 cursor-pointer ${
                       task.status === 'pending_approval'
-                        ? 'border-amber-300 bg-amber-50 text-amber-700'
-                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                        ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-400 dark:hover:bg-[#222632]'
                     }`}
                   >
                     📤 Onaya Sun
@@ -580,8 +580,8 @@ export function TaskDetailModal({
                     onClick={() => handleStatusChange('completed')}
                     className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all disabled:opacity-50 cursor-pointer ${
                       task.status === 'completed'
-                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
-                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-400 dark:hover:bg-[#222632]'
                     }`}
                   >
                     ✅ Tamamlandı
@@ -592,8 +592,8 @@ export function TaskDetailModal({
                     onClick={() => handleStatusChange('unassigned')}
                     className={`rounded-lg border px-2 py-1 text-[11px] font-semibold transition-all disabled:opacity-50 cursor-pointer ${
                       task.status === 'unassigned'
-                        ? 'border-slate-300 bg-slate-200 text-slate-800'
-                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                        ? 'border-slate-300 bg-slate-200 text-slate-800 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-400 dark:hover:bg-[#222632]'
                     }`}
                   >
                     📋 Havuz
@@ -603,42 +603,42 @@ export function TaskDetailModal({
             </div>
 
             {/* Ajans İçi Yorumlar & Notlaşma */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3.5">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-800 border-b border-slate-100 pb-2.5">
-                <MessageSquare className="h-4 w-4 text-indigo-600" />
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-3.5 dark:border-[#272b37] dark:bg-[#1a1d25]">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-800 border-b border-slate-100 pb-2.5 dark:border-[#272b37] dark:text-slate-200">
+                <MessageSquare className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 <span>Ajans İçi Yorumlar ({task.commentsCount})</span>
               </div>
 
               {/* Yorumlar Akışı */}
               <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
                 {task.comments.length === 0 ? (
-                  <p className="text-xs italic text-slate-400 py-2">Henüz yorum yazılmamış.</p>
+                  <p className="text-xs italic text-slate-400 dark:text-slate-500 py-2">Henüz yorum yazılmamış.</p>
                 ) : (
                   task.comments.map((c) => (
                     <div
                       key={c.id}
-                      className="rounded-xl border border-slate-100 bg-slate-50/70 p-2.5 space-y-1 text-xs"
+                      className="rounded-xl border border-slate-100 bg-slate-50/70 p-2.5 space-y-1 text-xs dark:border-[#272b37] dark:bg-[#16181f]"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-800">{c.authorName}</span>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="font-bold text-slate-800 dark:text-slate-200">{c.authorName}</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">
                           {new Date(c.createdAt).toLocaleDateString('tr-TR')}
                         </span>
                       </div>
-                      <p className="text-slate-700 whitespace-pre-wrap">{c.commentText}</p>
+                      <p className="text-slate-700 whitespace-pre-wrap dark:text-slate-300">{c.commentText}</p>
                     </div>
                   ))
                 )}
               </div>
 
               {/* Yeni Yorum Formu */}
-              <form onSubmit={handleAddComment} className="flex gap-1.5 pt-2 border-t border-slate-100">
+              <form onSubmit={handleAddComment} className="flex gap-1.5 pt-2 border-t border-slate-100 dark:border-[#272b37]">
                 <input
                   type="text"
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Ekip için not veya yorum yazın..."
-                  className="h-9 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-1 focus:ring-indigo-100"
+                  className="h-9 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-1 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
                 />
                 <button
                   type="submit"

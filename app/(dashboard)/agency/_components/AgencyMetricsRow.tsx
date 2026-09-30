@@ -19,25 +19,25 @@ export function AgencyMetricsRow({
       label: 'Aktif Müşteri',
       value: activeBrandsCount,
       icon: Building2,
-      iconBg: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+      iconBg: 'bg-indigo-50 text-indigo-600 border-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-900/40',
     },
     {
       label: 'Çalışan Sayısı',
       value: employeeCount,
       icon: Users,
-      iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+      iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/40',
     },
     {
       label: 'Bugünkü Görevler',
       value: todayTasksCount,
       icon: Clock,
-      iconBg: 'bg-sky-50 text-sky-600 border-sky-100',
+      iconBg: 'bg-sky-50 text-sky-600 border-sky-100 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-900/40',
     },
     {
       label: 'Onay Bekleyen İşler',
       value: pendingApprovalCount,
       icon: AlertCircle,
-      iconBg: 'bg-amber-50 text-amber-600 border-amber-100',
+      iconBg: 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/40',
     },
   ]
 
@@ -48,7 +48,7 @@ export function AgencyMetricsRow({
         return (
           <div
             key={item.label}
-            className="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:border-slate-300"
+            className="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white dark:border-[#272b37] dark:bg-[#16181f] p-5 shadow-xs transition-all hover:border-slate-300 dark:hover:border-[#383d4e]"
           >
             <div
               className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border ${item.iconBg}`}
@@ -56,8 +56,8 @@ export function AgencyMetricsRow({
               <Icon className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500">{item.label}</p>
-              <p className="mt-0.5 text-2xl font-black tracking-tight text-slate-900">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{item.label}</p>
+              <p className="mt-0.5 text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100">
                 {item.value}
               </p>
             </div>

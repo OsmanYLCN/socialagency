@@ -42,9 +42,9 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
         <button
           type="button"
           onClick={() => setIsTaskModalOpen(true)}
-          className="group flex items-center justify-center gap-3 rounded-2xl border-2 border-indigo-200/90 bg-white px-6 py-4 text-sm font-bold text-indigo-700 shadow-xs transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50/40 hover:shadow-sm active:scale-[0.99] cursor-pointer"
+          className="group flex items-center justify-center gap-3 rounded-2xl border-2 border-indigo-200/90 bg-white dark:border-indigo-900/50 dark:bg-[#16181f] dark:text-indigo-300 dark:hover:bg-indigo-950/30 px-6 py-4 text-sm font-bold text-indigo-700 shadow-xs transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50/40 hover:shadow-sm active:scale-[0.99] cursor-pointer"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition-transform duration-200 group-hover:scale-110">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400 transition-transform duration-200 group-hover:scale-110">
             <CheckSquare className="h-4.5 w-4.5" />
           </div>
           <span>Yeni Görev Ata</span>
@@ -52,9 +52,9 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
 
         <Link
           href="/agency/customers"
-          className="group flex items-center justify-center gap-3 rounded-2xl border-2 border-slate-200/90 bg-white px-6 py-4 text-sm font-bold text-slate-800 shadow-xs transition-all duration-200 hover:border-indigo-300 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.99]"
+          className="group flex items-center justify-center gap-3 rounded-2xl border-2 border-slate-200/90 bg-white dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-100 dark:hover:bg-[#1e212b] px-6 py-4 text-sm font-bold text-slate-800 shadow-xs transition-all duration-200 hover:border-indigo-300 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.99]"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition-transform duration-200 group-hover:scale-110">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400 transition-transform duration-200 group-hover:scale-110">
             <Building2 className="h-4.5 w-4.5" />
           </div>
           <span>Müşteri ve Marka Yönetimi</span>
@@ -62,22 +62,22 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
       </div>
 
       {isTaskModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-[#272b37] bg-white dark:bg-[#16181f] p-6 shadow-xl animate-in zoom-in-95 duration-150">
             <div className="mb-5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                   <CheckSquare className="h-4 w-4" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Yeni Görev Ata</h3>
-                  <p className="text-xs text-slate-500">Marka ve platform belirleyerek görevi planlayın</p>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Yeni Görev Ata</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Marka ve platform belirleyerek görevi planlayın</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsTaskModalOpen(false)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1e212b] hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -91,11 +91,11 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
 
             <form action={taskActionRun} className="space-y-3.5">
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">Marka Seçin</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-200">Marka Seçin</label>
                 <select
                   name="brand_id"
                   required
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:ring-indigo-950/40"
                 >
                   <option value="">Bir marka seçin...</option>
                   {brands.map((b) => (
@@ -113,11 +113,11 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Platform</label>
+                  <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-200">Platform</label>
                   <select
                     name="platform"
                     required
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:ring-indigo-950/40"
                   >
                     <option value="instagram">Instagram</option>
                     <option value="tiktok">TikTok</option>
@@ -127,11 +127,11 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">İçerik Türü</label>
+                  <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-200">İçerik Türü</label>
                   <select
                     name="content"
                     required
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:ring-indigo-950/40"
                   >
                     <option value="reels">Reels</option>
                     <option value="post">Post</option>
@@ -145,20 +145,20 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Teslim Tarihi</label>
+                  <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-200">Teslim Tarihi</label>
                   <input
                     type="date"
                     name="due_date"
                     required
                     defaultValue={getLocalDateString()}
-                    className="h-10 w-full rounded-xl border border-slate-200 px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:ring-indigo-950/40"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Atanan Çalışan</label>
+                  <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-200">Atanan Çalışan</label>
                   <select
                     name="assignee_id"
-                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:ring-indigo-950/40"
                   >
                     <option value="">Atama Yapma (Boşta)</option>
                     {employees.map((e) => (
@@ -171,12 +171,12 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-700">Açıklama / Not</label>
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-200">Açıklama / Not</label>
                 <textarea
                   name="note"
                   rows={2}
                   placeholder="İçerik hakkında detaylar..."
-                  className="w-full rounded-xl border border-slate-200 p-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className="w-full rounded-xl border border-slate-200 bg-white p-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:ring-indigo-950/40"
                 />
               </div>
 
@@ -184,7 +184,7 @@ export function AgencyActionButtons({ brands = [], employees = [] }: ActionButto
                 <button
                   type="button"
                   onClick={() => setIsTaskModalOpen(false)}
-                  className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                  className="rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-[#222632] cursor-pointer transition-colors"
                 >
                   İptal
                 </button>

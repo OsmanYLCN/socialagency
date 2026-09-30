@@ -64,15 +64,15 @@ function renderPlatformIcon(platform: string, className = 'h-3 w-3') {
     case 'instagram':
       return <InstagramIcon className={`${className} text-rose-600`} />
     case 'tiktok':
-      return <TikTokIcon className={`${className} text-slate-900`} />
+      return <TikTokIcon className={`${className} text-slate-900 dark:text-slate-100`} />
     case 'youtube':
       return <YoutubeIcon className={`${className} text-red-600`} />
     case 'x':
-      return <XTwitterIcon className={`${className} text-slate-800`} />
+      return <XTwitterIcon className={`${className} text-slate-800 dark:text-slate-200`} />
     case 'linkedin':
       return <LinkedinIcon className={`${className} text-sky-600`} />
     default:
-      return <CalendarIcon className={`${className} text-slate-600`} />
+      return <CalendarIcon className={`${className} text-slate-600 dark:text-slate-400`} />
   }
 }
 
@@ -100,32 +100,32 @@ function getStatusBadge(status: string) {
     case 'completed':
       return {
         label: 'Tamamlandı',
-        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-900/50',
         dotClass: 'bg-emerald-500',
       }
     case 'pending_approval':
       return {
         label: 'Onay Bekliyor',
-        badgeClass: 'bg-amber-50 text-amber-700 border-amber-200',
+        badgeClass: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/50',
         dotClass: 'bg-amber-500',
       }
     case 'revision_requested':
       return {
         label: 'Revizyonda',
-        badgeClass: 'bg-rose-50 text-rose-700 border-rose-200',
+        badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-900/50',
         dotClass: 'bg-rose-500',
       }
     case 'assigned':
       return {
         label: 'Üretimde',
-        badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
+        badgeClass: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-900/50',
         dotClass: 'bg-blue-500',
       }
     case 'unassigned':
     default:
       return {
         label: 'İş Havuzunda',
-        badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
+        badgeClass: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-[#222632] dark:text-slate-300 dark:border-[#272b37]',
         dotClass: 'bg-slate-400',
       }
   }
@@ -268,16 +268,16 @@ export function InteractiveContentCalendar({
   return (
     <div className="space-y-6">
       {/* Takvim Ust Bar: Ay Secici & Hizli Butonlar */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between dark:border-[#272b37] dark:bg-[#16181f]">
         <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
             <CalendarDays className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">
               {MONTH_NAMES[currentMonth]} {currentYear}
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Bu ay için toplam {filteredTasks.length} planlı/üretilen görev bulunuyor
             </p>
           </div>
@@ -288,16 +288,16 @@ export function InteractiveContentCalendar({
           <button
             type="button"
             onClick={handleToday}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632]"
           >
             Bugün
           </button>
-          <div className="flex items-center rounded-xl border border-slate-200 bg-white p-0.5 shadow-2xs">
+          <div className="flex items-center rounded-xl border border-slate-200 bg-white p-0.5 shadow-2xs dark:border-[#272b37] dark:bg-[#1a1d25]">
             <button
               type="button"
               onClick={handlePrevMonth}
               title="Önceki Ay"
-              className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+              className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#222632] dark:hover:text-slate-200 transition-colors cursor-pointer"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -305,7 +305,7 @@ export function InteractiveContentCalendar({
               type="button"
               onClick={handleNextMonth}
               title="Sonraki Ay"
-              className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+              className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#222632] dark:hover:text-slate-200 transition-colors cursor-pointer"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -316,9 +316,9 @@ export function InteractiveContentCalendar({
       {/* Ana Grid & Secili Gun Yan Paneli */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
         {/* Sol / Ana Alan: 7 Sutunlu Aylik Takvim Izgarasi (3 Kolon Genisliginde) */}
-        <div className="lg:col-span-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
+        <div className="lg:col-span-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
           {/* Hafta Gunleri Basliklari */}
-          <div className="grid grid-cols-7 border-b border-slate-200 pb-2 text-center text-xs font-bold text-slate-500">
+          <div className="grid grid-cols-7 border-b border-slate-200 pb-2 text-center text-xs font-bold text-slate-500 dark:border-[#272b37] dark:text-slate-400">
             {WEEK_DAYS.map((d) => (
               <div key={d.name} className="py-1">
                 <span className="hidden sm:inline">{d.name}</span>
@@ -328,7 +328,7 @@ export function InteractiveContentCalendar({
           </div>
 
           {/* Gun Hucreleri */}
-          <div className="grid grid-cols-7 gap-px bg-slate-100 mt-2 rounded-xl overflow-hidden border border-slate-200/60">
+          <div className="grid grid-cols-7 gap-px bg-slate-100 dark:bg-[#272b37] mt-2 rounded-xl overflow-hidden border border-slate-200/60 dark:border-[#272b37]">
             {calendarCells.map((cell) => {
               const isSelected = cell.dateStr === selectedDateStr
               return (
@@ -336,7 +336,9 @@ export function InteractiveContentCalendar({
                   key={cell.dateStr}
                   onClick={() => setSelectedDateStr(cell.dateStr)}
                   className={`min-h-[90px] sm:min-h-[110px] p-1.5 transition-all cursor-pointer flex flex-col justify-between ${
-                    cell.isCurrentMonth ? 'bg-white hover:bg-indigo-50/20' : 'bg-slate-50/60 text-slate-400'
+                    cell.isCurrentMonth
+                      ? 'bg-white hover:bg-indigo-50/20 dark:bg-[#16181f] dark:hover:bg-indigo-950/10'
+                      : 'bg-slate-50/60 text-slate-400 dark:bg-[#14161d] dark:text-slate-600'
                   } ${isSelected ? 'ring-2 ring-indigo-600 ring-inset z-10' : ''}`}
                 >
                   {/* Gun Numarasi & Rozet */}
@@ -346,14 +348,14 @@ export function InteractiveContentCalendar({
                         cell.isToday
                           ? 'bg-indigo-600 text-white'
                           : cell.isCurrentMonth
-                          ? 'text-slate-800'
-                          : 'text-slate-400'
+                          ? 'text-slate-800 dark:text-slate-200'
+                          : 'text-slate-400 dark:text-slate-600'
                       }`}
                     >
                       {cell.dayNumber}
                     </span>
                     {cell.tasks.length > 0 && (
-                      <span className="rounded-md bg-slate-100 px-1 py-0.2 text-[10px] font-bold text-slate-600">
+                      <span className="rounded-md bg-slate-100 px-1 py-0.2 text-[10px] font-bold text-slate-600 dark:bg-[#222632] dark:text-slate-300">
                         {cell.tasks.length}
                       </span>
                     )}
@@ -366,18 +368,18 @@ export function InteractiveContentCalendar({
                       return (
                         <div
                           key={task.id}
-                          className="flex items-center gap-1 rounded-md border border-slate-200/80 bg-white p-1 text-[10px] shadow-2xs truncate hover:border-slate-300"
+                          className="flex items-center gap-1 rounded-md border border-slate-200/80 bg-white p-1 text-[10px] shadow-2xs truncate hover:border-slate-300 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-200 dark:hover:border-slate-600"
                         >
                           <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${st.dotClass}`} />
                           <span className="shrink-0">{renderPlatformIcon(task.platform, 'h-2.5 w-2.5')}</span>
-                          <span className="truncate font-medium text-slate-800">
+                          <span className="truncate font-medium text-slate-800 dark:text-slate-200">
                             {task.brand_name}
                           </span>
                         </div>
                       )
                     })}
                     {cell.tasks.length > 2 && (
-                      <span className="text-[10px] font-semibold text-indigo-600 pl-0.5">
+                      <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 pl-0.5">
                         +{cell.tasks.length - 2} içerik daha
                       </span>
                     )}
@@ -391,16 +393,16 @@ export function InteractiveContentCalendar({
         </div>
 
         {/* Sag Alan: Secili Gun Detay Paneli (1 Kolon Genisliginde) */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-4">
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-4 dark:border-[#272b37] dark:bg-[#16181f]">
           {/* Panel Basligi */}
-          <div className="border-b border-slate-100 pb-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600">
+          <div className="border-b border-slate-100 dark:border-[#272b37] pb-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               Seçili Gün Detayı
             </span>
-            <h3 className="text-sm font-bold text-slate-900 mt-0.5">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
               {selectedDateFormatted}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               {selectedDayTasks.length} içerik teslimatı planlandı
             </p>
           </div>
@@ -412,12 +414,12 @@ export function InteractiveContentCalendar({
               return (
                 <div
                   key={task.id}
-                  className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-3.5 space-y-2.5 transition-all hover:border-slate-300 hover:bg-white hover:shadow-xs"
+                  className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-3.5 space-y-2.5 transition-all hover:border-slate-300 hover:bg-white hover:shadow-xs dark:border-[#272b37] dark:bg-[#1a1d25]/60 dark:hover:border-slate-600 dark:hover:bg-[#1a1d25]"
                 >
                   {/* Marka & Durum */}
                   <div className="flex items-center justify-between gap-2">
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-slate-900 truncate">
-                      <Building2 className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-white truncate">
+                      <Building2 className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
                       <span className="truncate">{task.brand_name}</span>
                     </span>
                     <span
@@ -430,11 +432,11 @@ export function InteractiveContentCalendar({
 
                   {/* Platform & Format */}
                   <div className="flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 rounded-md bg-white border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-800">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-white border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-800 dark:bg-[#222632] dark:border-[#272b37] dark:text-slate-200">
                       {renderPlatformIcon(task.platform, 'h-3 w-3')}
                       <span className="capitalize">{task.platform}</span>
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-white border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-white border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-[#222632] dark:border-[#272b37] dark:text-slate-300">
                       {renderFormatIcon(task.content, 'h-3 w-3')}
                       <span className="capitalize">{task.content}</span>
                     </span>
@@ -442,17 +444,17 @@ export function InteractiveContentCalendar({
 
                   {/* Varsa Brief/Not */}
                   {task.assignment_note && (
-                    <p className="text-[11px] text-slate-600 line-clamp-2 italic bg-white/70 p-2 rounded-lg border border-slate-100">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-2 italic bg-white/70 dark:bg-[#14161d] p-2 rounded-lg border border-slate-100 dark:border-[#272b37]">
                       &quot;{task.assignment_note}&quot;
                     </p>
                   )}
 
                   {/* Aksiyon Linki */}
-                  <div className="border-t border-slate-200/60 pt-2 flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400">Görev Detayı</span>
+                  <div className="border-t border-slate-200/60 dark:border-[#272b37] pt-2 flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400 dark:text-slate-500">Görev Detayı</span>
                     <Link
                       href="/agency/tasks"
-                      className="inline-flex items-center gap-1 font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                      className="inline-flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
                     >
                       <span>Yönetimde Aç</span>
                       <ArrowUpRight className="h-3 w-3" />
@@ -464,12 +466,12 @@ export function InteractiveContentCalendar({
 
             {/* Secili Gunde Gorev Yoksa */}
             {selectedDayTasks.length === 0 && (
-              <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-6 text-center text-slate-400">
-                <CalendarIcon className="h-6 w-6 text-slate-300" />
-                <p className="text-xs font-medium text-slate-600">
+              <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-6 text-center text-slate-400 dark:border-[#272b37] dark:bg-[#1a1d25]/30 dark:text-slate-500">
+                <CalendarIcon className="h-6 w-6 text-slate-300 dark:text-slate-600" />
+                <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   Bu tarihte henüz bir içerik görevi bulunmuyor
                 </p>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">
                   Şablon Matrisi üzerinden rutin ekleyebilir veya toplu görev üretebilirsiniz.
                 </p>
               </div>

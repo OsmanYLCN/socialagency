@@ -60,7 +60,7 @@ export function Sidebar({ role }: SidebarProps) {
 
   return (
     <aside
-      className={`relative flex h-full shrink-0 flex-col border-r border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900 transition-[width] duration-300 ease-in-out select-none will-change-[width] ${
+      className={`relative flex h-full shrink-0 flex-col border-r border-slate-200/80 bg-white dark:border-[#262a36] dark:bg-[#14161d] transition-[width] duration-300 ease-in-out select-none will-change-[width] ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
@@ -70,7 +70,7 @@ export function Sidebar({ role }: SidebarProps) {
         onClick={() => setIsCollapsed((prev) => !prev)}
         aria-label={isCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
         title={isCollapsed ? 'Menüyü Genişlet' : 'Menüyü Daralt'}
-        className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-200 active:scale-95 focus:outline-none cursor-pointer"
+        className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-[#262a36] dark:bg-[#1e212b] dark:text-slate-400 dark:hover:border-[#383d4d] dark:hover:bg-[#252935] dark:hover:text-slate-100 active:scale-95 focus:outline-none cursor-pointer"
       >
         <ChevronLeft
           className={`h-3.5 w-3.5 transition-transform duration-300 ease-in-out ${
@@ -80,7 +80,7 @@ export function Sidebar({ role }: SidebarProps) {
       </button>
 
       {/* Üst Logo ve Başlık Alanı */}
-      <div className="flex h-16 items-center border-b border-slate-100/80 dark:border-slate-800 px-3">
+      <div className="flex h-16 items-center border-b border-slate-100/80 dark:border-[#262a36] px-3">
         <Link
           href={homeHref}
           title="SMAUP"
@@ -182,7 +182,7 @@ export function Sidebar({ role }: SidebarProps) {
       </nav>
 
       {/* Alt Marka Alanı */}
-      <div className="border-t border-slate-100/80 dark:border-slate-800 px-3 py-3.5">
+      <div className="border-t border-slate-100/80 dark:border-[#262a36] px-3 py-3.5">
         <div
           title="SMAUP"
           className="relative flex h-8 items-center overflow-hidden"

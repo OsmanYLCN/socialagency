@@ -64,23 +64,23 @@ export function TasksFilterBar({
   }
 
   return (
-    <div className="space-y-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
+    <div className="space-y-3 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
       {/* Üst Sıra: Arama & Hızlı Bilgi */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input
             type="text"
             value={filters.search}
             onChange={(e) => handleChange('search', e.target.value)}
             placeholder="Marka, görevli, brief veya platformda ara..."
-            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#14161d] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-500/20"
           />
           {filters.search && (
             <button
               type="button"
               onClick={() => handleChange('search', '')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
               title="Aramayı temizle"
             >
               <X className="h-3.5 w-3.5" />
@@ -89,15 +89,15 @@ export function TasksFilterBar({
         </div>
 
         <div className="flex items-center justify-between gap-3 md:justify-end">
-          <span className="text-xs font-semibold text-slate-500 shrink-0">
-            <span className="font-bold text-slate-800">{filteredCount}</span> / {totalCount} görev listeleniyor
+          <span className="text-xs font-semibold text-slate-500 shrink-0 dark:text-slate-400">
+            <span className="font-bold text-slate-800 dark:text-slate-200">{filteredCount}</span> / {totalCount} görev listeleniyor
           </span>
 
           {isAnyFilterActive && (
             <button
               type="button"
               onClick={onResetFilters}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632] dark:hover:text-white"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Filtreleri Sıfırla
@@ -113,7 +113,7 @@ export function TasksFilterBar({
           <select
             value={filters.brandId}
             onChange={(e) => handleChange('brandId', e.target.value)}
-            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#14161d] dark:text-slate-200 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25]"
           >
             <option value="">Tüm Markalar</option>
             {brands.map((b) => (
@@ -129,7 +129,7 @@ export function TasksFilterBar({
           <select
             value={filters.assigneeId}
             onChange={(e) => handleChange('assigneeId', e.target.value)}
-            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#14161d] dark:text-slate-200 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25]"
           >
             <option value="">Tüm Ekip & Havuz</option>
             <option value="unassigned">📋 İş Havuzu (Atanmamış)</option>
@@ -146,7 +146,7 @@ export function TasksFilterBar({
           <select
             value={filters.platform}
             onChange={(e) => handleChange('platform', e.target.value)}
-            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#14161d] dark:text-slate-200 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25]"
           >
             <option value="">Tüm Platformlar</option>
             {PLATFORMS.map((p) => (
@@ -162,7 +162,7 @@ export function TasksFilterBar({
           <select
             value={filters.content}
             onChange={(e) => handleChange('content', e.target.value)}
-            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#14161d] dark:text-slate-200 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25]"
           >
             <option value="">Tüm Formatlar</option>
             {CONTENT_TYPES.map((c) => (
@@ -178,7 +178,7 @@ export function TasksFilterBar({
           <select
             value={filters.timeFilter}
             onChange={(e) => handleChange('timeFilter', e.target.value)}
-            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+            className="h-9 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-medium text-slate-700 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#14161d] dark:text-slate-200 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25]"
           >
             <option value="">Tüm Zamanlar</option>
             <option value="overdue">⚠️ Sadece Gecikenler</option>

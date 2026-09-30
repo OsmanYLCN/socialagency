@@ -15,18 +15,18 @@ export default function DashboardError({
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="w-full max-w-md rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 text-rose-600">
+      <div className="w-full max-w-md rounded-2xl border border-rose-200 bg-white p-8 text-center shadow-sm dark:border-rose-950/60 dark:bg-[#16181f]">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
           <span className="text-xl font-bold">!</span>
         </div>
-        <h1 className="text-lg font-bold text-slate-900">Panel yüklenemedi</h1>
-        <p className="mt-2 text-sm leading-relaxed text-slate-500">
+        <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">Panel yüklenemedi</h1>
+        <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
           Panel verileri alınırken beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.
         </p>
         <button
           type="button"
           onClick={() => unstable_retry()}
-          className="mt-6 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-700"
+          className="mt-6 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-700 dark:bg-indigo-600 dark:hover:bg-indigo-500 cursor-pointer"
         >
           Tekrar Dene
         </button>

@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="min-h-full bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-150">
+      <body className="min-h-full bg-slate-50 text-slate-900 dark:bg-[#0e1015] dark:text-[#f8fafc] font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-150">
         <ThemeListener />
         {children}
       </body>

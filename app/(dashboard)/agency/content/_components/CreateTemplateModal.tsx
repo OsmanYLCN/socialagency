@@ -27,11 +27,11 @@ interface CreateTemplateModalProps {
 }
 
 const PLATFORMS = [
-  { id: 'instagram', name: 'Instagram', borderClass: 'peer-checked:border-rose-500 peer-checked:bg-rose-50/60 peer-checked:text-rose-700' },
-  { id: 'tiktok', name: 'TikTok', borderClass: 'peer-checked:border-slate-900 peer-checked:bg-slate-900 peer-checked:text-white' },
-  { id: 'youtube', name: 'YouTube', borderClass: 'peer-checked:border-red-600 peer-checked:bg-red-50/60 peer-checked:text-red-700' },
-  { id: 'x', name: 'X (Twitter)', borderClass: 'peer-checked:border-slate-800 peer-checked:bg-slate-100 peer-checked:text-slate-900' },
-  { id: 'linkedin', name: 'LinkedIn', borderClass: 'peer-checked:border-sky-600 peer-checked:bg-sky-50/60 peer-checked:text-sky-700' },
+  { id: 'instagram', name: 'Instagram', borderClass: 'peer-checked:border-rose-500 peer-checked:bg-rose-50/60 peer-checked:text-rose-700 dark:peer-checked:bg-rose-950/40 dark:peer-checked:text-rose-300' },
+  { id: 'tiktok', name: 'TikTok', borderClass: 'peer-checked:border-slate-900 peer-checked:bg-slate-900 peer-checked:text-white dark:peer-checked:border-slate-100 dark:peer-checked:bg-slate-100 dark:peer-checked:text-slate-900' },
+  { id: 'youtube', name: 'YouTube', borderClass: 'peer-checked:border-red-600 peer-checked:bg-red-50/60 peer-checked:text-red-700 dark:peer-checked:bg-red-950/40 dark:peer-checked:text-red-300' },
+  { id: 'x', name: 'X (Twitter)', borderClass: 'peer-checked:border-slate-800 peer-checked:bg-slate-100 peer-checked:text-slate-900 dark:peer-checked:border-slate-300 dark:peer-checked:bg-[#222632] dark:peer-checked:text-slate-100' },
+  { id: 'linkedin', name: 'LinkedIn', borderClass: 'peer-checked:border-sky-600 peer-checked:bg-sky-50/60 peer-checked:text-sky-700 dark:peer-checked:bg-sky-950/40 dark:peer-checked:text-sky-300' },
 ]
 
 const CONTENT_TYPES = [
@@ -104,28 +104,28 @@ export function CreateTemplateModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Arka Plan Karartmasi */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Penceresi */}
-      <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl transition-all">
+      <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl transition-all dark:border dark:border-[#272b37] dark:bg-[#16181f]">
         {/* Baslik */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#272b37] px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
               <Plus className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">Yeni İçerik Şablonu Ekle</h2>
-              <p className="text-xs text-slate-500">Haftalık rutin paylaşım kuralı tanımlayın</p>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Yeni İçerik Şablonu Ekle</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Haftalık rutin paylaşım kuralı tanımlayın</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#222632] dark:hover:text-slate-300 transition-colors cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -134,7 +134,7 @@ export function CreateTemplateModal({
         {/* Form */}
         <form action={formAction} className="space-y-4 px-6 py-5">
           {state?.error && (
-            <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700">
+            <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/50 dark:text-rose-300">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{state.error}</span>
             </div>
@@ -143,17 +143,17 @@ export function CreateTemplateModal({
           {/* Marka & Gun Secimi */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Marka <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Building2 className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Building2 className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
                 <select
                   name="brand_id"
                   value={selectedBrand}
                   onChange={(e) => setSelectedBrand(e.target.value)}
                   required
-                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-8 text-xs font-medium text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-8 text-xs font-medium text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
                 >
                   {brands.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -165,17 +165,17 @@ export function CreateTemplateModal({
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Yayınlanacağı Gün <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Calendar className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Calendar className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
                 <select
                   name="day_of_week"
                   value={selectedDay}
                   onChange={(e) => setSelectedDay(Number(e.target.value))}
                   required
-                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-8 text-xs font-medium text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-8 text-xs font-medium text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
                 >
                   {DAYS_OF_WEEK.map((d) => (
                     <option key={d.num} value={d.num}>
@@ -189,7 +189,7 @@ export function CreateTemplateModal({
 
           {/* Platform Secimi */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Sosyal Medya Platformu <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -204,7 +204,7 @@ export function CreateTemplateModal({
                     className="peer sr-only"
                   />
                   <div
-                    className={`flex items-center justify-center rounded-xl border border-slate-200 py-2 px-3 text-xs font-medium text-slate-700 transition-all hover:bg-slate-50 ${platform.borderClass}`}
+                    className={`flex items-center justify-center rounded-xl border border-slate-200 py-2 px-3 text-xs font-medium text-slate-700 transition-all hover:bg-slate-50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632] ${platform.borderClass}`}
                   >
                     {platform.name}
                   </div>
@@ -215,7 +215,7 @@ export function CreateTemplateModal({
 
           {/* Icerik Formati Secimi */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               İçerik Formatı <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -231,7 +231,7 @@ export function CreateTemplateModal({
                       onChange={() => setSelectedContent(type.id)}
                       className="peer sr-only"
                     />
-                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 py-2 px-2.5 text-xs font-medium text-slate-700 transition-all hover:bg-slate-50 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/70 peer-checked:text-indigo-700">
+                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 py-2 px-2.5 text-xs font-medium text-slate-700 transition-all hover:bg-slate-50 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/70 peer-checked:text-indigo-700 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632] dark:peer-checked:border-indigo-500 dark:peer-checked:bg-indigo-950/40 dark:peer-checked:text-indigo-300">
                       <Icon className="h-3.5 w-3.5 shrink-0" />
                       <span className="truncate">{type.name}</span>
                     </div>
@@ -243,11 +243,11 @@ export function CreateTemplateModal({
 
           {/* Adet */}
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-700">
+            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Haftalık Paylaşım Adedi
             </label>
             <div className="relative">
-              <Hash className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <Hash className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
               <input
                 type="number"
                 name="quantity"
@@ -256,34 +256,34 @@ export function CreateTemplateModal({
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 required
-                className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs font-medium text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs font-medium text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
               />
             </div>
-            <p className="mt-1 text-[11px] text-slate-400">
+            <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
               Belirtilen gün içinde bu formattan kaç adet üretileceğini belirler (Genelde 1).
             </p>
           </div>
 
           {/* Varsayilan Aciklama / Brief Notu */}
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-700">
-              Varsayılan Brief / Strateji Notu <span className="font-normal text-slate-400">(İsteğe bağlı)</span>
+            <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Varsayılan Brief / Strateji Notu <span className="font-normal text-slate-400 dark:text-slate-500">(İsteğe bağlı)</span>
             </label>
             <textarea
               name="default_description"
               rows={2}
               maxLength={500}
               placeholder="Örn: Haftalık ürün tanıtım videosu veya eğlenceli reels konsepti..."
-              className="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 resize-none"
+              className="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-900 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 resize-none dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950/40"
             />
           </div>
 
           {/* Butonlar */}
-          <div className="flex items-center justify-end gap-2.5 border-t border-slate-100 pt-4">
+          <div className="flex items-center justify-end gap-2.5 border-t border-slate-100 dark:border-[#272b37] pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+              className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632] transition-colors cursor-pointer"
             >
               Vazgeç
             </button>

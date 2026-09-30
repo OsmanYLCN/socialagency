@@ -39,27 +39,27 @@ type SortOrder = 'asc' | 'desc'
 const PLATFORM_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
   instagram: {
     label: 'Instagram',
-    badge: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200/80',
+    badge: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200/80 dark:bg-fuchsia-950/40 dark:text-fuchsia-300 dark:border-fuchsia-900/40',
     dot: 'bg-fuchsia-500',
   },
   tiktok: {
     label: 'TikTok',
-    badge: 'bg-slate-900 text-white border-slate-900',
+    badge: 'bg-slate-900 text-white border-slate-900 dark:bg-black dark:border-slate-800 dark:text-slate-200',
     dot: 'bg-cyan-400',
   },
   linkedin: {
     label: 'LinkedIn',
-    badge: 'bg-blue-50 text-blue-700 border-blue-200/80',
+    badge: 'bg-blue-50 text-blue-700 border-blue-200/80 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900/40',
     dot: 'bg-blue-600',
   },
   youtube: {
     label: 'YouTube',
-    badge: 'bg-rose-50 text-rose-700 border-rose-200/80',
+    badge: 'bg-rose-50 text-rose-700 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/40',
     dot: 'bg-rose-600',
   },
   x: {
     label: 'X (Twitter)',
-    badge: 'bg-slate-100 text-slate-800 border-slate-200',
+    badge: 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-[#1a1d25] dark:text-slate-300 dark:border-[#272b37]',
     dot: 'bg-slate-700',
   },
 }
@@ -68,27 +68,27 @@ const PLATFORM_CONFIG: Record<string, { label: string; badge: string; dot: strin
 const STATUS_CONFIG: Record<TaskItem['status'], { label: string; badge: string; dot: string }> = {
   unassigned: {
     label: 'İş Havuzu',
-    badge: 'bg-slate-100 text-slate-700 border-slate-200',
+    badge: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-[#1a1d25] dark:text-slate-300 dark:border-[#272b37]',
     dot: 'bg-slate-400',
   },
   assigned: {
     label: 'Üretimde',
-    badge: 'bg-blue-50 text-blue-700 border-blue-200/80',
+    badge: 'bg-blue-50 text-blue-700 border-blue-200/80 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900/40',
     dot: 'bg-blue-500',
   },
   pending_approval: {
     label: 'Onay Bekliyor',
-    badge: 'bg-amber-50 text-amber-700 border-amber-200/80',
+    badge: 'bg-amber-50 text-amber-700 border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/40',
     dot: 'bg-amber-500',
   },
   revision_requested: {
     label: 'Revizyonda',
-    badge: 'bg-rose-50 text-rose-700 border-rose-200/80',
+    badge: 'bg-rose-50 text-rose-700 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900/40',
     dot: 'bg-rose-500',
   },
   completed: {
     label: 'Tamamlandı',
-    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/40',
     dot: 'bg-emerald-500',
   },
 }
@@ -170,14 +170,14 @@ export function TasksListView({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
+    <div className="rounded-2xl border border-slate-200/80 bg-white shadow-xs overflow-hidden dark:border-[#272b37] dark:bg-[#16181f]">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-200/80 bg-slate-50/75 text-[11px] font-bold uppercase tracking-wider text-slate-500 select-none">
+            <tr className="border-b border-slate-200/80 bg-slate-50/75 text-[11px] font-bold uppercase tracking-wider text-slate-500 select-none dark:border-[#272b37] dark:bg-[#14161d] dark:text-slate-400">
               <th
                 onClick={() => handleSort('platform')}
-                className="py-3.5 pl-6 pr-4 cursor-pointer hover:text-slate-800 transition-colors"
+                className="py-3.5 pl-6 pr-4 cursor-pointer hover:text-slate-800 transition-colors dark:hover:text-slate-200"
               >
                 <div className="flex items-center gap-1.5">
                   <span>Platform & Format</span>
@@ -187,7 +187,7 @@ export function TasksListView({
 
               <th
                 onClick={() => handleSort('brandName')}
-                className="py-3.5 px-4 cursor-pointer hover:text-slate-800 transition-colors"
+                className="py-3.5 px-4 cursor-pointer hover:text-slate-800 transition-colors dark:hover:text-slate-200"
               >
                 <div className="flex items-center gap-1.5">
                   <span>Marka & Brief Notu</span>
@@ -199,7 +199,7 @@ export function TasksListView({
 
               <th
                 onClick={() => handleSort('dueDate')}
-                className="py-3.5 px-4 cursor-pointer hover:text-slate-800 transition-colors"
+                className="py-3.5 px-4 cursor-pointer hover:text-slate-800 transition-colors dark:hover:text-slate-200"
               >
                 <div className="flex items-center gap-1.5">
                   <span>Teslim Tarihi</span>
@@ -209,7 +209,7 @@ export function TasksListView({
 
               <th
                 onClick={() => handleSort('status')}
-                className="py-3.5 px-4 cursor-pointer hover:text-slate-800 transition-colors"
+                className="py-3.5 px-4 cursor-pointer hover:text-slate-800 transition-colors dark:hover:text-slate-200"
               >
                 <div className="flex items-center gap-1.5">
                   <span>Aşama / Durum</span>
@@ -223,19 +223,19 @@ export function TasksListView({
             </tr>
           </thead>
 
-          <tbody className={`divide-y divide-slate-100 text-xs ${isPending ? 'opacity-60' : ''}`}>
+          <tbody className={`divide-y divide-slate-100 text-xs dark:divide-[#272b37] ${isPending ? 'opacity-60' : ''}`}>
             {sortedTasks.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-slate-400">
-                  <p className="text-sm font-semibold text-slate-600">Filtrelere uygun görev bulunamadı</p>
-                  <p className="mt-1 text-xs text-slate-400">Arama kriterlerinizi değiştirmeyi deneyin.</p>
+                <td colSpan={7} className="py-12 text-center text-slate-400 dark:text-slate-500">
+                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Filtrelere uygun görev bulunamadı</p>
+                  <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Arama kriterlerinizi değiştirmeyi deneyin.</p>
                 </td>
               </tr>
             ) : (
               sortedTasks.map((task) => {
                 const platformInfo = PLATFORM_CONFIG[task.platform] ?? {
                   label: task.platform,
-                  badge: 'bg-slate-100 text-slate-700 border-slate-200',
+                  badge: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-[#1a1d25] dark:text-slate-300 dark:border-[#272b37]',
                   dot: 'bg-slate-500',
                 }
                 const statusInfo = STATUS_CONFIG[task.status] ?? STATUS_CONFIG.unassigned
@@ -246,7 +246,7 @@ export function TasksListView({
                   <tr
                     key={task.id}
                     onClick={() => onTaskClick(task)}
-                    className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                    className="hover:bg-slate-50/80 transition-colors cursor-pointer group dark:hover:bg-[#1a1d25]"
                   >
                     {/* 1. Platform & Format */}
                     <td className="py-3.5 pl-6 pr-4 whitespace-nowrap">
@@ -257,7 +257,7 @@ export function TasksListView({
                           <span className={`h-1.5 w-1.5 rounded-full ${platformInfo.dot}`} />
                           {platformInfo.label}
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 uppercase">
+                        <span className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 uppercase dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300">
                           {getFormatIcon(task.content)}
                           {task.content}
                         </span>
@@ -268,12 +268,12 @@ export function TasksListView({
                     <td className="py-3.5 px-4 min-w-[200px] max-w-xs">
                       <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+                          <span className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate dark:text-slate-100 dark:group-hover:text-indigo-400">
                             {task.brandName}
                           </span>
                           {task.revisionsCount > 0 && (
                             <span
-                              className="inline-flex items-center gap-0.5 text-[10px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded shrink-0"
+                              className="inline-flex items-center gap-0.5 text-[10px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded shrink-0 dark:bg-rose-950/40 dark:text-rose-300"
                               title={`${task.revisionsCount} kez revizyon istendi`}
                             >
                               <RotateCcw className="h-2.5 w-2.5" />
@@ -282,7 +282,7 @@ export function TasksListView({
                           )}
                           {task.commentsCount > 0 && (
                             <span
-                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-400 shrink-0"
+                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-400 shrink-0 dark:text-slate-500"
                               title={`${task.commentsCount} yorum`}
                             >
                               <MessageSquare className="h-2.5 w-2.5" />
@@ -291,11 +291,11 @@ export function TasksListView({
                           )}
                         </div>
                         {task.assignmentNote ? (
-                          <p className="mt-0.5 text-[11px] text-slate-500 truncate">
+                          <p className="mt-0.5 text-[11px] text-slate-500 truncate dark:text-slate-400">
                             {task.assignmentNote}
                           </p>
                         ) : (
-                          <span className="text-[11px] text-slate-300 italic">Brief girilmemiş</span>
+                          <span className="text-[11px] text-slate-300 italic dark:text-slate-600">Brief girilmemiş</span>
                         )}
                       </div>
                     </td>
@@ -312,13 +312,13 @@ export function TasksListView({
                             onClick={() =>
                               setOpenAssignId(openAssignId === task.id ? null : task.id)
                             }
-                            className="flex items-center gap-2 rounded-lg py-1 px-1.5 hover:bg-slate-100 transition-colors cursor-pointer text-left"
+                            className="flex items-center gap-2 rounded-lg py-1 px-1.5 hover:bg-slate-100 transition-colors cursor-pointer text-left dark:hover:bg-[#222632]"
                             title="Görevliyi değiştir"
                           >
-                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700 shrink-0">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700 shrink-0 dark:border dark:border-indigo-800/40 dark:bg-indigo-950/70 dark:text-indigo-300">
                               {task.assigneeName.slice(0, 2).toUpperCase()}
                             </div>
-                            <span className="font-medium text-slate-700 truncate max-w-[120px]">
+                            <span className="font-medium text-slate-700 truncate max-w-[120px] dark:text-slate-200">
                               {task.assigneeName}
                             </span>
                           </button>
@@ -328,7 +328,7 @@ export function TasksListView({
                             onClick={() =>
                               setOpenAssignId(openAssignId === task.id ? null : task.id)
                             }
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-slate-300 bg-slate-50/60 px-2.5 py-1 text-[11px] font-semibold text-slate-500 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-slate-300 bg-slate-50/60 px-2.5 py-1 text-[11px] font-semibold text-slate-500 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-400 dark:hover:border-indigo-500/50 dark:hover:text-indigo-400"
                           >
                             <User className="h-3 w-3" />
                             <span>Ata</span>
@@ -338,16 +338,16 @@ export function TasksListView({
                         {/* Personel Atama Dropdown */}
                         {openAssignId === task.id && (
                           <div
-                            className="absolute left-0 top-8 z-30 w-52 rounded-xl border border-slate-200 bg-white p-2 shadow-xl animate-in fade-in zoom-in-95 duration-100"
+                            className="absolute left-0 top-8 z-30 w-52 rounded-xl border border-slate-200 bg-white p-2 shadow-xl animate-in fade-in zoom-in-95 duration-100 dark:border-[#272b37] dark:bg-[#1a1d25]"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <p className="px-2 py-1 text-[11px] font-bold text-slate-800 border-b border-slate-100 mb-1">
+                            <p className="px-2 py-1 text-[11px] font-bold text-slate-800 border-b border-slate-100 mb-1 dark:border-[#272b37] dark:text-slate-200">
                               Personele Ata
                             </p>
                             <button
                               type="button"
                               onClick={() => handleAssign(task.id, '')}
-                              className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-100 cursor-pointer"
+                              className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 hover:bg-slate-100 cursor-pointer dark:text-slate-300 dark:hover:bg-[#222632]"
                             >
                               <span>📋 İş Havuzuna Gönder (Atanmamış)</span>
                             </button>
@@ -358,8 +358,8 @@ export function TasksListView({
                                 onClick={() => handleAssign(task.id, emp.id)}
                                 className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
                                   task.assigneeId === emp.id
-                                    ? 'bg-indigo-50 font-bold text-indigo-700'
-                                    : 'text-slate-700 hover:bg-slate-100'
+                                    ? 'bg-indigo-50 font-bold text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300'
+                                    : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-[#222632]'
                                 }`}
                               >
                                 <User className="h-3.5 w-3.5 text-slate-400" />
@@ -376,16 +376,16 @@ export function TasksListView({
                       <div
                         className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold ${
                           isOverdue
-                            ? 'bg-rose-100 text-rose-700 font-bold'
+                            ? 'bg-rose-100 text-rose-700 font-bold dark:bg-rose-950/50 dark:text-rose-300'
                             : isToday
-                            ? 'bg-amber-100 text-amber-800 font-bold'
+                            ? 'bg-amber-100 text-amber-800 font-bold dark:bg-amber-950/50 dark:text-amber-300'
                             : isCompleted
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'text-slate-600 bg-slate-50'
+                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                            : 'text-slate-600 bg-slate-50 dark:bg-[#1a1d25] dark:text-slate-300'
                         }`}
                       >
                         {isOverdue ? (
-                          <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0" />
+                          <AlertTriangle className="h-3.5 w-3.5 text-rose-600 shrink-0 dark:text-rose-400" />
                         ) : (
                           <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                         )}
@@ -415,13 +415,13 @@ export function TasksListView({
                           href={task.contentUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-1 text-[11px] font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-1 text-[11px] font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors dark:border-indigo-900/40 dark:bg-indigo-950/40 dark:text-indigo-300 dark:hover:bg-indigo-900/40"
                         >
                           <ExternalLink className="h-3 w-3" />
                           <span>Görüntüle</span>
                         </a>
                       ) : (
-                        <span className="text-[11px] text-slate-400 italic">—</span>
+                        <span className="text-[11px] text-slate-400 italic dark:text-slate-600">—</span>
                       )}
                     </td>
 
@@ -436,21 +436,21 @@ export function TasksListView({
                           onClick={() =>
                             setOpenMenuId(openMenuId === task.id ? null : task.id)
                           }
-                          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
+                          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer dark:text-slate-500 dark:hover:bg-[#1a1d25] dark:hover:text-slate-300"
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </button>
 
                         {/* Aksiyon Menüsü */}
                         {openMenuId === task.id && (
-                          <div className="absolute right-0 top-8 z-30 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl animate-in fade-in zoom-in-95 duration-100 text-left">
+                          <div className="absolute right-0 top-8 z-30 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl animate-in fade-in zoom-in-95 duration-100 text-left dark:border-[#272b37] dark:bg-[#1a1d25]">
                             <button
                               type="button"
                               onClick={() => {
                                 setOpenMenuId(null)
                                 onTaskClick(task)
                               }}
-                              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer dark:text-slate-200 dark:hover:bg-[#222632] dark:hover:text-white"
                             >
                               <span>Detay Gör & Yorum</span>
                             </button>
@@ -461,22 +461,22 @@ export function TasksListView({
                                 setOpenMenuId(null)
                                 onEditClick(task)
                               }}
-                              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer dark:text-slate-200 dark:hover:bg-[#222632] dark:hover:text-white"
                             >
                               <Pencil className="h-3.5 w-3.5 text-slate-400" />
                               <span>Görevi Düzenle</span>
                             </button>
 
-                            <div className="my-1 border-t border-slate-100" />
+                            <div className="my-1 border-t border-slate-100 dark:border-[#272b37]" />
 
-                            <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                               Aşama Değiştir
                             </div>
                             {task.status !== 'assigned' && (
                               <button
                                 type="button"
                                 onClick={() => handleStatusChange(task.id, 'assigned')}
-                                className="flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                                className="flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer dark:text-blue-400 dark:hover:bg-blue-950/40"
                               >
                                 <span>Üretime Al</span>
                               </button>
@@ -485,7 +485,7 @@ export function TasksListView({
                               <button
                                 type="button"
                                 onClick={() => handleStatusChange(task.id, 'pending_approval')}
-                                className="flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
+                                className="flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer dark:text-amber-400 dark:hover:bg-amber-950/40"
                               >
                                 <span>Onaya Sun</span>
                               </button>
@@ -494,14 +494,14 @@ export function TasksListView({
                               <button
                                 type="button"
                                 onClick={() => handleStatusChange(task.id, 'completed')}
-                                className="flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
+                                className="flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer dark:text-emerald-400 dark:hover:bg-emerald-950/40"
                               >
                                 <CheckCircle2 className="h-3 w-3" />
                                 <span>Tamamlandı</span>
                               </button>
                             )}
 
-                            <div className="my-1 border-t border-slate-100" />
+                            <div className="my-1 border-t border-slate-100 dark:border-[#272b37]" />
 
                             <button
                               type="button"
@@ -509,7 +509,7 @@ export function TasksListView({
                                 setOpenMenuId(null)
                                 onDeleteClick(task)
                               }}
-                              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer dark:text-rose-400 dark:hover:bg-rose-950/40"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                               <span>Görevi Sil</span>

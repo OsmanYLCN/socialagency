@@ -28,11 +28,11 @@ interface CreateTaskModalProps {
 }
 
 const PLATFORMS = [
-  { id: 'instagram', name: 'Instagram', color: 'hover:border-fuchsia-400 peer-checked:border-fuchsia-500 peer-checked:bg-fuchsia-50/60 peer-checked:text-fuchsia-700' },
-  { id: 'tiktok', name: 'TikTok', color: 'hover:border-slate-800 peer-checked:border-slate-900 peer-checked:bg-slate-900 peer-checked:text-white' },
-  { id: 'linkedin', name: 'LinkedIn', color: 'hover:border-blue-400 peer-checked:border-blue-600 peer-checked:bg-blue-50/60 peer-checked:text-blue-700' },
-  { id: 'youtube', name: 'YouTube', color: 'hover:border-rose-400 peer-checked:border-rose-600 peer-checked:bg-rose-50/60 peer-checked:text-rose-700' },
-  { id: 'x', name: 'X (Twitter)', color: 'hover:border-slate-700 peer-checked:border-slate-900 peer-checked:bg-slate-100 peer-checked:text-slate-900' },
+  { id: 'instagram', name: 'Instagram', color: 'hover:border-fuchsia-400 peer-checked:border-fuchsia-500 peer-checked:bg-fuchsia-50/60 peer-checked:text-fuchsia-700 dark:peer-checked:bg-fuchsia-950/40 dark:peer-checked:text-fuchsia-300 dark:peer-checked:border-fuchsia-800' },
+  { id: 'tiktok', name: 'TikTok', color: 'hover:border-slate-800 peer-checked:border-slate-900 peer-checked:bg-slate-900 peer-checked:text-white dark:peer-checked:border-slate-700 dark:peer-checked:bg-black dark:peer-checked:text-slate-200' },
+  { id: 'linkedin', name: 'LinkedIn', color: 'hover:border-blue-400 peer-checked:border-blue-600 peer-checked:bg-blue-50/60 peer-checked:text-blue-700 dark:peer-checked:bg-blue-950/40 dark:peer-checked:text-blue-300 dark:peer-checked:border-blue-800' },
+  { id: 'youtube', name: 'YouTube', color: 'hover:border-rose-400 peer-checked:border-rose-600 peer-checked:bg-rose-50/60 peer-checked:text-rose-700 dark:peer-checked:bg-rose-950/40 dark:peer-checked:text-rose-300 dark:peer-checked:border-rose-800' },
+  { id: 'x', name: 'X (Twitter)', color: 'hover:border-slate-700 peer-checked:border-slate-900 peer-checked:bg-slate-100 peer-checked:text-slate-900 dark:peer-checked:border-slate-600 dark:peer-checked:bg-[#222632] dark:peer-checked:text-white' },
 ]
 
 const CONTENT_TYPES = [
@@ -81,27 +81,27 @@ export function CreateTaskModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150">
+      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-[#272b37] dark:bg-[#16181f]">
         {/* Başlık Barı */}
-        <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-3 dark:border-[#272b37]">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
               <Plus className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-900">Yeni İçerik Görevi Oluştur</h2>
-              <p className="text-xs text-slate-500">Ajans bünyesinde üretilecek içeriğin brief ve detaylarını tanımlayın</p>
+              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Yeni İçerik Görevi Oluştur</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Ajans bünyesinde üretilecek içeriğin brief ve detaylarını tanımlayın</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer dark:hover:bg-[#222632] dark:hover:text-slate-200"
           >
             <X className="h-5 w-5" />
           </button>
@@ -119,20 +119,20 @@ export function CreateTaskModal({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Marka Seçimi */}
             <div>
-              <label htmlFor="task-brand" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              <label htmlFor="task-brand" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Marka <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Building2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Building2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <select
                   id="task-brand"
                   name="brand_id"
                   required
-                  className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+                  className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
                 >
-                  <option value="">Marka Seçiniz...</option>
+                  <option value="" className="dark:bg-[#1a1d25]">Marka Seçiniz...</option>
                   {brands.map((b) => (
-                    <option key={b.id} value={b.id}>
+                    <option key={b.id} value={b.id} className="dark:bg-[#1a1d25]">
                       {b.name}
                     </option>
                   ))}
@@ -142,25 +142,25 @@ export function CreateTaskModal({
 
             {/* Görevli Personel */}
             <div>
-              <label htmlFor="task-assignee" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              <label htmlFor="task-assignee" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Görevli Personel
               </label>
               <div className="relative">
-                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <select
                   id="task-assignee"
                   name="assignee_id"
-                  className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+                  className="h-10 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
                 >
-                  <option value="">📋 İş Havuzu (Atanmamış)</option>
+                  <option value="" className="dark:bg-[#1a1d25]">📋 İş Havuzu (Atanmamış)</option>
                   {employees.map((e) => (
-                    <option key={e.id} value={e.id}>
+                    <option key={e.id} value={e.id} className="dark:bg-[#1a1d25]">
                       👤 {e.name}
                     </option>
                   ))}
                 </select>
               </div>
-              <p className="mt-1 text-[11px] text-slate-400">
+              <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500">
                 Personel seçmezseniz görev İş Havuzunda toplanır.
               </p>
             </div>
@@ -168,7 +168,7 @@ export function CreateTaskModal({
 
           {/* Platform Seçimi */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Yayın Platformu <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -183,7 +183,7 @@ export function CreateTaskModal({
                     className="peer sr-only"
                   />
                   <div
-                    className={`flex h-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-2 text-xs font-bold text-slate-700 transition-all ${p.color}`}
+                    className={`flex h-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-2 text-xs font-bold text-slate-700 transition-all dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 ${p.color}`}
                   >
                     <span>{p.name}</span>
                   </div>
@@ -194,7 +194,7 @@ export function CreateTaskModal({
 
           {/* İçerik Formatı Seçimi */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               İçerik Formatı <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -214,8 +214,8 @@ export function CreateTaskModal({
                     <div
                       className={`flex h-10 items-center gap-2 rounded-xl border px-3 text-xs font-semibold transition-all ${
                         isChecked
-                          ? 'border-indigo-500 bg-indigo-50/70 text-indigo-700 shadow-xs'
-                          : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300'
+                          ? 'border-indigo-500 bg-indigo-50/70 text-indigo-700 shadow-xs dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-500'
+                          : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
@@ -230,35 +230,35 @@ export function CreateTaskModal({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Teslim Tarihi */}
             <div>
-              <label htmlFor="task-due-date" className="mb-1.5 block text-xs font-semibold text-slate-700">
+              <label htmlFor="task-due-date" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Teslim / Prodüksiyon Tarihi <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Calendar className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Calendar className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <input
                   id="task-due-date"
                   name="due_date"
                   type="date"
                   required
                   defaultValue={defaultDueDate}
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs font-medium text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
                 />
               </div>
             </div>
 
             {/* Referans / Varlık Linki */}
             <div>
-              <label htmlFor="task-content-url" className="mb-1.5 block text-xs font-semibold text-slate-700">
-                Referans / Çalışma Bağlantısı <span className="text-slate-400 font-normal">(İsteğe bağlı)</span>
+              <label htmlFor="task-content-url" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Referans / Çalışma Bağlantısı <span className="text-slate-400 dark:text-slate-500 font-normal">(İsteğe bağlı)</span>
               </label>
               <div className="relative">
-                <LinkIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <LinkIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                 <input
                   id="task-content-url"
                   name="content_url"
                   type="url"
                   placeholder="https://drive.google.com/... veya Figma"
-                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
                 />
               </div>
             </div>
@@ -266,27 +266,27 @@ export function CreateTaskModal({
 
           {/* Brief & Prodüksiyon Notu */}
           <div>
-            <label htmlFor="task-note" className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="task-note" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
               Brief & İçerik Notu
             </label>
             <div className="relative">
-              <FileText className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              <FileText className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400 dark:text-slate-500" />
               <textarea
                 id="task-note"
                 name="note"
                 rows={3}
                 placeholder="Video kurgu talimatları, metin taslağı, kullanılacak müzik veya kreatif yönlendirmeler..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
               />
             </div>
           </div>
 
           {/* Alt Butonlar */}
-          <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
+          <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4 dark:border-[#272b37]">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-300 dark:hover:bg-[#222632]"
             >
               Vazgeç
             </button>

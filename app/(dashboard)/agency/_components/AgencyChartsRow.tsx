@@ -68,13 +68,13 @@ export function AgencyChartsRow({
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
+      <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white dark:border-[#272b37] dark:bg-[#16181f] p-6 shadow-xs">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-slate-900">Aylık Müşteri Artışı</h3>
-            <p className="text-xs text-slate-400">Son 6 aylık marka büyüme ivmesi</p>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Aylık Müşteri Artışı</h3>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Son 6 aylık marka büyüme ivmesi</p>
           </div>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
             <TrendingUp className="h-4 w-4" />
           </div>
         </div>
@@ -88,9 +88,9 @@ export function AgencyChartsRow({
               </linearGradient>
             </defs>
 
-            <line x1="10" y1="30" x2="310" y2="30" stroke="#f1f5f9" strokeDasharray="3 3" />
-            <line x1="10" y1="70" x2="310" y2="70" stroke="#f1f5f9" strokeDasharray="3 3" />
-            <line x1="10" y1="120" x2="310" y2="120" stroke="#f1f5f9" />
+            <line x1="10" y1="30" x2="310" y2="30" stroke="#f1f5f9" className="stroke-[#f1f5f9] dark:stroke-[#272b37]" strokeDasharray="3 3" />
+            <line x1="10" y1="70" x2="310" y2="70" stroke="#f1f5f9" className="stroke-[#f1f5f9] dark:stroke-[#272b37]" strokeDasharray="3 3" />
+            <line x1="10" y1="120" x2="310" y2="120" stroke="#f1f5f9" className="stroke-[#f1f5f9] dark:stroke-[#272b37]" />
 
             <path d={areaD} fill="url(#clientGrowthGrad)" />
 
@@ -108,13 +108,13 @@ export function AgencyChartsRow({
                   cx={pt.x}
                   cy={pt.y}
                   r="4"
-                  className="fill-white stroke-indigo-600 stroke-2"
+                  className="fill-white dark:fill-[#16181f] stroke-indigo-600 stroke-2"
                 />
                 <text
                   x={pt.x}
                   y={pt.y - 8}
                   textAnchor="middle"
-                  className="fill-slate-400 text-[10px] font-semibold"
+                  className="fill-slate-400 dark:fill-slate-500 text-[10px] font-semibold"
                 >
                   {pt.count}
                 </text>
@@ -123,20 +123,20 @@ export function AgencyChartsRow({
           </svg>
         </div>
 
-        <div className="mt-2 flex justify-between px-2 text-[11px] font-medium text-slate-400">
+        <div className="mt-2 flex justify-between px-2 text-[11px] font-medium text-slate-400 dark:text-slate-500">
           {monthlyGrowth.map((m) => (
             <span key={m.month}>{m.month}</span>
           ))}
         </div>
       </div>
 
-      <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
+      <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white dark:border-[#272b37] dark:bg-[#16181f] p-6 shadow-xs">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-slate-900">Görev Tamamlama Oranı</h3>
-            <p className="text-xs text-slate-400">Bu ayki hedeflenen işlerin durumu</p>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Görev Tamamlama Oranı</h3>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Bu ayki hedeflenen işlerin durumu</p>
           </div>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
             <CheckCircle className="h-4 w-4" />
           </div>
         </div>
@@ -148,6 +148,7 @@ export function AgencyChartsRow({
               cy="50"
               r={radius}
               stroke="#f1f5f9"
+              className="stroke-[#f1f5f9] dark:stroke-[#272b37]"
               strokeWidth="9"
               fill="transparent"
             />
@@ -167,8 +168,8 @@ export function AgencyChartsRow({
             )}
           </svg>
           <div className="absolute flex flex-col items-center justify-center text-center">
-            <span className="text-3xl font-black text-slate-900">%{completionRate}</span>
-            <span className="text-[10px] font-semibold text-emerald-600">
+            <span className="text-3xl font-black text-slate-900 dark:text-slate-100">%{completionRate}</span>
+            <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
               {totalTasksCount === 0
                 ? 'Görev Yok'
                 : completionRate >= 80
@@ -180,26 +181,26 @@ export function AgencyChartsRow({
           </div>
         </div>
 
-        <div className="flex justify-around border-t border-slate-100 pt-3 text-center">
+        <div className="flex justify-around border-t border-slate-100 dark:border-[#272b37] pt-3 text-center">
           <div>
-            <p className="text-xs text-slate-400">Tamamlanan</p>
-            <p className="text-sm font-bold text-slate-800">{completedTasksCount}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Tamamlanan</p>
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{completedTasksCount}</p>
           </div>
-          <div className="h-7 w-px bg-slate-100" />
+          <div className="h-7 w-px bg-slate-100 dark:bg-[#272b37]" />
           <div>
-            <p className="text-xs text-slate-400">Toplam Görev</p>
-            <p className="text-sm font-bold text-slate-800">{totalTasksCount}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Toplam Görev</p>
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{totalTasksCount}</p>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs">
+      <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white dark:border-[#272b37] dark:bg-[#16181f] p-6 shadow-xs">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-slate-900">İçerik Dağılımı</h3>
-            <p className="text-xs text-slate-400">Format bazlı üretim adetleri</p>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">İçerik Dağılımı</h3>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Format bazlı üretim adetleri</p>
           </div>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
             <PieChart className="h-4 w-4" />
           </div>
         </div>
@@ -207,8 +208,8 @@ export function AgencyChartsRow({
         <div className="my-3 flex items-center justify-center">
           <div className="relative flex h-32 w-32 items-center justify-center">
             {totalContent === 0 ? (
-              <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-dashed border-slate-200 text-center">
-                <span className="text-[11px] font-medium text-slate-400">Kayıt Yok</span>
+              <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-dashed border-slate-200 dark:border-[#272b37] text-center">
+                <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">Kayıt Yok</span>
               </div>
             ) : (
               <>

@@ -34,14 +34,14 @@ export function ContentPlanHeader({
       {/* Baslik & Aciklama */}
       <div>
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
             <CalendarIcon className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
               İçerik Planı & Strateji
             </h1>
-            <p className="text-xs text-slate-500 sm:text-sm">
+            <p className="text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
               Markalarınızın haftalık rutin içerik şablonlarını yönetin ve takvim üzerinde izleyin.
             </p>
           </div>
@@ -52,11 +52,11 @@ export function ContentPlanHeader({
       <div className="flex flex-wrap items-center gap-3">
         {/* Marka Secici Dropdown */}
         <div className="relative flex items-center">
-          <Filter className="pointer-events-none absolute left-3 h-4 w-4 text-slate-400" />
+          <Filter className="pointer-events-none absolute left-3 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <select
             value={selectedBrandId}
             onChange={(e) => onSelectBrand(e.target.value)}
-            className="h-10 cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-8 text-xs font-semibold text-slate-700 shadow-xs transition-all hover:border-slate-300 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+            className="h-10 cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-9 pr-8 text-xs font-semibold text-slate-700 shadow-xs transition-all hover:border-slate-300 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-200 dark:hover:border-slate-600 dark:focus:ring-indigo-950/40"
           >
             <option value="all">Tüm Markalar ({brands.length})</option>
             {brands.map((brand) => (
@@ -65,7 +65,7 @@ export function ContentPlanHeader({
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute right-3 flex items-center text-slate-400">
+          <div className="pointer-events-none absolute right-3 flex items-center text-slate-400 dark:text-slate-500">
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
@@ -73,14 +73,14 @@ export function ContentPlanHeader({
         </div>
 
         {/* Gorunum Modu Toggle (Sablon Matrisi / Takvim) */}
-        <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50/80 p-1 shadow-xs">
+        <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50/80 p-1 shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
           <button
             type="button"
             onClick={() => onChangeViewMode('matrix')}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
               viewMode === 'matrix'
-                ? 'bg-white font-semibold text-slate-900 shadow-xs'
-                : 'text-slate-500 hover:text-slate-900'
+                ? 'bg-white font-semibold text-slate-900 shadow-xs dark:bg-[#222632] dark:text-white'
+                : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <LayoutGrid className="h-3.5 w-3.5" />
@@ -91,8 +91,8 @@ export function ContentPlanHeader({
             onClick={() => onChangeViewMode('calendar')}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
               viewMode === 'calendar'
-                ? 'bg-white font-semibold text-slate-900 shadow-xs'
-                : 'text-slate-500 hover:text-slate-900'
+                ? 'bg-white font-semibold text-slate-900 shadow-xs dark:bg-[#222632] dark:text-white'
+                : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <CalendarDays className="h-3.5 w-3.5" />
@@ -104,9 +104,9 @@ export function ContentPlanHeader({
         <button
           type="button"
           onClick={onOpenGenerateModal}
-          className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50/80 px-4 py-2 text-xs font-semibold text-indigo-700 shadow-xs transition-all hover:bg-indigo-100/80 hover:border-indigo-300 active:scale-98 cursor-pointer"
+          className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50/80 px-4 py-2 text-xs font-semibold text-indigo-700 shadow-xs transition-all hover:bg-indigo-100/80 hover:border-indigo-300 active:scale-98 cursor-pointer dark:border-indigo-900/50 dark:bg-indigo-950/30 dark:text-indigo-300 dark:hover:bg-indigo-950/50 dark:hover:border-indigo-800"
         >
-          <Sparkles className="h-4 w-4 text-indigo-600" />
+          <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
           <span>Haftalık Görevleri Üret</span>
         </button>
 
