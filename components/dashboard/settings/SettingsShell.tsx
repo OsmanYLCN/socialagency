@@ -19,6 +19,8 @@ import {
 } from '@/lib/settings'
 import { AppearanceTab } from './AppearanceTab'
 import { LocalizationTab } from './LocalizationTab'
+import { NotificationTab } from './NotificationTab'
+import { SecurityTab } from './SecurityTab'
 
 export type SettingsTabId =
   | 'appearance'
@@ -212,7 +214,11 @@ export function SettingsShell({ children }: SettingsShellProps) {
             {activeTab === 'localization' && (
               <LocalizationTab settings={settings} updateSetting={updateSetting} />
             )}
-            {activeTab !== 'appearance' && activeTab !== 'localization' && (
+            {activeTab === 'notifications' && (
+              <NotificationTab settings={settings} updateSetting={updateSetting} />
+            )}
+            {activeTab === 'security' && <SecurityTab />}
+            {activeTab === 'workspace' && (
               children ? (
                 children({ settings, updateSetting, activeTab })
               ) : (
