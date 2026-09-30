@@ -8,7 +8,7 @@ export function PageLoading() {
       <div className="flex flex-col items-center gap-4">
         {/* Dümdüz Yükleniyor yazısı */}
         <span className="text-xs sm:text-sm font-medium tracking-[0.15em] text-slate-400 select-none">
-          Yükleniyor...
+          Yükleniyor
         </span>
 
         {/* Çok şık yuvarlak dönen halka */}

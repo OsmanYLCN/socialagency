@@ -13,7 +13,7 @@ export default function RootLoading() {
 
         {/* Dümdüz Yükleniyor yazısı */}
         <span className="text-xs sm:text-sm font-medium tracking-[0.15em] text-slate-400 select-none">
-          Yükleniyor...
+          Yükleniyor
         </span>
 
         {/* En altta ortada dönen çok şık yuvarlak halka */}
