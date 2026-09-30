@@ -21,6 +21,7 @@ import { AppearanceTab } from './AppearanceTab'
 import { LocalizationTab } from './LocalizationTab'
 import { NotificationTab } from './NotificationTab'
 import { SecurityTab } from './SecurityTab'
+import { WorkspaceTab } from './WorkspaceTab'
 
 export type SettingsTabId =
   | 'appearance'
@@ -219,13 +220,11 @@ export function SettingsShell({ children }: SettingsShellProps) {
             )}
             {activeTab === 'security' && <SecurityTab />}
             {activeTab === 'workspace' && (
-              children ? (
-                children({ settings, updateSetting, activeTab })
-              ) : (
-                <div className="py-12 text-center text-slate-400">
-                  <p className="text-sm font-medium">Bu sekmenin içerikleri hazırlanıyor...</p>
-                </div>
-              )
+              <WorkspaceTab
+                settings={settings}
+                updateSetting={updateSetting}
+                onReset={handleReset}
+              />
             )}
           </div>
         </main>
