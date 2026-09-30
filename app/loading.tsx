@@ -3,47 +3,41 @@ export default function RootLoading() {
     <div
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 select-none"
       aria-busy="true"
-      aria-label="SMAUP yükleniyor"
+      aria-label="Yükleniyor"
     >
       <div className="flex flex-col items-center gap-4">
-        {/* Logo and Animated Ring */}
-        <div className="relative flex h-16 w-16 items-center justify-center">
-          {/* Subtle Outer Pulse */}
-          <div className="absolute inset-0 rounded-2xl bg-indigo-500/15 animate-ping opacity-60" />
+        {/* Üstte: Sol alttakiyle birebir aynı font, aynı renk ve harf aralığında SMAUP */}
+        <span className="text-2xl sm:text-3xl font-black tracking-[0.2em] text-slate-700 select-none">
+          SMAUP
+        </span>
 
-          {/* Rotating Spinner Ring */}
-          <div className="absolute inset-[-4px] rounded-2xl border-2 border-indigo-600/20 border-t-indigo-600 animate-spin" />
+        {/* Dümdüz Yükleniyor yazısı */}
+        <span className="text-xs sm:text-sm font-medium tracking-[0.15em] text-slate-400 select-none">
+          Yükleniyor...
+        </span>
 
-          {/* Logo Box */}
-          <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-800 text-white shadow-md shadow-slate-900/10">
-            <svg
-              className="h-7 w-7 text-indigo-400"
-              viewBox="0 0 24 24"
-              fill="none"
+        {/* En altta ortada dönen çok şık yuvarlak halka */}
+        <div className="relative flex h-8 w-8 items-center justify-center mt-1">
+          <svg
+            className="h-8 w-8 animate-spin text-indigo-600"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-20"
+              cx="12"
+              cy="12"
+              r="10"
               stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m12 3-8 4.5v9L12 21l8-4.5v-9L12 3Z" />
-              <path d="M12 12 4 7.5" />
-              <path d="m12 12 8-4.5" />
-              <path d="M12 12v9" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Brand Text & Status */}
-        <div className="flex flex-col items-center gap-1.5 mt-2">
-          <span className="text-sm font-black tracking-[0.25em] text-slate-800">
-            SMAUP
-          </span>
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-indigo-600 animate-pulse" />
-            <span className="text-xs font-medium text-slate-400 tracking-wide">
-              Sistem hazırlanıyor...
-            </span>
-          </div>
+              strokeWidth="2.8"
+            />
+            <path
+              className="opacity-90"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
         </div>
       </div>
     </div>
