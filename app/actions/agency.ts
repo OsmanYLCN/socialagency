@@ -102,40 +102,37 @@ export async function createCustomerAction(
     return { error: msg }
   }
 
-  const { data: brand, error: brandError } = await serviceClient
-    .from('brands')
-    .insert({
-      agency_id: agencyOwner.agencyId,
-      name: brandName,
-      monthly_fee: monthlyFee,
+  try {
+    await prisma.$transaction(async (tx) => {
+      const brand = await tx.brands.create({
+        data: {
+          agency_id: agencyOwner.agencyId!,
+          name: brandName,
+          monthly_fee: monthlyFee,
+        }
+      })
+
+      await tx.profiles.create({
+        data: {
+          id: authUser.user.id,
+          agency_id: agencyOwner.agencyId!,
+          brand_id: brand.id,
+          role: 'customer',
+          first_name: firstName,
+          last_name: lastName,
+          is_active: true,
+        }
+      })
     })
-    .select('id')
-    .single()
 
-  if (brandError || !brand) {
+    revalidatePath('/agency/customers')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
     await serviceClient.auth.admin.deleteUser(authUser.user.id)
-    return { error: `Marka kaydedilemedi: ${brandError?.message ?? 'Bilinmeyen hata'}` }
+    const msg = err instanceof Error ? err.message : 'Kayıt işlemi tamamlanamadı'
+    return { error: `Müşteri ve marka oluşturulamadı: ${msg}` }
   }
-
-  const { error: profileError } = await serviceClient.from('profiles').insert({
-    id: authUser.user.id,
-    agency_id: agencyOwner.agencyId,
-    brand_id: brand.id,
-    role: 'customer',
-    first_name: firstName,
-    last_name: lastName,
-    is_active: true,
-  })
-
-  if (profileError) {
-    await serviceClient.auth.admin.deleteUser(authUser.user.id)
-    await serviceClient.from('brands').delete().eq('id', brand.id)
-    return { error: `Müşteri profili oluşturulamadı: ${profileError.message}` }
-  }
-
-  revalidatePath('/agency/customers')
-  revalidatePath('/agency')
-  return { success: true }
 }
 
 // Yeni ajans çalışanı oluşturur
@@ -748,9 +745,6 @@ export async function deleteTaskAction(
   if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
 
   try {
-    await prisma.notifications.deleteMany({ where: { task_id: taskId } })
-    await prisma.task_comments.deleteMany({ where: { task_id: taskId } })
-    await prisma.task_revisions.deleteMany({ where: { task_id: taskId } })
     await prisma.tasks.delete({ where: { id: taskId } })
 
     revalidatePath('/agency/tasks')
@@ -879,28 +873,30 @@ export async function deleteCustomerAction(
   })
 
   try {
+    await prisma.$transaction(async (tx) => {
+      if (targetCustomerProfile?.id) {
+        await tx.profiles.deleteMany({ where: { id: targetCustomerProfile.id } })
+      }
+
+      await tx.tasks.updateMany({
+        where: { brand_id: brandId },
+        data: { template_id: null },
+      })
+      await tx.tasks.deleteMany({
+        where: { brand_id: brandId },
+      })
+
+      await tx.profiles.updateMany({
+        where: { brand_id: brandId },
+        data: { brand_id: null },
+      })
+
+      await tx.brands.delete({ where: { id: brandId } })
+    })
+
     if (targetCustomerProfile?.id) {
       await serviceClient.auth.admin.deleteUser(targetCustomerProfile.id)
-      await prisma.profiles.deleteMany({ where: { id: targetCustomerProfile.id } })
     }
-
-    // 1. Markaya ait görevlerin template_id bağlantısını çöz ve görevleri temizle (Foreign Key kısıt ihlalini önler)
-    await prisma.tasks.updateMany({
-      where: { brand_id: brandId },
-      data: { template_id: null },
-    })
-    await prisma.tasks.deleteMany({
-      where: { brand_id: brandId },
-    })
-
-    // 2. İlişkili profillerin brand_id bağlantısını çöz
-    await prisma.profiles.updateMany({
-      where: { brand_id: brandId },
-      data: { brand_id: null },
-    })
-
-    // 3. Markayı güvenle sil (şablonlar cascade ile silinir)
-    await prisma.brands.delete({ where: { id: brandId } })
 
     revalidatePath('/agency/customers')
     revalidatePath('/agency')
@@ -1125,17 +1121,15 @@ export async function deleteEmployeeAction(
   }
 
   try {
-    // 1. Çalışana atanmış tüm görevleri iş havuzuna iade et (veri kaybını önler)
-    await prisma.tasks.updateMany({
-      where: { assignee_id: employeeId },
-      data: { assignee_id: null, status: 'unassigned' },
+    await prisma.$transaction(async (tx) => {
+      await tx.tasks.updateMany({
+        where: { assignee_id: employeeId },
+        data: { assignee_id: null, status: 'unassigned' },
+      })
+      await tx.profiles.deleteMany({ where: { id: employeeId } })
     })
 
-    // 2. Supabase Auth kullanıcı hesabını sil
     await serviceClient.auth.admin.deleteUser(employeeId)
-
-    // 3. Profil kaydını sil (tasks.updateMany sonrası foreign key uyumludur; cascade yapılmışsa hata vermez)
-    await prisma.profiles.deleteMany({ where: { id: employeeId } })
 
     revalidatePath('/agency/employees')
     revalidatePath('/agency')
