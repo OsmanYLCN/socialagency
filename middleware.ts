@@ -6,7 +6,7 @@ const PROTECTED_PREFIXES = ['/admin', '/agency', '/employee', '/customer']
 const AUTH_ROUTES = ['/login', '/register']
 
 // Rotaları ve oturumları korur
-export default function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('sb-access-token')?.value
   const role = request.cookies.get('user-role')?.value
@@ -24,6 +24,42 @@ export default function middleware(request: NextRequest) {
         return NextResponse.redirect(refreshUrl)
       }
 
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('from', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+
+    // 1.5. Token Doğrulama (Edge uyumlu Supabase Auth API çağrısı)
+    let isValidToken = false
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (supabaseUrl && supabaseAnonKey && token) {
+      try {
+        const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            apikey: supabaseAnonKey,
+          },
+          cache: 'no-store'
+        })
+        if (response.ok) {
+          isValidToken = true
+        }
+      } catch (err) {
+        // Ağ veya fetch hatası durumunda token geçersiz sayılır
+      }
+    }
+
+    // Token geçersizse (süresi dolmuş, manipüle edilmiş vb.)
+    if (!isValidToken) {
+      const refreshToken = request.cookies.get('sb-refresh-token')?.value
+      if (refreshToken) {
+        const refreshUrl = new URL('/auth/refresh', request.url)
+        refreshUrl.searchParams.set('next', pathname)
+        return NextResponse.redirect(refreshUrl)
+      }
+      
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('from', pathname)
       return NextResponse.redirect(loginUrl)
