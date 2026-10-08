@@ -1503,19 +1503,34 @@ export async function generateTasksFromTemplatesAction(
       generatedCount += qty
     }
 
-    // 2. Yeni görevleri tek seferde topluca oluştur
+    // Güvenlik & Performans: Tek seferde maksimum 500 görev oluşturmaya izin ver (Y-4)
+    const MAX_TASKS_PER_RUN = 500
+    if (allTasksToCreate.length > MAX_TASKS_PER_RUN) {
+      allTasksToCreate.length = MAX_TASKS_PER_RUN
+      generatedCount = MAX_TASKS_PER_RUN
+    }
+
+    // 2. Yeni görevleri chunk'lar (parçalar) halinde topluca oluştur
     if (allTasksToCreate.length > 0) {
-      await prisma.tasks.createMany({
-        data: allTasksToCreate,
-      })
+      const CHUNK_SIZE = 100
+      for (let i = 0; i < allTasksToCreate.length; i += CHUNK_SIZE) {
+        const chunk = allTasksToCreate.slice(i, i + CHUNK_SIZE)
+        await prisma.tasks.createMany({
+          data: chunk,
+        })
+      }
     }
 
     // 3. Şablonların son üretilme tarihlerini tek seferde güncelle
     if (processedTemplateIds.length > 0) {
-      await prisma.content_templates.updateMany({
-        where: { id: { in: processedTemplateIds } },
-        data: { last_generated_at: new Date() },
-      })
+      const CHUNK_SIZE = 100
+      for (let i = 0; i < processedTemplateIds.length; i += CHUNK_SIZE) {
+        const chunk = processedTemplateIds.slice(i, i + CHUNK_SIZE)
+        await prisma.content_templates.updateMany({
+          where: { id: { in: chunk } },
+          data: { last_generated_at: new Date() },
+        })
+      }
     }
 
     revalidatePath('/agency/content')

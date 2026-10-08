@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Bell, ChevronDown, LogOut, Search, Settings, User } from 'lucide-react'
+import { Bell, ChevronDown, LogOut, Settings, User } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { logoutAction } from '@/app/actions/auth'
@@ -100,15 +100,7 @@ export function Topbar({
   return (
     <>
       <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white dark:border-[#262a36] dark:bg-[#14161d] px-6">
-        <div className="relative w-72 max-w-sm">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-          <input
-            type="text"
-            placeholder="Ara... (Müşteri, çalışan, görev)"
-            className="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 text-xs text-slate-800 placeholder-slate-400 dark:border-[#2a2f3d] dark:bg-[#1a1d26] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:bg-[#1e222d] transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/40"
-          />
-        </div>
-
+        <div className="flex-1" />
         <div className="flex items-center gap-2.5">
           <button
             id="topbar-notifications"
