@@ -3,13 +3,20 @@ import { prisma } from '@/lib/prisma'
 import { requireAgencyOwner } from '@/lib/auth'
 import { CustomersClientView } from './_components/CustomersClientView'
 
+import { Pagination } from '@/components/ui/Pagination'
+
 export const metadata: Metadata = {
   title: 'Müşteriler & Markalar – SMAUP',
   description: 'Ajansınıza bağlı marka ve müşteri hesaplarını yönetin.',
 }
 
 // Ajans musteri ve marka yonetim sayfasi
-export default async function CustomersPage() {
+export default async function CustomersPage(props: { searchParams: Promise<{ page?: string }> }) {
+  const searchParams = await props.searchParams
+  const page = parseInt(searchParams?.page || '1', 10)
+  const pageSize = 20
+  const skip = (page - 1) * pageSize
+
   const user = await requireAgencyOwner()
   const agencyId = user.agencyId
 
@@ -19,6 +26,12 @@ export default async function CustomersPage() {
   })
   const agencyName = agency?.name ?? 'Ajansım'
 
+  // Toplam kayıt sayısını al
+  const totalBrands = await prisma.brands.count({
+    where: { agency_id: agencyId },
+  })
+
+  // Sadece ilgili sayfadaki markaları çek
   const brands = await prisma.brands.findMany({
     where: { agency_id: agencyId },
     include: {
@@ -39,19 +52,28 @@ export default async function CustomersPage() {
       },
     },
     orderBy: { created_at: 'desc' },
+    skip,
+    take: pageSize,
   })
 
-  // Sayfa proplarini hesapla
-  const totalBrands = brands.length
-  const activeBrands = brands.filter((b) => b.profiles.some((p) => p.is_active)).length
-  const monthlyRevenue = brands.reduce((sum, b) => sum + Number(b.monthly_fee ?? 0), 0)
+  // Metrikler için özet veri (sadece gerekli alanları çekerek belleği yormadan hesaplama)
+  const metricsData = await prisma.brands.findMany({
+    where: { agency_id: agencyId },
+    select: {
+      monthly_fee: true,
+      profiles: { where: { role: 'customer' }, select: { is_active: true } },
+      tasks: { select: { status: true } }
+    }
+  })
+
+  const activeBrands = metricsData.filter((b) => b.profiles.some((p) => p.is_active)).length
+  const monthlyRevenue = metricsData.reduce((sum, b) => sum + Number(b.monthly_fee ?? 0), 0)
   const activeStatuses = ['unassigned', 'assigned', 'pending_approval', 'revision_requested']
-  const activeTasksCount = brands.reduce(
+  const activeTasksCount = metricsData.reduce(
     (sum, b) => sum + b.tasks.filter((t) => activeStatuses.includes(t.status ?? '')).length,
     0
   )
 
-  // Istemci bilesenine aktarilacak sekilde serialize et
   const brandItems = brands.map((b) => {
     const customer = b.profiles[0] ?? null
     const activeTaskCount = b.tasks.filter((t) => activeStatuses.includes(t.status ?? '')).length
@@ -76,6 +98,8 @@ export default async function CustomersPage() {
     }
   })
 
+  const totalPages = Math.ceil(totalBrands / pageSize)
+
   return (
     <div className="mx-auto max-w-7xl space-y-6 pb-12">
       <CustomersClientView
@@ -88,6 +112,8 @@ export default async function CustomersPage() {
           activeTasksCount,
         }}
       />
+      <Pagination totalPages={totalPages} currentPage={page} />
     </div>
   )
 }
+

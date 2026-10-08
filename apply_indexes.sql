@@ -1,0 +1,10 @@
+CREATE INDEX IF NOT EXISTS profiles_agency_id_idx ON public.profiles(agency_id);
+CREATE INDEX IF NOT EXISTS profiles_brand_id_idx ON public.profiles(brand_id);
+CREATE INDEX IF NOT EXISTS tasks_agency_id_idx ON public.tasks(agency_id);
+CREATE INDEX IF NOT EXISTS tasks_brand_id_idx ON public.tasks(brand_id);
+CREATE INDEX IF NOT EXISTS tasks_assignee_id_idx ON public.tasks(assignee_id);
+CREATE INDEX IF NOT EXISTS tasks_status_idx ON public.tasks(status);
+CREATE INDEX IF NOT EXISTS tasks_due_date_idx ON public.tasks(due_date);
+CREATE INDEX IF NOT EXISTS notifications_profile_id_idx ON public.notifications(profile_id);
+CREATE INDEX IF NOT EXISTS transactions_agency_id_idx ON public.transactions(agency_id);
+CREATE INDEX IF NOT EXISTS transactions_transaction_date_idx ON public.transactions(transaction_date);

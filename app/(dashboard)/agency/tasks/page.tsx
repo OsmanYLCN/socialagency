@@ -10,16 +10,23 @@ import {
   TasksMetrics,
 } from './_components/TasksClientView'
 
+import { Pagination } from '@/components/ui/Pagination'
+
 export const metadata: Metadata = {
   title: 'Görev Yönetimi – SMAUP',
   description: 'Ajansınızın tüm içerik üretim, onay ve revizyon süreçlerini yönetin.',
 }
 
-export default async function AgencyTasksPage() {
+export default async function AgencyTasksPage(props: { searchParams: Promise<{ page?: string }> }) {
+  const searchParams = await props.searchParams
+  const page = parseInt(searchParams?.page || '1', 10)
+  const pageSize = 50
+  const skip = (page - 1) * pageSize
+
   const agencyOwner = await requireAgencyOwner()
   const agencyId = agencyOwner.agencyId
 
-  const [agency, brandsData, employeesData, tasksData] = await Promise.all([
+  const [agency, brandsData, employeesData, totalTasks, tasksData, metricsData] = await Promise.all([
     prisma.agencies.findUnique({
       where: { id: agencyId },
       select: { name: true },
@@ -38,6 +45,9 @@ export default async function AgencyTasksPage() {
         users: { select: { email: true } },
       },
       orderBy: { first_name: 'asc' },
+    }),
+    prisma.tasks.count({
+      where: { agency_id: agencyId, is_active: true },
     }),
     prisma.tasks.findMany({
       where: { agency_id: agencyId, is_active: true },
@@ -64,6 +74,12 @@ export default async function AgencyTasksPage() {
         },
       },
       orderBy: { due_date: 'asc' },
+      skip,
+      take: pageSize,
+    }),
+    prisma.tasks.findMany({
+      where: { agency_id: agencyId, is_active: true },
+      select: { status: true, due_date: true },
     }),
   ])
 
@@ -88,21 +104,15 @@ export default async function AgencyTasksPage() {
   // Bugünün yerel tarihi (saat dilimi kayması olmadan kesin kontrol için)
   const todayStr = getLocalDateString()
 
-  // Metrik hesaplamaları
+  // Metrik hesaplamaları (tüm görevler üzerinden)
   let inProgressTasks = 0
   let revisionAndPendingTasks = 0
   let overdueTasks = 0
   let unassignedTasks = 0
   let completedTasks = 0
 
-  const taskItems: TaskItem[] = tasksData.map((t) => {
+  metricsData.forEach((t) => {
     const status = t.status ?? 'unassigned'
-    const assignee = t.profiles
-    const assigneeName = assignee
-      ? [assignee.first_name, assignee.last_name].filter(Boolean).join(' ') || 'İsimsiz Çalışan'
-      : null
-    const assigneeEmail = assignee?.users?.email ?? null
-
     const dueDateStr = t.due_date ? t.due_date.toISOString().slice(0, 10) : ''
     const { isOverdue } = getTaskDueStatus(dueDateStr, status, todayStr)
 
@@ -111,6 +121,15 @@ export default async function AgencyTasksPage() {
     else if (status === 'assigned') inProgressTasks++
     else if (status === 'pending_approval' || status === 'revision_requested') revisionAndPendingTasks++
     else if (status === 'completed') completedTasks++
+  })
+
+  const taskItems: TaskItem[] = tasksData.map((t) => {
+    const status = t.status ?? 'unassigned'
+    const assignee = t.profiles
+    const assigneeName = assignee
+      ? [assignee.first_name, assignee.last_name].filter(Boolean).join(' ') || 'İsimsiz Çalışan'
+      : null
+    const assigneeEmail = assignee?.users?.email ?? null
 
     const comments = t.task_comments.map((c) => {
       const authorName = c.profiles
@@ -159,13 +178,15 @@ export default async function AgencyTasksPage() {
   })
 
   const metrics: TasksMetrics = {
-    totalTasks: tasksData.length,
+    totalTasks,
     inProgressTasks,
     revisionAndPendingTasks,
     overdueTasks,
     unassignedTasks,
     completedTasks,
   }
+
+  const totalPages = Math.ceil(totalTasks / pageSize)
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 pb-12">
@@ -176,6 +197,7 @@ export default async function AgencyTasksPage() {
         employees={employees}
         metrics={metrics}
       />
+      <Pagination totalPages={totalPages} currentPage={page} />
     </div>
   )
 }

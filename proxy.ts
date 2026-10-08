@@ -46,7 +46,7 @@ export default async function proxy(request: NextRequest) {
         if (response.ok) {
           isValidToken = true
         }
-      } catch (err) {
+      } catch {
         // Ağ veya fetch hatası durumunda token geçersiz sayılır
       }
     }
