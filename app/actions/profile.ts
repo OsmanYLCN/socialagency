@@ -138,9 +138,21 @@ export async function updateProfileDetailsAction(
   const fullName = [firstName, lastName].filter(Boolean).join(' ')
 
   let newAvatarUrl: string | undefined = undefined
+  let currentAvatarFilename = ''
+
+  try {
+    const { data: profData } = await serviceClient.from('profiles').select('avatar_url').eq('id', userId).single()
+    if (profData?.avatar_url) {
+      const parts = profData.avatar_url.split('/')
+      currentAvatarFilename = parts[parts.length - 1]
+    }
+  } catch {}
 
   if (removeAvatar) {
     newAvatarUrl = ''
+    if (currentAvatarFilename) {
+      await serviceClient.storage.from('avatars').remove([currentAvatarFilename])
+    }
   } else if (avatarFile && typeof avatarFile === 'object' && 'size' in avatarFile && avatarFile.size > 0) {
     if (!avatarFile.type.startsWith('image/')) {
       return { error: 'Lütfen geçerli bir görsel dosyası (PNG, JPG, WEBP) seçin.' }
@@ -150,9 +162,28 @@ export async function updateProfileDetailsAction(
     }
 
     try {
-      const ext = (avatarFile.name.split('.').pop() || 'jpg').toLowerCase()
-      const filename = `${userId}-${Date.now()}.${ext}`
       const buffer = Buffer.from(await avatarFile.arrayBuffer())
+
+      // Magic Bytes kontrolü
+      let isValidImage = false
+      if (buffer.length >= 4) {
+        if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) isValidImage = true // JPEG
+        else if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) isValidImage = true // PNG
+        else if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x38) isValidImage = true // GIF
+        else if (buffer.length >= 12 && buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 && buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) isValidImage = true // WEBP
+      }
+
+      if (!isValidImage) {
+        return { error: 'Geçersiz dosya formatı. Lütfen gerçek bir görsel yükleyin (MIME sahteciliği algılandı).' }
+      }
+
+      const allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'gif']
+      const ext = (avatarFile.name.split('.').pop() || 'jpg').toLowerCase()
+      if (!allowedExts.includes(ext)) {
+        return { error: 'Sadece JPG, PNG, WEBP ve GIF uzantılarına izin verilmektedir.' }
+      }
+
+      const filename = `${userId}-${Date.now()}.${ext}`
 
       const { error: uploadError } = await serviceClient.storage
         .from('avatars')
@@ -163,6 +194,10 @@ export async function updateProfileDetailsAction(
 
       if (uploadError) {
         return { error: `Fotoğraf yüklenemedi: ${uploadError.message}` }
+      }
+
+      if (currentAvatarFilename) {
+        await serviceClient.storage.from('avatars').remove([currentAvatarFilename])
       }
 
       const { data: publicUrlData } = serviceClient.storage
