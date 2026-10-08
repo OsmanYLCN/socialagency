@@ -589,6 +589,19 @@ export async function updateTaskContentUrlAction(
 
   if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
 
+  if (contentUrl) {
+    if (contentUrl.length > 2048) {
+      return { error: 'İçerik linki çok uzun (maksimum 2048 karakter).' }
+    }
+    try {
+      const parsedUrl = new URL(contentUrl)
+      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        return { error: 'İçerik linki geçerli bir HTTP veya HTTPS adresi olmalıdır.' }
+      }
+    } catch {
+      return { error: 'Geçersiz URL formatı.' }
+    }
+  }
   try {
     await prisma.tasks.update({
       where: { id: taskId },
@@ -630,6 +643,10 @@ export async function requestTaskRevisionAction(
   })
 
   if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
+
+  if (task.status !== 'pending_approval') {
+    return { error: 'Bu görev revizyon için uygun durumda değil (sadece onay bekleyen görevler için).' }
+  }
 
   try {
     await prisma.task_revisions.create({
