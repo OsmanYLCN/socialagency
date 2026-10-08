@@ -138,6 +138,7 @@ export function UserProfileModal({
     }
   }, [previewAvatar])
 
+  const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -585,6 +586,28 @@ export function UserProfileModal({
               </div>
 
               <div>
+                <label className="mb-1 block text-xs font-bold text-slate-700 dark:text-slate-300">Mevcut Şifre</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="current_password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                    placeholder="Mevcut şifreniz"
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 pr-10 text-xs text-slate-800 placeholder-slate-400 transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:bg-[#1a1d25] dark:focus:ring-indigo-950/40"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
                 <label className="mb-1 block text-xs font-bold text-slate-700 dark:text-slate-300">Yeni Şifre</label>
                 <div className="relative">
                   <input
@@ -644,7 +667,7 @@ export function UserProfileModal({
                 </button>
                 <button
                   type="submit"
-                  disabled={isPasswordPending || !isPasswordMatch || isPasswordTooShort}
+                  disabled={isPasswordPending || !isPasswordMatch || isPasswordTooShort || currentPassword.length === 0}
                   className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-indigo-700 disabled:opacity-50 cursor-pointer"
                 >
                   {isPasswordPending ? (

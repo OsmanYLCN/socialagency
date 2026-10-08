@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
-import { getServiceClient } from '@/lib/supabase/server'
+import { getServiceClient, getAnonClient } from '@/lib/supabase/server'
 import { getAuthenticatedUser, requireAuthenticatedUser } from '@/lib/auth'
 import {
   getFormString,
@@ -274,9 +274,19 @@ export async function changePasswordAction(
 ) {
   const user = await requireAuthenticatedUser()
   const userId = user.id
-  const serviceClient = getServiceClient()
+  
+  if (!user.email) {
+    return { error: 'Şifre değiştirmek için hesabınıza bağlı bir e-posta adresi bulunmalıdır.' }
+  }
+
+  const currentPassword = getFormString(formData, 'current_password')
   const newPassword = getFormString(formData, 'new_password')
   const confirmPassword = getFormString(formData, 'confirm_password')
+  
+  if (!currentPassword) {
+    return { error: 'Mevcut şifrenizi girmelisiniz.' }
+  }
+  
   const passwordError = validatePassword(newPassword, 'Yeni şifre')
   if (passwordError) return { error: passwordError }
 
@@ -284,6 +294,19 @@ export async function changePasswordAction(
     return { error: 'Girdiğiniz yeni şifreler eşleşmiyor.' }
   }
 
+  const anonClient = getAnonClient()
+  
+  // Mevcut şifreyi doğrula
+  const { error: signInError } = await anonClient.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  })
+  
+  if (signInError) {
+    return { error: 'Mevcut şifrenizi yanlış girdiniz.' }
+  }
+
+  const serviceClient = getServiceClient()
   try {
     const { error: updateError } = await serviceClient.auth.admin.updateUserById(userId, {
       password: newPassword,
