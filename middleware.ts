@@ -6,7 +6,7 @@ const PROTECTED_PREFIXES = ['/admin', '/agency', '/employee', '/customer']
 const AUTH_ROUTES = ['/login', '/register']
 
 // Rotaları ve oturumları korur
-export function proxy(request: NextRequest) {
+export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('sb-access-token')?.value
   const role = request.cookies.get('user-role')?.value
