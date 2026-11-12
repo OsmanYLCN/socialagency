@@ -20,6 +20,11 @@ export type AgencyOwner = AuthenticatedUser & {
   agencyId: string
 }
 
+export type EmployeeUser = AuthenticatedUser & {
+  role: 'employee'
+  agencyId: string
+}
+
 // Access token ve profil kaydını birlikte doğrular.
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
   const cookieStore = await cookies()
@@ -115,4 +120,29 @@ export async function requireAgencyOwner(): Promise<AgencyOwner> {
   }
 
   return { ...user, role: 'agency_owner', agencyId: user.agencyId }
+}
+
+export async function getEmployee(): Promise<EmployeeUser | null> {
+  const cookieStore = await cookies()
+  const refreshToken = cookieStore.get('sb-refresh-token')?.value
+  const user = await getAuthenticatedUser()
+
+  if (!user || user.role !== 'employee' || !user.agencyId) {
+    if (!user && refreshToken) {
+      redirect('/auth/refresh?next=/employee')
+    }
+    return null
+  }
+
+  return { ...user, role: 'employee', agencyId: user.agencyId }
+}
+
+export async function requireEmployee(): Promise<EmployeeUser> {
+  const user = await requireRole('employee')
+
+  if (!user.agencyId) {
+    redirect('/login')
+  }
+
+  return { ...user, role: 'employee', agencyId: user.agencyId }
 }
