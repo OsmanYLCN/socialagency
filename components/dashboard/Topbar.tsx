@@ -9,6 +9,7 @@ import { getProfileDetailsAction } from '@/app/actions/profile'
 import { ROLE_SETTINGS } from '@/lib/constants'
 import { getInitials, avatarLoader } from '@/lib/utils'
 import { UserProfileModal } from './UserProfileModal'
+import { NotificationsPopover } from './NotificationsPopover'
 
 const ROLE_BADGE: Record<string, { label: string; textColor: string; colors: string }> = {
   super_admin: {
@@ -102,14 +103,7 @@ export function Topbar({
       <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white dark:border-[#262a36] dark:bg-[#14161d] px-6">
         <div className="flex-1" />
         <div className="flex items-center gap-2.5">
-          <button
-            id="topbar-notifications"
-            aria-label="Bildirimler"
-            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:border-[#262a36] dark:bg-[#1e212b] dark:text-slate-400 dark:hover:bg-[#252935] dark:hover:text-slate-200 transition-all cursor-pointer"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#14161d]" />
-          </button>
+          <NotificationsPopover role={role} />
 
           <Link
             href={ROLE_SETTINGS[role] ?? '/agency/settings'}
