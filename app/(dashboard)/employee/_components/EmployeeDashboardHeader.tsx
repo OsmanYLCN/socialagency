@@ -6,6 +6,8 @@ import { CheckSquare, Briefcase, Calendar } from 'lucide-react'
 interface EmployeeDashboardHeaderProps {
   employeeName: string
   agencyName: string
+  employeeTitle?: string | null
+  employeeDepartment?: string | null
   poolCount: number
   activeTasksCount: number
   formattedDate: string
@@ -14,18 +16,29 @@ interface EmployeeDashboardHeaderProps {
 export function EmployeeDashboardHeader({
   employeeName,
   agencyName,
+  employeeTitle,
+  employeeDepartment,
   poolCount,
   activeTasksCount,
   formattedDate,
 }: EmployeeDashboardHeaderProps) {
+  const roleBadgeText = [agencyName, employeeTitle || employeeDepartment || 'Ekip Üyesi']
+    .filter(Boolean)
+    .join(' • ')
+
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200/80 pb-6 dark:border-[#272b37]">
       <div>
-        <div className="flex items-center gap-2 mb-1.5">
+        <div className="flex flex-wrap items-center gap-2 mb-1.5">
           <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/40">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            {agencyName} Ekip Üyesi
+            {roleBadgeText}
           </span>
+          {employeeTitle && employeeDepartment && (
+            <span className="inline-flex items-center rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 border border-indigo-200/60 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-900/40">
+              {employeeDepartment}
+            </span>
+          )}
           <span className="hidden sm:inline-flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
             <Calendar className="h-3.5 w-3.5" />
             {formattedDate}

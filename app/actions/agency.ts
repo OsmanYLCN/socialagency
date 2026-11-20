@@ -11,7 +11,7 @@ import {
   validateEmail,
   validatePassword,
 } from '@/lib/validation'
-import { content_type, platform_type, task_status, notification_type } from '@prisma/client'
+import { content_type, platform_type, task_status, notification_type, transaction_type, transaction_category, work_model_type } from '@prisma/client'
 
 function isPlatform(value: string): value is platform_type {
   return Object.values(platform_type).includes(value as platform_type)
@@ -315,6 +315,8 @@ export async function createTaskAction(
 
     revalidatePath('/agency/tasks')
     revalidatePath('/agency')
+    revalidatePath('/employee')
+    revalidatePath('/employee/tasks')
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Görev oluşturulurken hata oluştu.'
@@ -426,6 +428,8 @@ export async function updateTaskAction(
 
     revalidatePath('/agency/tasks')
     revalidatePath('/agency')
+    revalidatePath('/employee')
+    revalidatePath('/employee/tasks')
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Görev güncellenirken hata oluştu.'
@@ -538,7 +542,7 @@ export async function updateTaskStatusAction(
 
   const task = await prisma.tasks.findFirst({
     where: { id: taskId, agency_id: agencyOwner.agencyId },
-    select: { id: true, assignee_id: true, status: true },
+    include: { brands: { select: { name: true } } },
   })
 
   if (!task) return { error: 'Görev bulunamadı veya bu ajansa ait değil.' }
@@ -557,8 +561,27 @@ export async function updateTaskStatusAction(
       data: updateData,
     })
 
+    if (status === 'completed' && task.status !== 'completed' && task.assignee_id) {
+      try {
+        await prisma.notifications.create({
+          data: {
+            profile_id: task.assignee_id,
+            task_id: taskId,
+            type: notification_type.approval,
+            message: `${task.brands.name} markasına ait ${task.content.toUpperCase()} (${task.platform}) göreviniz onaylandı ve tamamlandı.`,
+          },
+        })
+      } catch {
+        // Bildirim hatası ana işlemi engellemez
+      }
+    }
+
     revalidatePath('/agency/tasks')
     revalidatePath('/agency')
+    revalidatePath('/employee')
+    revalidatePath('/employee/tasks')
+    revalidatePath('/employee')
+    revalidatePath('/employee/tasks')
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Durum güncellenirken hata oluştu.'
@@ -613,6 +636,8 @@ export async function updateTaskContentUrlAction(
 
     revalidatePath('/agency/tasks')
     revalidatePath('/agency')
+    revalidatePath('/employee')
+    revalidatePath('/employee/tasks')
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'İçerik linki güncellenirken hata oluştu.'
@@ -678,6 +703,8 @@ export async function requestTaskRevisionAction(
 
     revalidatePath('/agency/tasks')
     revalidatePath('/agency')
+    revalidatePath('/employee')
+    revalidatePath('/employee/tasks')
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Revizyon talebi eklenirken hata oluştu.'
@@ -733,6 +760,8 @@ export async function addTaskCommentAction(
     }
 
     revalidatePath('/agency/tasks')
+    revalidatePath('/employee/tasks')
+    revalidatePath('/employee')
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Yorum eklenirken hata oluştu.'
@@ -766,6 +795,8 @@ export async function deleteTaskAction(
 
     revalidatePath('/agency/tasks')
     revalidatePath('/agency')
+    revalidatePath('/employee')
+    revalidatePath('/employee/tasks')
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Görev silinirken hata oluştu.'
@@ -774,7 +805,7 @@ export async function deleteTaskAction(
 }
 
 
-// Müşteri markasının adını ve aylık ücretini günceller
+// Müşteri markasının adını, ücretini ve tüm kurumsal/iletişim detaylarını günceller
 export async function updateCustomerAction(
   prevState: { success?: boolean; error?: string } | null,
   formData: FormData
@@ -783,6 +814,15 @@ export async function updateCustomerAction(
   const brandName = getFormString(formData, 'brand_name')
   const monthlyFeeStr = getFormString(formData, 'monthly_fee')
   const authorizedName = getFormString(formData, 'authorized_name')
+  const phone = getFormString(formData, 'phone')
+  const sector = getFormString(formData, 'sector')
+  const website = getFormString(formData, 'website')
+  const instagram = getFormString(formData, 'instagram')
+  const city = getFormString(formData, 'city')
+  const billingTitle = getFormString(formData, 'billing_title')
+  const taxId = getFormString(formData, 'tax_id')
+  const taxOffice = getFormString(formData, 'tax_office')
+  const notes = getFormString(formData, 'notes')
 
   if (!brandId) return { error: 'Marka kimliği gereklidir.' }
   if (!brandName) return { error: 'Marka adı zorunludur.' }
@@ -811,29 +851,56 @@ export async function updateCustomerAction(
       data: { name: brandName, monthly_fee: monthlyFee },
     })
 
-    if (authorizedName !== undefined) {
-      const nameParts = authorizedName.trim().split(/\s+/).filter(Boolean)
-      const firstName = nameParts[0] || (authorizedName.trim() ? authorizedName.trim() : brandName)
-      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : (authorizedName.trim() ? '' : '(Müşteri)')
+    const customerProfile = await prisma.profiles.findFirst({
+      where: { brand_id: brandId, role: 'customer' },
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true,
+        users: { select: { raw_user_meta_data: true } },
+      },
+    })
 
-      await prisma.profiles.updateMany({
-        where: { brand_id: brandId, role: 'customer' },
+    const nameParts = authorizedName.trim().split(/\s+/).filter(Boolean)
+    const firstName = nameParts[0] || (authorizedName.trim() ? authorizedName.trim() : (customerProfile?.first_name || brandName))
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : (authorizedName.trim() ? '' : (customerProfile?.last_name || '(Müşteri)'))
+
+    if (customerProfile) {
+      await prisma.profiles.update({
+        where: { id: customerProfile.id },
         data: { first_name: firstName, last_name: lastName },
       })
 
+      const prevMeta =
+        customerProfile.users?.raw_user_meta_data &&
+        typeof customerProfile.users.raw_user_meta_data === 'object' &&
+        !Array.isArray(customerProfile.users.raw_user_meta_data)
+          ? (customerProfile.users.raw_user_meta_data as Record<string, unknown>)
+          : {}
+
+      const updatedMetadata: Record<string, unknown> = {
+        ...prevMeta,
+        first_name: firstName,
+        last_name: lastName,
+        brand_name: brandName,
+        phone: formData.has('phone') ? (phone || null) : (prevMeta.phone ?? null),
+        sector: formData.has('sector') ? (sector || null) : (prevMeta.sector ?? null),
+        website: formData.has('website') ? (website || null) : (prevMeta.website ?? null),
+        instagram: formData.has('instagram') ? (instagram || null) : (prevMeta.instagram ?? null),
+        city: formData.has('city') ? (city || null) : (prevMeta.city ?? null),
+        billing_title: formData.has('billing_title') ? (billingTitle || null) : (prevMeta.billing_title ?? null),
+        tax_id: formData.has('tax_id') ? (taxId || null) : (prevMeta.tax_id ?? null),
+        tax_office: formData.has('tax_office') ? (taxOffice || null) : (prevMeta.tax_office ?? null),
+        notes: formData.has('notes') ? (notes || null) : (prevMeta.notes ?? null),
+      }
+
       try {
         const serviceClient = getServiceClient()
-        const customerProfile = await prisma.profiles.findFirst({
-          where: { brand_id: brandId, role: 'customer' },
-          select: { id: true },
+        await serviceClient.auth.admin.updateUserById(customerProfile.id, {
+          user_metadata: updatedMetadata,
         })
-        if (customerProfile) {
-          await serviceClient.auth.admin.updateUserById(customerProfile.id, {
-            user_metadata: { first_name: firstName, last_name: lastName, brand_name: brandName },
-          })
-        }
       } catch {
-        // Supabase kullanıcı güncellemesi başarısız olsa bile Prisma güncellemesi yeterlidir
+        // Supabase auth güncellemesi başarısız olsa bile Prisma kaydı güncellenmiştir
       }
     }
 
@@ -963,7 +1030,7 @@ export async function toggleCustomerStatusAction(
   }
 }
 
-// Çalışanın ad, soyad ve maaş bilgilerini günceller
+// Çalışanın ad, soyad, maaş ve tüm özlük/departman bilgilerini günceller
 export async function updateEmployeeAction(
   prevState: { success?: boolean; error?: string } | null,
   formData: FormData
@@ -972,6 +1039,15 @@ export async function updateEmployeeAction(
   const firstName = getFormString(formData, 'first_name')
   const lastName = getFormString(formData, 'last_name')
   const salaryStr = getFormString(formData, 'salary')
+  const phone = getFormString(formData, 'phone')
+  const department = getFormString(formData, 'department')
+  const title = getFormString(formData, 'title')
+  const workType = getFormString(formData, 'work_type')
+  const startDate = getFormString(formData, 'start_date')
+  const city = getFormString(formData, 'city')
+  const iban = getFormString(formData, 'iban')
+  const emergencyContact = getFormString(formData, 'emergency_contact')
+  const notes = getFormString(formData, 'notes')
 
   if (!employeeId) return { error: 'Çalışan kimliği gereklidir.' }
   if (!firstName || !lastName) return { error: 'Ad ve soyad zorunludur.' }
@@ -986,7 +1062,10 @@ export async function updateEmployeeAction(
 
   const existing = await prisma.profiles.findFirst({
     where: { id: employeeId, agency_id: agencyOwner.agencyId, role: 'employee' },
-    select: { id: true },
+    select: {
+      id: true,
+      users: { select: { raw_user_meta_data: true } },
+    },
   })
 
   if (!existing) {
@@ -999,10 +1078,32 @@ export async function updateEmployeeAction(
       data: { first_name: firstName, last_name: lastName, salary },
     })
 
+    const prevMeta =
+      existing.users?.raw_user_meta_data &&
+      typeof existing.users.raw_user_meta_data === 'object' &&
+      !Array.isArray(existing.users.raw_user_meta_data)
+        ? (existing.users.raw_user_meta_data as Record<string, unknown>)
+        : {}
+
+    const updatedMetadata: Record<string, unknown> = {
+      ...prevMeta,
+      first_name: firstName,
+      last_name: lastName,
+      phone: formData.has('phone') ? (phone || null) : (prevMeta.phone ?? null),
+      department: formData.has('department') ? (department || null) : (prevMeta.department ?? null),
+      title: formData.has('title') ? (title || null) : (prevMeta.title ?? null),
+      work_type: formData.has('work_type') ? (workType || null) : (prevMeta.work_type ?? null),
+      start_date: formData.has('start_date') ? (startDate || null) : (prevMeta.start_date ?? null),
+      city: formData.has('city') ? (city || null) : (prevMeta.city ?? null),
+      iban: formData.has('iban') ? (iban || null) : (prevMeta.iban ?? null),
+      emergency_contact: formData.has('emergency_contact') ? (emergencyContact || null) : (prevMeta.emergency_contact ?? null),
+      notes: formData.has('notes') ? (notes || null) : (prevMeta.notes ?? null),
+    }
+
     try {
       const serviceClient = getServiceClient()
       await serviceClient.auth.admin.updateUserById(employeeId, {
-        user_metadata: { first_name: firstName, last_name: lastName },
+        user_metadata: updatedMetadata,
       })
     } catch {
       // Supabase metadata güncelleme başarısız olsa bile Prisma güncellemesi yeterlidir
@@ -1010,6 +1111,7 @@ export async function updateEmployeeAction(
 
     revalidatePath('/agency/employees')
     revalidatePath('/agency')
+    revalidatePath('/employee')
     return { success: true }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Çalışan güncellenirken hata oluştu.'
@@ -1553,6 +1655,8 @@ export async function generateTasksFromTemplatesAction(
     revalidatePath('/agency/content')
     revalidatePath('/agency/tasks')
     revalidatePath('/agency')
+    revalidatePath('/employee')
+    revalidatePath('/employee/tasks')
 
     return {
       success: true,
@@ -1565,3 +1669,213 @@ export async function generateTasksFromTemplatesAction(
   }
 }
 
+
+// Ajansın kurumsal profil, iletişim, çalışma modeli ve sosyal medya bilgilerini günceller
+export async function updateAgencyDetailsAction(
+  prevState: { success?: boolean; error?: string; message?: string } | null,
+  formData: FormData
+) {
+  const name = getFormString(formData, 'name')
+  const contactEmail = getFormString(formData, 'contact_email')
+  const contactPhone = getFormString(formData, 'contact_phone')
+  const establishedYearStr = getFormString(formData, 'established_year')
+  const employeeCountStr = getFormString(formData, 'employee_count')
+  const workModelStr = getFormString(formData, 'work_model')
+  const address = getFormString(formData, 'address')
+  const mapsUrl = getFormString(formData, 'maps_url')
+  const website = getFormString(formData, 'website')
+  const instagram = getFormString(formData, 'instagram')
+  const linkedin = getFormString(formData, 'linkedin')
+  const sector = getFormString(formData, 'sector')
+  const taxOffice = getFormString(formData, 'tax_office')
+  const taxId = getFormString(formData, 'tax_id')
+  const description = getFormString(formData, 'description')
+
+  if (!name) return { error: 'Ajans adı zorunludur.' }
+  if (name.length > 255) return { error: 'Ajans adı çok uzun.' }
+
+  const emailError = validateEmail(contactEmail)
+  if (emailError) return { error: emailError }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  let establishedYear: number | null = null
+  if (establishedYearStr) {
+    const parsedYear = parseInt(establishedYearStr, 10)
+    const currentYear = new Date().getFullYear()
+    if (isNaN(parsedYear) || parsedYear < 1950 || parsedYear > currentYear + 1) {
+      return { error: `Kuruluş yılı 1950 ile ${currentYear} arasında olmalıdır.` }
+    }
+    establishedYear = parsedYear
+  }
+
+  let employeeCount: number | null = null
+  if (employeeCountStr) {
+    const parsedCount = parseInt(employeeCountStr, 10)
+    if (isNaN(parsedCount) || parsedCount < 1 || parsedCount > 10000) {
+      return { error: 'Ekip büyüklüğü 1 ile 10.000 arasında olmalıdır.' }
+    }
+    employeeCount = parsedCount
+  }
+
+  const validWorkModels = Object.values(work_model_type) as string[]
+  const workModel: work_model_type | null =
+    workModelStr && validWorkModels.includes(workModelStr)
+      ? (workModelStr as work_model_type)
+      : null
+
+  if (mapsUrl) {
+    try {
+      const parsed = new URL(mapsUrl)
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return { error: 'Harita bağlantısı geçerli bir HTTP/HTTPS adresi olmalıdır.' }
+      }
+    } catch {
+      return { error: 'Geçersiz harita bağlantısı formatı.' }
+    }
+  }
+
+  try {
+    const currentAgency = await prisma.agencies.findUnique({
+      where: { id: agencyOwner.agencyId },
+      select: { social_media: true },
+    })
+
+    const existingSocial =
+      currentAgency?.social_media &&
+      typeof currentAgency.social_media === 'object' &&
+      !Array.isArray(currentAgency.social_media)
+        ? (currentAgency.social_media as Record<string, unknown>)
+        : {}
+
+    const socialMedia = {
+      ...existingSocial,
+      website: website || null,
+      instagram: instagram || null,
+      linkedin: linkedin || null,
+      sector: sector || null,
+      tax_office: taxOffice || null,
+      tax_id: taxId || null,
+      description: description || null,
+    }
+
+    await prisma.agencies.update({
+      where: { id: agencyOwner.agencyId },
+      data: {
+        name,
+        contact_email: contactEmail,
+        contact_phone: contactPhone || null,
+        established_year: establishedYear,
+        employee_count: employeeCount,
+        work_model: workModel,
+        address: address || null,
+        maps_url: mapsUrl || null,
+        social_media: socialMedia,
+      },
+    })
+
+    revalidatePath('/agency/organization')
+    revalidatePath('/agency')
+    revalidatePath('/employee')
+    return {
+      success: true,
+      message: 'Ajans kurumsal bilgileri başarıyla güncellendi.',
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Ajans bilgileri güncellenirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Ajans finansal gelir/gider hareketi (transaction) ekler
+export async function createTransactionAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const typeStr = getFormString(formData, 'type')
+  const categoryStr = getFormString(formData, 'category')
+  const amountStr = getFormString(formData, 'amount')
+  const transactionDateStr = getFormString(formData, 'transaction_date')
+  const description = getFormString(formData, 'description')
+
+  const validTypes = Object.values(transaction_type) as string[]
+  const validCategories = Object.values(transaction_category) as string[]
+
+  if (!validTypes.includes(typeStr)) {
+    return { error: 'Geçerli bir işlem türü (Gelir / Gider) seçilmelidir.' }
+  }
+  if (!validCategories.includes(categoryStr)) {
+    return { error: 'Geçerli bir işlem kategorisi seçilmelidir.' }
+  }
+
+  const amount = parseNonNegativeNumber(amountStr, 'Tutar')
+  if (typeof amount === 'string') return { error: amount }
+  if (amount <= 0) return { error: 'İşlem tutarı 0\'dan büyük olmalıdır.' }
+
+  const dateError = validateDate(transactionDateStr)
+  if (dateError) return { error: dateError }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  try {
+    await prisma.transactions.create({
+      data: {
+        agency_id: agencyOwner.agencyId,
+        type: typeStr as transaction_type,
+        category: categoryStr as transaction_category,
+        amount,
+        description: description || null,
+        transaction_date: new Date(`${transactionDateStr}T00:00:00.000Z`),
+      },
+    })
+
+    revalidatePath('/agency/organization')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Finansal işlem kaydedilirken hata oluştu.'
+    return { error: msg }
+  }
+}
+
+// Ajans finansal gelir/gider hareketini siler
+export async function deleteTransactionAction(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData
+) {
+  const transactionId = getFormString(formData, 'transaction_id')
+  if (!transactionId) return { error: 'İşlem kimliği gereklidir.' }
+
+  const agencyOwner = await getAgencyOwner()
+  if (!agencyOwner?.agencyId) {
+    return { error: 'Bu işlem için yetkili ajans oturumu gereklidir.' }
+  }
+
+  const existing = await prisma.transactions.findFirst({
+    where: { id: transactionId, agency_id: agencyOwner.agencyId },
+    select: { id: true },
+  })
+
+  if (!existing) {
+    return { error: 'Kayıt bulunamadı veya bu ajansa ait değil.' }
+  }
+
+  try {
+    await prisma.transactions.delete({
+      where: { id: transactionId },
+    })
+
+    revalidatePath('/agency/organization')
+    revalidatePath('/agency')
+    return { success: true }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Finansal işlem silinirken hata oluştu.'
+    return { error: msg }
+  }
+}

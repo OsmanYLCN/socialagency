@@ -2,12 +2,16 @@ import { prisma } from '@/lib/prisma'
 import { requireAgencyOwner } from '@/lib/auth'
 import { getLocalDateString } from '@/lib/utils'
 import { AgencyMetricsRow } from './_components/AgencyMetricsRow'
-import { AgencyChartsRow } from './_components/AgencyChartsRow'
+import { AgencyChartsRow, type ContentDistribution } from './_components/AgencyChartsRow'
 import { AgencyActionButtons } from './_components/AgencyActionButtons'
 import { AgencyRecentActivities, RecentActivityItem } from './_components/AgencyRecentActivities'
 import { AgencyTaskPipeline, PipelineTaskItem } from './_components/AgencyTaskPipeline'
 import { AgencyContentCalendar } from './_components/AgencyContentCalendar'
 import { AgencyActiveBrands, BrandOverviewItem } from './_components/AgencyActiveBrands'
+import {
+  AgencyQuickApprovalQueue,
+  type QuickApprovalTaskItem,
+} from './_components/AgencyQuickApprovalQueue'
 import { notification_type } from '@prisma/client'
 
 function getActivityType(type: notification_type | null): RecentActivityItem['type'] {
@@ -75,16 +79,25 @@ export default async function AgencyPage() {
   let completionRate = 0
   let completedTasksCount = 0
   let totalTasksCount = 0
-  let contentDistribution = { reels: 0, post: 0, story: 0, carousel: 0 }
+  let contentDistribution: ContentDistribution = {
+    reels: 0,
+    post: 0,
+    story: 0,
+    carousel: 0,
+    shorts: 0,
+    tweet: 0,
+  }
 
   let pipeline: {
     planned: PipelineTaskItem[]
     inProgress: PipelineTaskItem[]
+    revisionRequested: PipelineTaskItem[]
     shared: PipelineTaskItem[]
     pendingApproval: PipelineTaskItem[]
   } = {
     planned: [],
     inProgress: [],
+    revisionRequested: [],
     shared: [],
     pendingApproval: [],
   }
@@ -102,50 +115,54 @@ export default async function AgencyPage() {
   let recentActivities: RecentActivityItem[] = []
 
   const [agency, brands, employees, tasks, templates, notifications] = await Promise.all([
-        prisma.agencies.findUnique({
-          where: { id: agencyId },
-          select: { name: true },
-        }),
-        prisma.brands.findMany({
-          where: { agency_id: agencyId },
-          include: {
-            profiles: {
-              where: { role: 'customer' },
-              select: { first_name: true, last_name: true },
-            },
-            tasks: {
-              select: { id: true, status: true },
-            },
-          },
-          orderBy: { created_at: 'desc' },
-        }),
-        prisma.profiles.findMany({
-          where: { agency_id: agencyId, role: 'employee' },
-          select: { id: true, first_name: true, last_name: true, salary: true },
-        }),
-        prisma.tasks.findMany({
-          where: { agency_id: agencyId, is_active: true },
-          select: {
-            id: true,
-            platform: true,
-            content: true,
-            status: true,
-            due_date: true,
-            created_at: true,
-            brands: { select: { name: true } },
-          },
-          orderBy: { created_at: 'desc' },
-        }),
-        prisma.content_templates.findMany({
-          where: { brands: { agency_id: agencyId }, is_active: true },
-          select: { day_of_week: true, platform: true },
-        }),
-        prisma.notifications.findMany({
-          where: { profiles: { agency_id: agencyId } },
-          take: 6,
-          orderBy: { created_at: 'desc' },
-        }),
-      ])
+    prisma.agencies.findUnique({
+      where: { id: agencyId },
+      select: { name: true },
+    }),
+    prisma.brands.findMany({
+      where: { agency_id: agencyId },
+      include: {
+        profiles: {
+          where: { role: 'customer' },
+          select: { first_name: true, last_name: true },
+        },
+        tasks: {
+          where: { is_active: true },
+          select: { id: true, status: true },
+        },
+      },
+      orderBy: { created_at: 'desc' },
+    }),
+    prisma.profiles.findMany({
+      where: { agency_id: agencyId, role: 'employee' },
+      select: { id: true, first_name: true, last_name: true, salary: true },
+    }),
+    prisma.tasks.findMany({
+      where: { agency_id: agencyId, is_active: true },
+      select: {
+        id: true,
+        platform: true,
+        content: true,
+        status: true,
+        due_date: true,
+        content_url: true,
+        assignment_note: true,
+        created_at: true,
+        brands: { select: { name: true } },
+        profiles: { select: { first_name: true, last_name: true } },
+      },
+      orderBy: { created_at: 'desc' },
+    }),
+    prisma.content_templates.findMany({
+      where: { brands: { agency_id: agencyId }, is_active: true },
+      select: { day_of_week: true, platform: true },
+    }),
+    prisma.notifications.findMany({
+      where: { profile_id: user.id },
+      take: 6,
+      orderBy: { created_at: 'desc' },
+    }),
+  ])
 
   if (agency?.name) {
     agencyName = agency.name
@@ -179,6 +196,8 @@ export default async function AgencyPage() {
     post: tasks.filter((t) => t.content === 'post').length,
     story: tasks.filter((t) => t.content === 'story').length,
     carousel: tasks.filter((t) => t.content === 'carousel').length,
+    shorts: tasks.filter((t) => t.content === 'shorts').length,
+    tweet: tasks.filter((t) => t.content === 'tweet').length,
   }
 
   const last6 = getLast6Months()
@@ -194,7 +213,9 @@ export default async function AgencyPage() {
   brandOverviewItems = brands.slice(0, 8).map((b) => {
     const customerProfile = b.profiles?.[0]
     const manager = customerProfile
-      ? [customerProfile.first_name, customerProfile.last_name].filter(Boolean).join(' ')
+      ? [customerProfile.first_name, customerProfile.last_name]
+          .filter((p) => p && p !== '(Müşteri)')
+          .join(' ') || 'Atanmadı'
       : 'Atanmadı'
     const activeTasks = b.tasks.filter((t) => t.status !== 'completed').length
     return {
@@ -215,9 +236,26 @@ export default async function AgencyPage() {
   pipeline = {
     planned: tasks.filter((t) => t.status === 'unassigned').map(mapTaskItem),
     inProgress: tasks.filter((t) => t.status === 'assigned').map(mapTaskItem),
+    revisionRequested: tasks.filter((t) => t.status === 'revision_requested').map(mapTaskItem),
     shared: tasks.filter((t) => t.status === 'completed').map(mapTaskItem),
     pendingApproval: tasks.filter((t) => t.status === 'pending_approval').map(mapTaskItem),
   }
+
+  const quickApprovalTasks: QuickApprovalTaskItem[] = tasks
+    .filter((t) => t.status === 'pending_approval')
+    .slice(0, 6)
+    .map((t) => ({
+      id: t.id,
+      brandName: t.brands?.name || 'Bilinmeyen Marka',
+      assigneeName: t.profiles
+        ? [t.profiles.first_name, t.profiles.last_name].filter(Boolean).join(' ') || 'Ekip Üyesi'
+        : 'Atanmadı',
+      platform: t.platform,
+      content: t.content,
+      dueDate: t.due_date ? t.due_date.toISOString() : new Date().toISOString(),
+      contentUrl: t.content_url,
+      assignmentNote: t.assignment_note,
+    }))
 
   tasks.forEach((t) => {
     if (!t.due_date) return
@@ -292,6 +330,9 @@ export default async function AgencyPage() {
         todayTasksCount={todayTasksCount}
         pendingApprovalCount={pendingApprovalCount}
       />
+
+      {/* Hızlı Onay Masası (Onay bekleyen teslimler varsa doğrudan gösterilir) */}
+      <AgencyQuickApprovalQueue tasks={quickApprovalTasks} />
 
       <AgencyChartsRow
         monthlyGrowth={monthlyGrowth}

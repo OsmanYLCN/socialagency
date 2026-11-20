@@ -361,3 +361,110 @@ export async function changePasswordAction(
     return { error: msg }
   }
 }
+
+
+export interface ActiveSessionDTO {
+  id: string
+  userAgent: string
+  ip: string
+  updatedAt: string
+  createdAt: string
+  isCurrent: boolean
+}
+
+export interface SessionSecurityInfo {
+  email: string
+  role: string
+  emailConfirmed: boolean
+  lastSignInAt: string | null
+  createdAt: string | null
+  sessions: ActiveSessionDTO[]
+}
+
+// Kullanıcının gerçek aktif oturumlarını ve güvenlik durumunu getirir
+export async function getSessionSecurityInfoAction(): Promise<SessionSecurityInfo | null> {
+  const user = await getAuthenticatedUser()
+  if (!user) return null
+
+  const [dbUser, dbSessions] = await Promise.all([
+    prisma.users.findUnique({
+      where: { id: user.id },
+      select: {
+        email: true,
+        email_confirmed_at: true,
+        last_sign_in_at: true,
+        created_at: true,
+      },
+    }),
+    prisma.sessions.findMany({
+      where: { user_id: user.id },
+      orderBy: { updated_at: 'desc' },
+      take: 6,
+    }),
+  ])
+
+  const sessions: ActiveSessionDTO[] = dbSessions.map((s, idx) => ({
+    id: s.id,
+    userAgent: s.user_agent || 'Web Tarayıcısı',
+    ip: s.ip ? String(s.ip) : 'Doğrulanmış Ağ',
+    updatedAt: s.updated_at?.toISOString() ?? new Date().toISOString(),
+    createdAt: s.created_at?.toISOString() ?? new Date().toISOString(),
+    isCurrent: idx === 0,
+  }))
+
+  return {
+    email: dbUser?.email || user.email || '',
+    role: user.role,
+    emailConfirmed: Boolean(dbUser?.email_confirmed_at),
+    lastSignInAt: dbUser?.last_sign_in_at?.toISOString() ?? null,
+    createdAt: dbUser?.created_at?.toISOString() ?? null,
+    sessions,
+  }
+}
+
+// Mevcut en güncel oturum haricindeki diğer tüm açık oturumları sonlandırır
+export async function terminateOtherSessionsAction(): Promise<{
+  success: boolean
+  removedCount?: number
+  error?: string
+}> {
+  const user = await getAuthenticatedUser()
+  if (!user) {
+    return { success: false, error: 'Oturum doğrulanamadı.' }
+  }
+
+  try {
+    const cookieStore = await cookies()
+    const accessToken = cookieStore.get('sb-access-token')?.value
+    const refreshToken = cookieStore.get('sb-refresh-token')?.value
+
+    if (accessToken && refreshToken) {
+      try {
+        const anonClient = getAnonClient()
+        await anonClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        await anonClient.auth.signOut({ scope: 'others' })
+      } catch {
+        // Supabase scope signOut desteklenmezse doğrudan DB oturumlarını temizle
+      }
+    }
+
+    const allSessions = await prisma.sessions.findMany({
+      where: { user_id: user.id },
+      orderBy: { updated_at: 'desc' },
+      select: { id: true },
+    })
+
+    if (allSessions.length > 1) {
+      const otherIds = allSessions.slice(1).map((s) => s.id)
+      const res = await prisma.sessions.deleteMany({
+        where: { id: { in: otherIds }, user_id: user.id },
+      })
+      return { success: true, removedCount: res.count }
+    }
+
+    return { success: true, removedCount: 0 }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Diğer oturumlar kapatılırken hata oluştu.'
+    return { success: false, error: msg }
+  }
+}

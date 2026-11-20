@@ -1,210 +1,265 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import {
   ShieldCheck,
   Smartphone,
   Monitor,
   Laptop,
   LogOut,
-  AlertCircle,
   Check,
   KeyRound,
+  Loader2,
+  Clock,
+  MailCheck,
 } from 'lucide-react'
+import {
+  getSessionSecurityInfoAction,
+  terminateOtherSessionsAction,
+  type SessionSecurityInfo,
+} from '@/app/actions/profile'
+
+function parseDeviceLabel(ua: string): { label: string; isMobile: boolean } {
+  const lower = ua.toLowerCase()
+  const isMobile = lower.includes('iphone') || lower.includes('android') || lower.includes('mobile')
+  let browser = 'Web Tarayıcısı'
+  if (lower.includes('edg/')) browser = 'Microsoft Edge'
+  else if (lower.includes('chrome/')) browser = 'Google Chrome'
+  else if (lower.includes('firefox/')) browser = 'Mozilla Firefox'
+  else if (lower.includes('safari/') && !lower.includes('chrome')) browser = 'Apple Safari'
+
+  let os = 'Bilgisayar'
+  if (lower.includes('windows')) os = 'Windows'
+  else if (lower.includes('mac os')) os = 'macOS'
+  else if (lower.includes('iphone') || lower.includes('ipad')) os = 'iOS'
+  else if (lower.includes('android')) os = 'Android'
+  else if (lower.includes('linux')) os = 'Linux'
+
+  return { label: `${browser} (${os})`, isMobile }
+}
 
 export function SecurityTab() {
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false)
-  const [show2FAModal, setShow2FAModal] = useState(false)
-  const [sessionTerminated, setSessionTerminated] = useState(false)
+  const [info, setInfo] = useState<SessionSecurityInfo | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isPending, startTransition] = useTransition()
+  const [feedback, setFeedback] = useState<string | null>(null)
+
+  const loadInfo = async () => {
+    setIsLoading(true)
+    try {
+      const data = await getSessionSecurityInfoAction()
+      setInfo(data)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadInfo()
+  }, [])
 
   const handleTerminateOtherSessions = () => {
-    setSessionTerminated(true)
-    setTimeout(() => setSessionTerminated(false), 4000)
+    setFeedback(null)
+    startTransition(async () => {
+      const res = await terminateOtherSessionsAction()
+      if (res.success) {
+        setFeedback(
+          res.removedCount && res.removedCount > 0
+            ? `Mevcut cihazınız hariç diğer ${res.removedCount} aktif oturum başarıyla sonlandırıldı.`
+            : 'Mevcut cihazınız dışında açık başka bir oturum bulunamadı.'
+        )
+        await loadInfo()
+      }
+    })
   }
 
   return (
     <div className="space-y-8">
-      {/* 1. İki Adımlı Doğrulama (2FA) */}
+      {/* 1. Hesap Güvenlik ve Kimlik Doğrulama Özeti */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
             <KeyRound className="h-3.5 w-3.5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">İki Adımlı Doğrulama (2FA)</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Hesap Güvenlik Durumu</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Hesabınıza giriş yaparken şifrenize ek olarak tek kullanımlık doğrulama kodu isteyerek güvenliği artırın.
+              Oturum doğrulama, e-posta onayı ve JWT kriptografik erişim koruma durumu.
             </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 dark:border-[#272b37] dark:bg-[#16181f]">
-          <div className="flex items-start gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-400 dark:border-indigo-900/50">
-              <ShieldCheck className="h-6 w-6" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs flex items-start gap-3.5 dark:border-[#272b37] dark:bg-[#16181f]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-900/50">
+              <MailCheck className="h-5 w-5" />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <p className="text-xs font-bold text-slate-900 dark:text-slate-100">Authenticator Uygulaması (TOTP)</p>
-                <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                    is2FAEnabled
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60'
-                      : 'bg-slate-100 text-slate-600 dark:bg-[#1a1d25] dark:text-slate-400'
-                  }`}
-                >
-                  {is2FAEnabled ? 'Aktif' : 'Devre Dışı'}
+                <p className="text-xs font-bold text-slate-900 dark:text-slate-100">E-posta & Kimlik Onayı</p>
+                <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60">
+                  {info?.emailConfirmed ? 'Doğrulandı' : 'Aktif'}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
-                Google Authenticator, Apple Passwords veya 1Password gibi TOTP destekli uygulamalarla giriş güvenliğinizi en üst seviyeye çıkarın.
+              <p className="mt-1 truncate text-xs font-medium text-slate-600 dark:text-slate-300">
+                {info?.email || 'Yükleniyor...'}
+              </p>
+              <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">
+                Şifrenizi üst menüdeki &quot;Kişisel Bilgiler&quot; penceresinden mevcut şifre onayıyla değiştirebilirsiniz.
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              if (is2FAEnabled) {
-                setIs2FAEnabled(false)
-              } else {
-                setShow2FAModal(true)
-              }
-            }}
-            className={`shrink-0 rounded-xl px-4 py-2 text-xs font-semibold shadow-xs transition-all cursor-pointer ${
-              is2FAEnabled
-                ? 'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400 dark:hover:bg-rose-900/40'
-                : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-100 dark:shadow-none'
-            }`}
-          >
-            {is2FAEnabled ? '2FA Devre Dışı Bırak' : '2FA Etkinleştir'}
-          </button>
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs flex items-start gap-3.5 dark:border-[#272b37] dark:bg-[#16181f]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-400 dark:border-indigo-900/50">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-bold text-slate-900 dark:text-slate-100">Oturum Kalkanı (Anti-Spoofing)</p>
+                <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 border border-indigo-200/60 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/60">
+                  Etkin
+                </span>
+              </div>
+              <p className="mt-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+                Son Giriş:{' '}
+                {info?.lastSignInAt
+                  ? new Date(info.lastSignInAt).toLocaleString('tr-TR', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : 'Şu anda aktif'}
+              </p>
+              <p className="mt-0.5 text-[11px] text-slate-400 dark:text-slate-500">
+                HTTP-Only çerez ve her istekte Supabase JWT doğrulaması ile korunmaktadır.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 2. Aktif Cihazlar ve Oturumlar */}
+      {/* 2. Veritabanındaki Gerçek Aktif Cihazlar ve Oturumlar */}
       <section className="space-y-3 border-t border-slate-100 dark:border-[#272b37] pt-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
               <Monitor className="h-3.5 w-3.5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Aktif Cihazlar & Oturumlar</h3>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                Aktif Cihazlar & Açık Oturumlar ({info?.sessions.length ?? 1})
+              </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Hesabınıza şu anda bağlı olan oturumları ve cihazları yönetin.
+                Veritabanında hesabınıza bağlı gerçek oturum kayıtları.
               </p>
             </div>
           </div>
 
           <button
             type="button"
+            disabled={isPending || isLoading}
             onClick={handleTerminateOtherSessions}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-rose-600 hover:border-rose-200 hover:bg-rose-50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-rose-400 dark:hover:bg-[#222632] transition-all cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-rose-600 hover:border-rose-200 hover:bg-rose-50 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-rose-400 dark:hover:bg-[#222632] transition-all cursor-pointer shadow-xs disabled:opacity-50"
           >
-            <LogOut className="h-3.5 w-3.5" />
+            {isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5" />}
             Diğer Oturumları Kapat
           </button>
         </div>
 
-        {sessionTerminated && (
+        {feedback && (
           <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200/80 p-3 text-xs text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800/80 dark:text-emerald-300 animate-in fade-in duration-150">
             <Check className="h-4 w-4 text-emerald-600 shrink-0" />
-            Mevcut cihazınız hariç diğer tüm cihazlardaki açık oturumlar sonlandırıldı.
+            <span>{feedback}</span>
           </div>
         )}
 
         <div className="rounded-2xl border border-slate-200/80 bg-white divide-y divide-slate-100 dark:border-[#272b37] dark:bg-[#16181f] dark:divide-[#272b37] overflow-hidden shadow-xs">
-          {/* Bu Cihaz (Aktif) */}
-          <div className="flex items-center justify-between p-4 bg-slate-50/40 dark:bg-[#1a1d25]">
-            <div className="flex items-center gap-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-                <Laptop className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-xs font-bold text-slate-900 dark:text-slate-100">Chrome on Windows (Bu Cihaz)</p>
-                  <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Şu Anda Aktif
-                  </span>
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2 py-10 text-xs text-slate-400">
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
+              <span>Aktif oturumlar yükleniyor...</span>
+            </div>
+          ) : !info || info.sessions.length === 0 ? (
+            <div className="flex items-center justify-between p-4 bg-slate-50/40 dark:bg-[#1a1d25]">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                  <Laptop className="h-5 w-5" />
                 </div>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                  İstanbul, Türkiye • IP: 10.74.***.*** • Son işlem: Az önce
-                </p>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-slate-900 dark:text-slate-100">Mevcut Tarayıcı Oturumu</p>
+                    <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Şu Anda Aktif
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                    Doğrulanmış Oturum • Son işlem: Az önce
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            info.sessions.map((sess) => {
+              const device = parseDeviceLabel(sess.userAgent)
+              const DeviceIcon = device.isMobile ? Smartphone : Laptop
 
-          {/* Diğer Cihaz */}
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 dark:bg-[#1a1d25] dark:text-slate-400">
-                <Smartphone className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Safari on iPhone (Mobil)</p>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                  İstanbul, Türkiye • Son görülme: 2 gün önce
-                </p>
-              </div>
-            </div>
-            <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">Beklemede</span>
-          </div>
+              return (
+                <div
+                  key={sess.id}
+                  className={`flex items-center justify-between p-4 ${
+                    sess.isCurrent ? 'bg-slate-50/40 dark:bg-[#1a1d25]' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                        sess.isCurrent
+                          ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400'
+                          : 'bg-slate-100 text-slate-500 dark:bg-[#222632] dark:text-slate-400'
+                      }`}
+                    >
+                      <DeviceIcon className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                          {device.label}
+                        </p>
+                        {sess.isCurrent && (
+                          <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            En Güncel Oturum
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">
+                        IP: {sess.ip} • Son aktivite:{' '}
+                        {new Date(sess.updatedAt).toLocaleString('tr-TR', {
+                          day: 'numeric',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  {!sess.isCurrent && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 dark:text-slate-500 shrink-0">
+                      <Clock className="h-3 w-3" />
+                      Açık
+                    </span>
+                  )}
+                </div>
+              )
+            })
+          )}
         </div>
       </section>
-
-      {/* 2FA Kurulum Modalı */}
-      {show2FAModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150 dark:border-[#272b37] dark:bg-[#16181f]">
-            <div className="flex items-center gap-3 border-b border-slate-100 dark:border-[#272b37] pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">İki Adımlı Doğrulama Kurulumu</h4>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Authenticator uygulamanızı bağlayın</p>
-              </div>
-            </div>
-
-            <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
-              <p>
-                1. Telefonunuzdaki Authenticator uygulamasını (Google Authenticator, Apple Passwords vb.) açın.
-              </p>
-              <div className="flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 p-6 text-center dark:bg-[#14161d] dark:border-[#272b37]">
-                <div className="space-y-1">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-white border border-slate-200 shadow-xs dark:bg-[#1a1d25] dark:border-[#272b37]">
-                    <KeyRound className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400 pt-2">KOD: SMAUP-SEC-7729-AUTH</p>
-                </div>
-              </div>
-              <p>2. Uygulamanın ürettiği 6 haneli kodu her girişte kullanacaksınız.</p>
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-[#272b37]">
-              <button
-                type="button"
-                onClick={() => setShow2FAModal(false)}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 dark:border-[#272b37] dark:text-slate-300 dark:hover:bg-[#222632] cursor-pointer"
-              >
-                Vazgeç
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIs2FAEnabled(true)
-                  setShow2FAModal(false)
-                }}
-                className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 cursor-pointer"
-              >
-                Etkinleştirmeyi Onayla
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

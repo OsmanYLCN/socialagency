@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { EmployeeTaskItem, BrandFilterOption } from '../../types'
 import { EmployeeTasksHeader } from './EmployeeTasksHeader'
@@ -9,6 +9,7 @@ import { EmployeeTasksKanbanView } from './EmployeeTasksKanbanView'
 import { EmployeeTasksListView } from './EmployeeTasksListView'
 import { EmployeeTaskDetailModal } from './EmployeeTaskDetailModal'
 import { claimTaskAction } from '@/app/actions/employee'
+import { getSavedSettings } from '@/lib/settings'
 
 interface EmployeeTasksClientViewProps {
   myTasks: EmployeeTaskItem[]
@@ -16,6 +17,7 @@ interface EmployeeTasksClientViewProps {
   brands: BrandFilterOption[]
   initialTab?: 'my_tasks' | 'pool'
   initialTaskId?: string
+  initialStatus?: string
 }
 
 export function EmployeeTasksClientView({
@@ -24,6 +26,7 @@ export function EmployeeTasksClientView({
   brands,
   initialTab = 'my_tasks',
   initialTaskId,
+  initialStatus,
 }: EmployeeTasksClientViewProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'my_tasks' | 'pool'>(initialTab)
@@ -32,7 +35,15 @@ export function EmployeeTasksClientView({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedBrand, setSelectedBrand] = useState('all')
   const [selectedPlatform, setSelectedPlatform] = useState('all')
-  const [selectedStatus, setSelectedStatus] = useState('all')
+  const [selectedStatus, setSelectedStatus] = useState(initialStatus || 'all')
+
+  // Kullanıcının Ayarlar -> Çalışma Alanı sekmesinde seçtiği varsayılan görünümü uygula
+  useEffect(() => {
+    const saved = getSavedSettings()
+    if (saved.defaultTaskView === 'kanban' || saved.defaultTaskView === 'list') {
+      setActiveView(saved.defaultTaskView)
+    }
+  }, [])
 
   const [selectedTask, setSelectedTask] = useState<EmployeeTaskItem | null>(() => {
     if (initialTaskId) {
@@ -46,15 +57,50 @@ export function EmployeeTasksClientView({
   })
   const [isModalOpen, setIsModalOpen] = useState(Boolean(initialTaskId))
 
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
-  // Aktif sekmedeki görev havuzu
+  // URL parametreleri (initialTab, initialStatus, initialTaskId) değiştiğinde senkronize et
+  useEffect(() => {
+    if (initialTab) setActiveTab(initialTab)
+  }, [initialTab])
+
+  useEffect(() => {
+    if (initialStatus) setSelectedStatus(initialStatus)
+  }, [initialStatus])
+
+  useEffect(() => {
+    if (initialTaskId) {
+      const target =
+        myTasks.find((t) => t.id === initialTaskId) ||
+        poolTasks.find((t) => t.id === initialTaskId) ||
+        null
+      if (target) {
+        setSelectedTask(target)
+        setIsModalOpen(true)
+      }
+    }
+  }, [initialTaskId, myTasks, poolTasks])
+
+  // Server revalidation sonrası açık modalın seçili görev verisini anlık güncelle
+  useEffect(() => {
+    if (selectedTask) {
+      const updated =
+        myTasks.find((t) => t.id === selectedTask.id) ||
+        poolTasks.find((t) => t.id === selectedTask.id) ||
+        null
+      if (updated) {
+        setSelectedTask(updated)
+      } else {
+        setSelectedTask(null)
+        setIsModalOpen(false)
+      }
+    }
+  }, [myTasks, poolTasks])
+
   const rawTasks = activeTab === 'my_tasks' ? myTasks : poolTasks
 
-  // Filtrelenmiş görev listesi
   const filteredTasks = useMemo(() => {
     return rawTasks.filter((task) => {
-      // Metin araması
       if (searchQuery.trim()) {
         const query = searchQuery.toLocaleLowerCase('tr-TR')
         const brandMatch = task.brand_name.toLocaleLowerCase('tr-TR').includes(query)
@@ -63,17 +109,14 @@ export function EmployeeTasksClientView({
         if (!brandMatch && !noteMatch && !platformMatch) return false
       }
 
-      // Marka filtresi
       if (selectedBrand !== 'all' && task.brand_id !== selectedBrand) {
         return false
       }
 
-      // Platform filtresi
       if (selectedPlatform !== 'all' && task.platform !== selectedPlatform) {
         return false
       }
 
-      // Durum filtresi (sadece Bana Atananlar'da)
       if (activeTab === 'my_tasks' && selectedStatus !== 'all' && task.status !== selectedStatus) {
         return false
       }
@@ -105,7 +148,6 @@ export function EmployeeTasksClientView({
 
   return (
     <div className="space-y-6">
-      {/* Üst Başlık & Sekmeler */}
       <EmployeeTasksHeader
         activeTab={activeTab}
         onTabChange={(tab) => {
@@ -118,7 +160,6 @@ export function EmployeeTasksClientView({
         poolCount={poolTasks.length}
       />
 
-      {/* Arama ve Filtreleme Çubuğu */}
       <EmployeeTasksFilterBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -133,7 +174,6 @@ export function EmployeeTasksClientView({
         onReset={handleResetFilters}
       />
 
-      {/* Görünüm: Kanban veya Tablo/Liste */}
       {activeView === 'kanban' ? (
         <EmployeeTasksKanbanView
           tasks={filteredTasks}
@@ -150,7 +190,6 @@ export function EmployeeTasksClientView({
         />
       )}
 
-      {/* Görev Detay & İş Teslim Modalı */}
       <EmployeeTaskDetailModal
         task={selectedTask}
         isOpen={isModalOpen}

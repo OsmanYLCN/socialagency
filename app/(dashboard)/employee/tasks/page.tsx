@@ -15,6 +15,7 @@ export default async function EmployeeTasksPage(props: {
   const searchParams = await props.searchParams
   const initialTab = searchParams?.tab === 'pool' ? 'pool' : 'my_tasks'
   const initialTaskId = searchParams?.taskId
+  const initialStatus = searchParams?.status
 
   const employee = await requireEmployee()
   const agencyId = employee.agencyId
@@ -147,6 +148,7 @@ export default async function EmployeeTasksPage(props: {
       brands={brands}
       initialTab={initialTab}
       initialTaskId={initialTaskId}
+      initialStatus={initialStatus}
     />
   )
 }

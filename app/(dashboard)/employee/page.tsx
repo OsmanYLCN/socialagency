@@ -31,10 +31,14 @@ export default async function EmployeePage() {
   const agencyId = employee.agencyId
   const employeeName = [employee.firstName, employee.lastName].filter(Boolean).join(' ') || 'Çalışan'
 
-  const [agency, myTasksRaw, poolTasksRaw, totalPoolCount, notificationsRaw] = await Promise.all([
+  const [agency, employeeAuthUser, myTasksRaw, poolTasksRaw, totalPoolCount, notificationsRaw] = await Promise.all([
     prisma.agencies.findUnique({
       where: { id: agencyId },
       select: { name: true },
+    }),
+    prisma.users.findUnique({
+      where: { id: employee.id },
+      select: { raw_user_meta_data: true },
     }),
     prisma.tasks.findMany({
       where: {
@@ -85,6 +89,15 @@ export default async function EmployeePage() {
   ])
 
   const agencyName = agency?.name ?? 'Ajansım'
+  const rawMeta =
+    employeeAuthUser?.raw_user_meta_data &&
+    typeof employeeAuthUser.raw_user_meta_data === 'object' &&
+    !Array.isArray(employeeAuthUser.raw_user_meta_data)
+      ? (employeeAuthUser.raw_user_meta_data as Record<string, unknown>)
+      : {}
+  const employeeTitle = typeof rawMeta.title === 'string' && rawMeta.title.trim() ? rawMeta.title.trim() : null
+  const employeeDepartment = typeof rawMeta.department === 'string' && rawMeta.department.trim() ? rawMeta.department.trim() : null
+
   const todayStr = getLocalDateString()
 
   const myTasks: EmployeeTaskItem[] = myTasksRaw.map((t) => ({
@@ -162,6 +175,8 @@ export default async function EmployeePage() {
       <EmployeeDashboardHeader
         employeeName={employeeName}
         agencyName={agencyName}
+        employeeTitle={employeeTitle}
+        employeeDepartment={employeeDepartment}
         poolCount={totalPoolCount}
         activeTasksCount={activeTasksCount}
         formattedDate={getFormattedDate()}

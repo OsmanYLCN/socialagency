@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ContentPlanHeader } from './ContentPlanHeader'
 import { ContentPlanMetrics } from './ContentPlanMetrics'
 import { ContentTemplateMatrix } from './ContentTemplateMatrix'
@@ -9,6 +9,7 @@ import { CreateTemplateModal } from './CreateTemplateModal'
 import { EditTemplateModal } from './EditTemplateModal'
 import { DeleteTemplateModal } from './DeleteTemplateModal'
 import { GenerateTasksModal } from './GenerateTasksModal'
+import { getSavedSettings } from '@/lib/settings'
 
 export interface BrandOption {
   id: string
@@ -70,14 +71,22 @@ export function ContentPlanClientView({
   const [selectedBrandId, setSelectedBrandId] = useState<string>('all')
   const [viewMode, setViewMode] = useState<'matrix' | 'calendar'>('matrix')
 
-  // Modallar icin durumlar
+  // Kullanıcının Ayarlar -> Çalışma Alanı sekmesinde seçtiği varsayılan görünümü uygula
+  useEffect(() => {
+    const saved = getSavedSettings()
+    if (saved.defaultContentView === 'matrix' || saved.defaultContentView === 'calendar') {
+      setViewMode(saved.defaultContentView)
+    }
+  }, [])
+
+  // Modallar için durumlar
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [preselectedDay, setPreselectedDay] = useState(1)
   const [editingTemplate, setEditingTemplate] = useState<ContentTemplateItem | null>(null)
   const [deletingTemplate, setDeletingTemplate] = useState<ContentTemplateItem | null>(null)
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false)
 
-  // Markaya gore filtrelenmis sablonlar
+  // Markaya göre filtrelenmiş şablonlar
   const filteredTemplates = templates.filter((tpl) => {
     if (selectedBrandId === 'all') return true
     return tpl.brand_id === selectedBrandId
@@ -95,7 +104,6 @@ export function ContentPlanClientView({
 
   return (
     <div className="space-y-6">
-      {/* 1. Baslik, Marka Filtresi ve Aksiyon Butonlari */}
       <ContentPlanHeader
         brands={brands}
         selectedBrandId={selectedBrandId}
@@ -106,7 +114,6 @@ export function ContentPlanClientView({
         onOpenGenerateModal={() => setIsGenerateModalOpen(true)}
       />
 
-      {/* 2. 4 Ozet KPI Metrik Karti */}
       <ContentPlanMetrics
         weeklyTargetCount={weeklyTargetCount}
         activeTemplatesCount={activeTemplatesCount}
@@ -117,7 +124,6 @@ export function ContentPlanClientView({
         topPlatform={topPlatform}
       />
 
-      {/* 3. Ana Icerik Gorunumu */}
       {viewMode === 'matrix' ? (
         <ContentTemplateMatrix
           templates={filteredTemplates}
@@ -132,7 +138,6 @@ export function ContentPlanClientView({
         />
       )}
 
-      {/* 4. Yeni Sablon Ekleme Modali */}
       <CreateTemplateModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -141,7 +146,6 @@ export function ContentPlanClientView({
         initialBrandId={selectedBrandId}
       />
 
-      {/* 5. Sablon Duzenleme Modali */}
       <EditTemplateModal
         isOpen={Boolean(editingTemplate)}
         onClose={() => setEditingTemplate(null)}
@@ -149,14 +153,12 @@ export function ContentPlanClientView({
         template={editingTemplate}
       />
 
-      {/* 6. Sablon Silme Onay Modali */}
       <DeleteTemplateModal
         isOpen={Boolean(deletingTemplate)}
         onClose={() => setDeletingTemplate(null)}
         template={deletingTemplate}
       />
 
-      {/* 7. Haftalik Gorevleri Uret Modali */}
       <GenerateTasksModal
         isOpen={isGenerateModalOpen}
         onClose={() => setIsGenerateModalOpen(false)}

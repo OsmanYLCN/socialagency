@@ -9,7 +9,6 @@ import {
   EmployeeOption,
   TasksMetrics,
 } from './_components/TasksClientView'
-
 import { Pagination } from '@/components/ui/Pagination'
 
 export const metadata: Metadata = {
@@ -17,81 +16,92 @@ export const metadata: Metadata = {
   description: 'Ajansınızın tüm içerik üretim, onay ve revizyon süreçlerini yönetin.',
 }
 
-export default async function AgencyTasksPage(props: { searchParams: Promise<{ page?: string }> }) {
+export default async function AgencyTasksPage(props: {
+  searchParams: Promise<{ page?: string; taskId?: string; brandId?: string }>
+}) {
   const searchParams = await props.searchParams
   const page = parseInt(searchParams?.page || '1', 10)
+  const initialTaskId = searchParams?.taskId
+  const initialBrandId = searchParams?.brandId
   const pageSize = 50
   const skip = (page - 1) * pageSize
 
   const agencyOwner = await requireAgencyOwner()
   const agencyId = agencyOwner.agencyId
 
-  const [agency, brandsData, employeesData, totalTasks, tasksData, metricsData] = await Promise.all([
-    prisma.agencies.findUnique({
-      where: { id: agencyId },
-      select: { name: true },
-    }),
-    prisma.brands.findMany({
-      where: { agency_id: agencyId },
-      select: { id: true, name: true },
-      orderBy: { name: 'asc' },
-    }),
-    prisma.profiles.findMany({
-      where: { agency_id: agencyId, role: 'employee', is_active: true },
+  const taskInclude = {
+    brands: { select: { id: true, name: true } },
+    profiles: {
       select: {
         id: true,
         first_name: true,
         last_name: true,
         users: { select: { email: true } },
       },
-      orderBy: { first_name: 'asc' },
-    }),
-    prisma.tasks.count({
-      where: { agency_id: agencyId, is_active: true },
-    }),
-    prisma.tasks.findMany({
-      where: { agency_id: agencyId, is_active: true },
+    },
+    task_comments: {
       include: {
-        brands: { select: { id: true, name: true } },
         profiles: {
-          select: {
-            id: true,
-            first_name: true,
-            last_name: true,
-            users: { select: { email: true } },
-          },
-        },
-        task_comments: {
-          include: {
-            profiles: {
-              select: { first_name: true, last_name: true, role: true },
-            },
-          },
-          orderBy: { created_at: 'asc' },
-        },
-        task_revisions: {
-          orderBy: { created_at: 'desc' },
+          select: { first_name: true, last_name: true, role: true },
         },
       },
-      orderBy: { due_date: 'asc' },
-      skip,
-      take: pageSize,
-    }),
-    prisma.tasks.findMany({
-      where: { agency_id: agencyId, is_active: true },
-      select: { status: true, due_date: true },
-    }),
-  ])
+      orderBy: { created_at: 'asc' as const },
+    },
+    task_revisions: {
+      orderBy: { created_at: 'desc' as const },
+    },
+  }
+
+  const [agency, brandsData, employeesData, totalTasks, tasksData, metricsData, specificTask] =
+    await Promise.all([
+      prisma.agencies.findUnique({
+        where: { id: agencyId },
+        select: { name: true },
+      }),
+      prisma.brands.findMany({
+        where: { agency_id: agencyId },
+        select: { id: true, name: true },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.profiles.findMany({
+        where: { agency_id: agencyId, role: 'employee', is_active: true },
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          users: { select: { email: true } },
+        },
+        orderBy: { first_name: 'asc' },
+      }),
+      prisma.tasks.count({
+        where: { agency_id: agencyId, is_active: true },
+      }),
+      prisma.tasks.findMany({
+        where: { agency_id: agencyId, is_active: true },
+        include: taskInclude,
+        orderBy: { due_date: 'asc' },
+        skip,
+        take: pageSize,
+      }),
+      prisma.tasks.findMany({
+        where: { agency_id: agencyId, is_active: true },
+        select: { status: true, due_date: true },
+      }),
+      initialTaskId
+        ? prisma.tasks.findFirst({
+            where: { id: initialTaskId, agency_id: agencyId, is_active: true },
+            include: taskInclude,
+          })
+        : Promise.resolve(null),
+    ])
 
   const agencyName = agency?.name ?? 'Ajansım'
 
-  // Markalar listesi
   const brands: BrandOption[] = brandsData.map((b) => ({
     id: b.id,
     name: b.name,
   }))
 
-  // Çalışanlar listesi
   const employees: EmployeeOption[] = employeesData.map((e) => {
     const fullName = [e.first_name, e.last_name].filter(Boolean).join(' ') || 'İsimsiz Çalışan'
     return {
@@ -101,10 +111,8 @@ export default async function AgencyTasksPage(props: { searchParams: Promise<{ p
     }
   })
 
-  // Bugünün yerel tarihi (saat dilimi kayması olmadan kesin kontrol için)
   const todayStr = getLocalDateString()
 
-  // Metrik hesaplamaları (tüm görevler üzerinden)
   let inProgressTasks = 0
   let revisionAndPendingTasks = 0
   let overdueTasks = 0
@@ -123,7 +131,12 @@ export default async function AgencyTasksPage(props: { searchParams: Promise<{ p
     else if (status === 'completed') completedTasks++
   })
 
-  const taskItems: TaskItem[] = tasksData.map((t) => {
+  const combinedRawTasks = [...tasksData]
+  if (specificTask && !combinedRawTasks.some((t) => t.id === specificTask.id)) {
+    combinedRawTasks.unshift(specificTask)
+  }
+
+  const taskItems: TaskItem[] = combinedRawTasks.map((t) => {
     const status = t.status ?? 'unassigned'
     const assignee = t.profiles
     const assigneeName = assignee
@@ -196,6 +209,8 @@ export default async function AgencyTasksPage(props: { searchParams: Promise<{ p
         brands={brands}
         employees={employees}
         metrics={metrics}
+        initialTaskId={initialTaskId}
+        initialBrandId={initialBrandId}
       />
       <Pagination totalPages={totalPages} currentPage={page} />
     </div>

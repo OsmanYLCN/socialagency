@@ -1,3 +1,6 @@
+'use client'
+
+import { useId } from 'react'
 import { TrendingUp, PieChart, CheckCircle } from 'lucide-react'
 
 interface MonthlyPoint {
@@ -5,11 +8,13 @@ interface MonthlyPoint {
   count: number
 }
 
-interface ContentDistribution {
+export interface ContentDistribution {
   reels: number
   post: number
   story: number
   carousel: number
+  shorts?: number
+  tweet?: number
 }
 
 interface ChartsRowProps {
@@ -33,20 +38,26 @@ export function AgencyChartsRow({
   completionRate = 0,
   completedTasksCount = 0,
   totalTasksCount = 0,
-  contentDistribution = { reels: 0, post: 0, story: 0, carousel: 0 },
+  contentDistribution = { reels: 0, post: 0, story: 0, carousel: 0, shorts: 0, tweet: 0 },
 }: ChartsRowProps) {
+  const gradId = useId()
   const radius = 42
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference - (completionRate / 100) * circumference
 
+  const shortsCount = contentDistribution.shorts ?? 0
+  const tweetCount = contentDistribution.tweet ?? 0
+  const videoCount = contentDistribution.reels + shortsCount
+  const postTweetCount = contentDistribution.post + tweetCount
+
   const totalContent =
-    contentDistribution.reels +
-    contentDistribution.post +
+    videoCount +
+    postTweetCount +
     contentDistribution.story +
     contentDistribution.carousel
 
-  const reelsPct = totalContent > 0 ? Math.round((contentDistribution.reels / totalContent) * 100) : 0
-  const postPct = totalContent > 0 ? Math.round((contentDistribution.post / totalContent) * 100) : 0
+  const reelsPct = totalContent > 0 ? Math.round((videoCount / totalContent) * 100) : 0
+  const postPct = totalContent > 0 ? Math.round((postTweetCount / totalContent) * 100) : 0
   const storyPct = totalContent > 0 ? Math.round((contentDistribution.story / totalContent) * 100) : 0
   const carouselPct = totalContent > 0 ? Math.max(0, 100 - (reelsPct + postPct + storyPct)) : 0
 
@@ -82,7 +93,7 @@ export function AgencyChartsRow({
         <div className="relative mt-4 h-44 w-full">
           <svg viewBox="0 0 320 140" className="h-full w-full overflow-visible">
             <defs>
-              <linearGradient id="clientGrowthGrad" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
                 <stop offset="100%" stopColor="#6366f1" stopOpacity="0.0" />
               </linearGradient>
@@ -92,7 +103,7 @@ export function AgencyChartsRow({
             <line x1="10" y1="70" x2="310" y2="70" stroke="#f1f5f9" className="stroke-[#f1f5f9] dark:stroke-[#272b37]" strokeDasharray="3 3" />
             <line x1="10" y1="120" x2="310" y2="120" stroke="#f1f5f9" className="stroke-[#f1f5f9] dark:stroke-[#272b37]" />
 
-            <path d={areaD} fill="url(#clientGrowthGrad)" />
+            <path d={areaD} fill={`url(#${gradId})`} />
 
             <path
               d={pathD}
@@ -168,7 +179,7 @@ export function AgencyChartsRow({
             )}
           </svg>
           <div className="absolute flex flex-col items-center justify-center text-center">
-            <span className="text-3xl font-black text-slate-900 dark:text-slate-100">%{completionRate}</span>
+            <span className="text-3xl font-black text-slate-900 dark:text-slate-100 tabular-nums">%{completionRate}</span>
             <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
               {totalTasksCount === 0
                 ? 'Görev Yok'
@@ -184,12 +195,12 @@ export function AgencyChartsRow({
         <div className="flex justify-around border-t border-slate-100 dark:border-[#272b37] pt-3 text-center">
           <div>
             <p className="text-xs text-slate-400 dark:text-slate-500">Tamamlanan</p>
-            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{completedTasksCount}</p>
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-200 tabular-nums">{completedTasksCount}</p>
           </div>
           <div className="h-7 w-px bg-slate-100 dark:bg-[#272b37]" />
           <div>
             <p className="text-xs text-slate-400 dark:text-slate-500">Toplam Görev</p>
-            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{totalTasksCount}</p>
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-200 tabular-nums">{totalTasksCount}</p>
           </div>
         </div>
       </div>
@@ -198,7 +209,7 @@ export function AgencyChartsRow({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">İçerik Dağılımı</h3>
-            <p className="text-xs text-slate-400 dark:text-slate-500">Format bazlı üretim adetleri</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">Format bazlı tüm üretim adetleri</p>
           </div>
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
             <PieChart className="h-4 w-4" />
@@ -220,6 +231,7 @@ export function AgencyChartsRow({
                     r="15.915"
                     fill="transparent"
                     stroke="#f1f5f9"
+                    className="stroke-[#f1f5f9] dark:stroke-[#272b37]"
                     strokeWidth="5"
                   />
                   {reelsPct > 0 && (
@@ -272,34 +284,34 @@ export function AgencyChartsRow({
                   )}
                 </svg>
                 <div className="absolute text-center">
-                  <span className="text-xs font-bold text-slate-600">{totalContent}</span>
-                  <span className="block text-[9px] text-slate-400">Toplam</span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100 tabular-nums">{totalContent}</span>
+                  <span className="block text-[9px] text-slate-400 dark:text-slate-500">Toplam</span>
                 </div>
               </>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 text-xs">
+        <div className="grid grid-cols-2 gap-2 border-t border-slate-100 dark:border-[#272b37] pt-3 text-xs">
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />
-            <span className="text-slate-600 font-medium">Reels</span>
-            <span className="ml-auto font-bold text-slate-900">{contentDistribution.reels}</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-indigo-500 shrink-0" />
+            <span className="text-slate-600 dark:text-slate-300 font-medium truncate">Reels / Shorts</span>
+            <span className="ml-auto font-bold text-slate-900 dark:text-slate-100 tabular-nums">{videoCount}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
-            <span className="text-slate-600 font-medium">Post</span>
-            <span className="ml-auto font-bold text-slate-900">{contentDistribution.post}</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-sky-400 shrink-0" />
+            <span className="text-slate-600 dark:text-slate-300 font-medium truncate">Post / Tweet</span>
+            <span className="ml-auto font-bold text-slate-900 dark:text-slate-100 tabular-nums">{postTweetCount}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            <span className="text-slate-600 font-medium">Story</span>
-            <span className="ml-auto font-bold text-slate-900">{contentDistribution.story}</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shrink-0" />
+            <span className="text-slate-600 dark:text-slate-300 font-medium truncate">Story</span>
+            <span className="ml-auto font-bold text-slate-900 dark:text-slate-100 tabular-nums">{contentDistribution.story}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
-            <span className="text-slate-600 font-medium">Carousel</span>
-            <span className="ml-auto font-bold text-slate-900">{contentDistribution.carousel}</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-500 shrink-0" />
+            <span className="text-slate-600 dark:text-slate-300 font-medium truncate">Carousel</span>
+            <span className="ml-auto font-bold text-slate-900 dark:text-slate-100 tabular-nums">{contentDistribution.carousel}</span>
           </div>
         </div>
       </div>

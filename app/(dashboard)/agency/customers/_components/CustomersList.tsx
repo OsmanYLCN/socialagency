@@ -2,7 +2,22 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { Search, ArrowUpDown, Mail, CheckSquare, Copy, Check, MoreHorizontal, Pencil, Trash2, Building2 } from 'lucide-react'
+import {
+  Search,
+  ArrowUpDown,
+  Mail,
+  CheckSquare,
+  Copy,
+  Check,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Building2,
+  Phone,
+  AtSign,
+  MapPin,
+  Briefcase,
+} from 'lucide-react'
 import type { BrandItem } from './CustomersClientView'
 
 type SortKey = 'newest' | 'oldest' | 'fee_high' | 'fee_low' | 'alpha'
@@ -12,9 +27,10 @@ interface CustomersListProps {
   onEdit: (brand: BrandItem) => void
   onDelete: (brand: BrandItem) => void
   onAdd: () => void
+  onSelect?: (brand: BrandItem) => void
 }
 
-// Markadan monogram renk sinifi uretir
+// Markadan monogram renk sınıfı üretir
 function getBrandColor(name: string): string {
   const colors = [
     'bg-indigo-50 text-indigo-700',
@@ -31,7 +47,7 @@ function getBrandColor(name: string): string {
   return colors[Math.abs(hash) % colors.length]
 }
 
-// Markadan 2 harflik monogram uretir
+// Markadan 2 harflik monogram üretir
 function getMonogram(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean)
   if (words.length === 0) return '??'
@@ -65,100 +81,154 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function BrandCard({ brand, onEdit, onDelete }: { brand: BrandItem; onEdit: () => void; onDelete: () => void }) {
+function BrandCard({
+  brand,
+  onEdit,
+  onDelete,
+  onSelect,
+}: {
+  brand: BrandItem
+  onEdit: () => void
+  onDelete: () => void
+  onSelect?: () => void
+}) {
   const [menuOpen, setMenuOpen] = useState(false)
   const monogram = getMonogram(brand.name)
   const colorClass = getBrandColor(brand.name)
-  const customerName = [brand.customer?.firstName, brand.customer?.lastName].filter(Boolean).join(' ') || 'Yetkili Atanmadı'
+  const customerName =
+    [brand.customer?.firstName, brand.customer?.lastName]
+      .filter((p) => p && p !== '(Müşteri)')
+      .join(' ') || 'Yetkili Atanmadı'
+  const meta = brand.metadata
 
   return (
-    <div className="group relative flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:border-indigo-200 hover:shadow-sm dark:border-[#272b37] dark:bg-[#16181f] dark:hover:border-indigo-500/50">
-      {/* Ust: Monogram + Isim + Menu */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${colorClass} dark:bg-opacity-20`}>
-            {monogram}
+    <div
+      onClick={() => onSelect?.()}
+      className={`group relative flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-200 hover:border-indigo-200 hover:shadow-sm dark:border-[#272b37] dark:bg-[#16181f] dark:hover:border-indigo-500/50 ${
+        onSelect ? 'cursor-pointer' : ''
+      }`}
+    >
+      {/* Üst: Monogram + İsim + Sektör + Menü */}
+      <div>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${colorClass} dark:bg-opacity-20`}>
+              {monogram}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h4 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">{brand.name}</h4>
+                {brand.customer && (
+                  <span
+                    className={`h-2 w-2 shrink-0 rounded-full ${
+                      brand.customer.isActive ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'
+                    }`}
+                    title={brand.customer.isActive ? 'Aktif' : 'Askıda'}
+                  />
+                )}
+              </div>
+              <p className="mt-0.5 truncate text-xs text-slate-400 dark:text-slate-400">
+                {meta?.sector ? `${meta.sector} • ${customerName}` : customerName}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <h4 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">{brand.name}</h4>
-            <p className="mt-0.5 truncate text-xs text-slate-400 dark:text-slate-400">{customerName}</p>
+
+          {/* Dropdown menü */}
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors dark:hover:bg-[#222632] dark:hover:text-slate-200"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                <div className="absolute right-0 top-8 z-20 w-40 rounded-xl border border-slate-200/80 bg-white p-1.5 shadow-lg dark:border-[#272b37] dark:bg-[#1a1d25]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      onEdit()
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 cursor-pointer dark:text-slate-200 dark:hover:bg-[#222632]"
+                  >
+                    <Pencil className="h-3.5 w-3.5 text-slate-400 dark:text-slate-400" />
+                    Düzenle
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      onDelete()
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 cursor-pointer dark:text-rose-400 dark:hover:bg-rose-950/40"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Sil
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Dropdown menu */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer transition-colors dark:hover:bg-[#222632] dark:hover:text-slate-200"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </button>
-          {menuOpen && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 top-8 z-20 w-40 rounded-xl border border-slate-200/80 bg-white p-1.5 shadow-lg dark:border-[#272b37] dark:bg-[#1a1d25]">
-                <button
-                  type="button"
-                  onClick={() => { setMenuOpen(false); onEdit() }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 cursor-pointer dark:text-slate-200 dark:hover:bg-[#222632]"
-                >
-                  <Pencil className="h-3.5 w-3.5 text-slate-400 dark:text-slate-400" />
-                  Düzenle
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setMenuOpen(false); onDelete() }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 cursor-pointer dark:text-rose-400 dark:hover:bg-rose-950/40"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  Sil
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+        {/* Orta: Kurumsal Etiketler & İletişim */}
+        {(meta?.instagram || meta?.city || meta?.phone) && (
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            {meta.instagram && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-fuchsia-50 px-2 py-0.5 text-[11px] font-medium text-fuchsia-700 dark:bg-fuchsia-950/40 dark:text-fuchsia-300">
+                <AtSign className="h-3 w-3" />
+                {meta.instagram.replace(/^@/, '')}
+              </span>
+            )}
+            {meta.city && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-[#1a1d25] dark:text-slate-300">
+                <MapPin className="h-3 w-3" />
+                {meta.city}
+              </span>
+            )}
+            {meta.phone && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-[#1a1d25] dark:text-slate-300">
+                <Phone className="h-3 w-3" />
+                {meta.phone}
+              </span>
+            )}
+          </div>
+        )}
+
+        {brand.customer?.email && (
+          <div className="mt-2.5 flex items-center gap-1 text-xs text-slate-400 dark:text-slate-400">
+            <Mail className="h-3 w-3 shrink-0" />
+            <span className="truncate">{brand.customer.email}</span>
+            <CopyButton text={brand.customer.email} />
+          </div>
+        )}
       </div>
 
-      {/* Orta: Email */}
-      {brand.customer?.email && (
-        <div className="mt-3 flex items-center gap-1 text-xs text-slate-400 dark:text-slate-400">
-          <Mail className="h-3 w-3 shrink-0" />
-          <span className="truncate">{brand.customer.email}</span>
-          <CopyButton text={brand.customer.email} />
-        </div>
-      )}
-
-      {/* Alt: Metrikler */}
+      {/* Alt: Metrikler & Ücret */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 dark:border-[#272b37]">
         <div className="flex items-center gap-2.5 text-xs min-w-0">
           <div className="flex items-center gap-1 whitespace-nowrap">
             <CheckSquare className="h-3.5 w-3.5 shrink-0 text-indigo-400" />
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400">{brand.activeTaskCount}</span>
+            <span className="font-semibold text-indigo-600 dark:text-indigo-400 tabular-nums">{brand.activeTaskCount}</span>
             <span className="text-slate-400 dark:text-slate-500">aktif</span>
           </div>
           <div className="h-3 w-px bg-slate-200 shrink-0 dark:bg-[#272b37]" />
           <div className="flex items-center gap-1 whitespace-nowrap">
             <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">{brand.completedTaskCount}</span>
+            <span className="font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">{brand.completedTaskCount}</span>
             <span className="text-slate-400 dark:text-slate-500">tamamlandı</span>
           </div>
         </div>
 
-        <span className="shrink-0 whitespace-nowrap rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-700 dark:bg-[#1a1d25] dark:text-slate-300">
+        <span className="shrink-0 whitespace-nowrap rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-700 tabular-nums dark:bg-[#1a1d25] dark:text-slate-300">
           {brand.monthlyFee > 0
             ? brand.monthlyFee.toLocaleString('tr-TR', { minimumFractionDigits: 0 }) + ' ₺'
             : 'Ücret yok'}
         </span>
       </div>
-
-      {/* Aktiflik rozeti */}
-      {brand.customer && (
-        <span
-          className={`absolute right-4 top-4 h-2 w-2 rounded-full ${brand.customer.isActive ? 'bg-emerald-400' : 'bg-slate-300 dark:bg-slate-600'}`}
-          title={brand.customer.isActive ? 'Aktif' : 'Pasif'}
-        />
-      )}
     </div>
   )
 }
@@ -171,8 +241,8 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'alpha', label: 'A-Z' },
 ]
 
-// Marka kartlari listesi, arama ve siralama ile
-export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersListProps) {
+// Marka kartları listesi, arama ve sıralama ile
+export function CustomersList({ brands, onEdit, onDelete, onSelect }: CustomersListProps) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
 
@@ -183,6 +253,9 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
           (b) =>
             b.name.toLocaleLowerCase('tr-TR').includes(q) ||
             b.customer?.email?.toLocaleLowerCase('tr-TR').includes(q) ||
+            (b.metadata?.sector ?? '').toLocaleLowerCase('tr-TR').includes(q) ||
+            (b.metadata?.city ?? '').toLocaleLowerCase('tr-TR').includes(q) ||
+            (b.metadata?.instagram ?? '').toLocaleLowerCase('tr-TR').includes(q) ||
             [b.customer?.firstName, b.customer?.lastName]
               .filter(Boolean)
               .join(' ')
@@ -197,14 +270,13 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
       if (sort === 'fee_low') return a.monthlyFee - b.monthlyFee
       if (sort === 'oldest')
         return (a.createdAt ? new Date(a.createdAt).getTime() : 0) - (b.createdAt ? new Date(b.createdAt).getTime() : 0)
-      // newest (default)
       return (b.createdAt ? new Date(b.createdAt).getTime() : 0) - (a.createdAt ? new Date(a.createdAt).getTime() : 0)
     })
   }, [brands, query, sort])
 
   return (
     <div className="space-y-4">
-      {/* Arama + Siralama */}
+      {/* Arama + Sıralama */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
@@ -212,7 +284,7 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Marka adı, yetkili veya e-posta ile ara..."
+            placeholder="Marka adı, sektör, şehir, yetkili veya e-posta ile ara..."
             className="h-10 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
           />
         </div>
@@ -224,20 +296,20 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
             className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 cursor-pointer dark:border-[#272b37] dark:bg-[#16181f] dark:text-slate-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
           >
             {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value} className="dark:bg-[#16181f]">{o.label}</option>
+              <option key={o.value} value={o.value} className="dark:bg-[#16181f]">
+                {o.label}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Sonuc sayisi */}
       {query && (
         <p className="text-xs text-slate-400 dark:text-slate-500">
           <span className="font-semibold text-slate-700 dark:text-slate-300">{filtered.length}</span> sonuç bulundu
         </p>
       )}
 
-      {/* Listesi */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-16 text-center shadow-xs dark:border-[#272b37] dark:bg-[#16181f]">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 dark:bg-[#1a1d25] dark:text-slate-500">
@@ -273,6 +345,7 @@ export function CustomersList({ brands, onEdit, onDelete, onAdd }: CustomersList
               brand={brand}
               onEdit={() => onEdit(brand)}
               onDelete={() => onDelete(brand)}
+              onSelect={onSelect ? () => onSelect(brand) : undefined}
             />
           ))}
         </div>

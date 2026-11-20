@@ -1,9 +1,44 @@
 'use client'
 
 import { useActionState, useEffect, useState, useTransition } from 'react'
-import { Building2, DollarSign, Mail, Check, Loader2, X, AlertCircle, ShieldAlert, Power, User } from 'lucide-react'
+import {
+  Building2,
+  DollarSign,
+  Mail,
+  Check,
+  Loader2,
+  X,
+  AlertCircle,
+  Power,
+  User,
+  Phone,
+  Globe,
+  AtSign,
+  MapPin,
+  Receipt,
+  FileText,
+  Briefcase,
+} from 'lucide-react'
 import { updateCustomerAction, toggleCustomerStatusAction } from '@/app/actions/agency'
 import type { BrandItem } from './CustomersClientView'
+
+const SECTORS = [
+  'E-Ticaret & Perakende',
+  'Moda & Tekstil',
+  'Yiyecek & İçecek / Restoran',
+  'Sağlık & Kozmetik & Estetik',
+  'Teknoloji & Yazılım (SaaS)',
+  'Gayrimenkul & İnşaat',
+  'Otomotiv & Yedek Parça',
+  'Eğitim & Akademi',
+  'Turizm & Otelcilik',
+  'Finans & Sigorta & Yatırım',
+  'Hukuk & Danışmanlık',
+  'Medya & Eğlence & Prodüksiyon',
+  'Spor & Fitness',
+  'Mobilya & Ev Yaşam',
+  'Diğer',
+]
 
 interface EditCustomerModalProps {
   isOpen: boolean
@@ -11,11 +46,21 @@ interface EditCustomerModalProps {
   onClose: () => void
 }
 
-// Musteri markasi ve hesap ayarlarini duzenleme modali
+// Müşteri markası, iletişim, sosyal medya ve fatura detaylarını düzenleme modalı
 export function EditCustomerModal({ isOpen, brand, onClose }: EditCustomerModalProps) {
   const [name, setName] = useState('')
   const [fee, setFee] = useState('')
   const [authorizedName, setAuthorizedName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [sector, setSector] = useState('')
+  const [website, setWebsite] = useState('')
+  const [instagram, setInstagram] = useState('')
+  const [city, setCity] = useState('')
+  const [billingTitle, setBillingTitle] = useState('')
+  const [taxOffice, setTaxOffice] = useState('')
+  const [taxId, setTaxId] = useState('')
+  const [notes, setNotes] = useState('')
+
   const [isToggling, startTransition] = useTransition()
   const [toggleError, setToggleError] = useState<string | null>(null)
 
@@ -23,8 +68,19 @@ export function EditCustomerModal({ isOpen, brand, onClose }: EditCustomerModalP
     if (brand) {
       setName(brand.name)
       setFee(brand.monthlyFee ? String(brand.monthlyFee) : '0')
-      const contactName = [brand.customer?.firstName, brand.customer?.lastName].filter(Boolean).join(' ')
+      const contactName = [brand.customer?.firstName, brand.customer?.lastName]
+        .filter((part) => part && part !== '(Müşteri)')
+        .join(' ')
       setAuthorizedName(contactName)
+      setPhone(brand.metadata?.phone ?? '')
+      setSector(brand.metadata?.sector ?? '')
+      setWebsite(brand.metadata?.website ?? '')
+      setInstagram(brand.metadata?.instagram ?? '')
+      setCity(brand.metadata?.city ?? '')
+      setBillingTitle(brand.metadata?.billingTitle ?? '')
+      setTaxOffice(brand.metadata?.taxOffice ?? '')
+      setTaxId(brand.metadata?.taxId ?? '')
+      setNotes(brand.metadata?.notes ?? '')
       setToggleError(null)
     }
   }, [brand])
@@ -77,16 +133,16 @@ export function EditCustomerModal({ isOpen, brand, onClose }: EditCustomerModalP
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-150 dark:border-[#272b37] dark:bg-[#16181f]">
-        {/* Baslik */}
-        <div className="mb-5 flex items-center justify-between">
+      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl animate-in zoom-in-95 duration-150 dark:border-[#272b37] dark:bg-[#16181f]">
+        {/* Başlık */}
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-[#272b37]">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-              <Building2 className="h-4 w-4" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+              <Building2 className="h-4.5 w-4.5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Marka ve Müşteri Düzenle</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Mevcut sözleşme ve marka detaylarını güncelleyin</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Marka & Müşteri Dosyasını Düzenle</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Kurumsal profil, iletişim, sosyal medya ve fatura kayıtlarını güncelleyin</p>
             </div>
           </div>
           <button
@@ -98,85 +154,252 @@ export function EditCustomerModal({ isOpen, brand, onClose }: EditCustomerModalP
           </button>
         </div>
 
-        {/* Hata bildirimleri */}
-        {state?.error && (
-          <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{state.error}</span>
-          </div>
-        )}
-
-        {toggleError && (
-          <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{toggleError}</span>
-          </div>
-        )}
-
-        <form action={formAction} className="space-y-4">
+        {/* Kaydırılabilir Form Gövdesi */}
+        <form action={formAction} className="flex-1 overflow-y-auto p-6 space-y-5">
           <input type="hidden" name="brand_id" value={brand.id} />
 
-          {/* Marka Adi */}
-          <div>
-            <label htmlFor="edit-brand-name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Marka Adı <span className="text-rose-500">*</span>
-            </label>
-            <div className="relative">
-              <Building2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-              <input
-                id="edit-brand-name"
-                name="brand_name"
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Marka adını girin"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
-              />
+          {state?.error && (
+            <div className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{state.error}</span>
+            </div>
+          )}
+
+          {toggleError && (
+            <div className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{toggleError}</span>
+            </div>
+          )}
+
+          {/* 1. Temel Marka & Sözleşme Bilgileri */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="edit-brand-name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Marka Adı <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <Building2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <input
+                  id="edit-brand-name"
+                  name="brand_name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Marka adını girin"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="edit-fee" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Aylık Hizmet Bedeli (₺)
+              </label>
+              <div className="relative">
+                <DollarSign className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <input
+                  id="edit-fee"
+                  name="monthly_fee"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={fee}
+                  onChange={(e) => setFee(e.target.value)}
+                  placeholder="0"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="edit-sector" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Faaliyet Sektörü
+              </label>
+              <div className="relative">
+                <Briefcase className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <select
+                  id="edit-sector"
+                  name="sector"
+                  value={sector}
+                  onChange={(e) => setSector(e.target.value)}
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                >
+                  <option value="">Sektör seçin...</option>
+                  {SECTORS.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="edit-city" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Şehir / Lokasyon
+              </label>
+              <div className="relative">
+                <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <input
+                  id="edit-city"
+                  name="city"
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="İstanbul"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Yetkili Adı & Soyadı */}
-          <div>
-            <label htmlFor="edit-authorized-name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Yetkili Adı & Soyadı <span className="text-slate-400 dark:text-slate-500 font-normal">(İsteğe bağlı)</span>
-            </label>
-            <div className="relative">
-              <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-              <input
-                id="edit-authorized-name"
-                name="authorized_name"
-                type="text"
-                value={authorizedName}
-                onChange={(e) => setAuthorizedName(e.target.value)}
-                placeholder="Örnek: Mehmet Yılmaz"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
-              />
+          {/* 2. Yetkili & Dijital Varlıklar */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 border-t border-slate-100 pt-4 dark:border-[#272b37]">
+            <div>
+              <label htmlFor="edit-authorized-name" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Yetkili Adı & Soyadı
+              </label>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <input
+                  id="edit-authorized-name"
+                  name="authorized_name"
+                  type="text"
+                  value={authorizedName}
+                  onChange={(e) => setAuthorizedName(e.target.value)}
+                  placeholder="Örnek: Mehmet Yılmaz"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="edit-phone" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                İletişim Telefonu
+              </label>
+              <div className="relative">
+                <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <input
+                  id="edit-phone"
+                  name="phone"
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="05XX XXX XX XX"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="edit-instagram" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Instagram Kullanıcı Adı
+              </label>
+              <div className="relative">
+                <AtSign className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <input
+                  id="edit-instagram"
+                  name="instagram"
+                  type="text"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value)}
+                  placeholder="@markaadi"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="edit-website" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Web Sitesi
+              </label>
+              <div className="relative">
+                <Globe className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                <input
+                  id="edit-website"
+                  name="website"
+                  type="text"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  placeholder="https://marka.com"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Aylık Ucret */}
-          <div>
-            <label htmlFor="edit-fee" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Aylık Hizmet Bedeli (₺)
-            </label>
-            <div className="relative">
-              <DollarSign className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-              <input
-                id="edit-fee"
-                name="monthly_fee"
-                type="number"
-                min="0"
-                step="1"
-                value={fee}
-                onChange={(e) => setFee(e.target.value)}
-                placeholder="0"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/30"
-              />
+          {/* 3. Fatura & Vergi Bilgileri */}
+          <div className="space-y-3 border-t border-slate-100 pt-4 dark:border-[#272b37]">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="sm:col-span-1">
+                <label htmlFor="edit-billing-title" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Resmi Ticari Ünvan
+                </label>
+                <div className="relative">
+                  <Receipt className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                  <input
+                    id="edit-billing-title"
+                    name="billing_title"
+                    type="text"
+                    value={billingTitle}
+                    onChange={(e) => setBillingTitle(e.target.value)}
+                    placeholder="Örn: Marka A.Ş."
+                    className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="edit-tax-office" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Vergi Dairesi
+                </label>
+                <input
+                  id="edit-tax-office"
+                  name="tax_office"
+                  type="text"
+                  value={taxOffice}
+                  onChange={(e) => setTaxOffice(e.target.value)}
+                  placeholder="Maslak V.D."
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="edit-tax-id" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Vergi No / TCKN
+                </label>
+                <input
+                  id="edit-tax-id"
+                  name="tax_id"
+                  type="text"
+                  value={taxId}
+                  onChange={(e) => setTaxId(e.target.value)}
+                  placeholder="1234567890"
+                  className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="edit-notes" className="mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Ajans İçi Marka Notları & Özel Brief
+              </label>
+              <div className="relative">
+                <FileText className="pointer-events-none absolute left-3.5 top-3 h-4 w-4 text-slate-400 dark:text-slate-500" />
+                <textarea
+                  id="edit-notes"
+                  name="notes"
+                  rows={2}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Markanın iletişim dili, renk kodları veya sözleşme özel şartları..."
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-xs text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white dark:border-[#272b37] dark:bg-[#1a1d25] dark:text-slate-100"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Musteri Hesap Bilgisi & Durumu */}
+          {/* 4. Müşteri Hesap Bilgisi & Durumu */}
           <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3.5 dark:border-[#272b37] dark:bg-[#1a1d25]">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
@@ -221,8 +444,8 @@ export function EditCustomerModal({ isOpen, brand, onClose }: EditCustomerModalP
             </div>
           </div>
 
-          {/* Aksiyon butonlari */}
-          <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-[#272b37]">
+          {/* Aksiyon butonları */}
+          <div className="flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-[#272b37]">
             <button
               type="button"
               onClick={onClose}

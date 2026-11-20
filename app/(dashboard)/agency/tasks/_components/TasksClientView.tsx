@@ -11,6 +11,7 @@ import { TaskDetailModal } from './TaskDetailModal'
 import { EditTaskModal } from './EditTaskModal'
 import { DeleteTaskModal } from './DeleteTaskModal'
 import { getLocalDateString } from '@/lib/utils'
+import { getSavedSettings } from '@/lib/settings'
 
 export interface TaskCommentItem {
   id: string
@@ -74,6 +75,8 @@ export interface TasksClientViewProps {
   brands: BrandOption[]
   employees: EmployeeOption[]
   metrics: TasksMetrics
+  initialTaskId?: string
+  initialBrandId?: string
 }
 
 const INITIAL_FILTERS: TaskFilterState = {
@@ -91,15 +94,49 @@ export function TasksClientView({
   brands,
   employees,
   metrics,
+  initialTaskId,
+  initialBrandId,
 }: TasksClientViewProps) {
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban')
-  const [filters, setFilters] = useState<TaskFilterState>(INITIAL_FILTERS)
+  const [filters, setFilters] = useState<TaskFilterState>(() => ({
+    ...INITIAL_FILTERS,
+    brandId: initialBrandId || '',
+  }))
+
+  // Kullanıcının Ayarlar -> Çalışma Alanı sekmesinde seçtiği varsayılan görünümü uygula
+  useEffect(() => {
+    const saved = getSavedSettings()
+    if (saved.defaultTaskView === 'kanban' || saved.defaultTaskView === 'list') {
+      setViewMode(saved.defaultTaskView)
+    }
+  }, [])
 
   // Modal durumları
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [detailTask, setDetailTask] = useState<TaskItem | null>(null)
+  const [detailTask, setDetailTask] = useState<TaskItem | null>(() => {
+    if (initialTaskId) {
+      return tasks.find((t) => t.id === initialTaskId) ?? null
+    }
+    return null
+  })
   const [editTask, setEditTask] = useState<TaskItem | null>(null)
   const [deleteTask, setDeleteTask] = useState<TaskItem | null>(null)
+
+  // URL üzerinden gelen ?taskId veya ?brandId değiştiğinde modal/filtreyi senkronize et
+  useEffect(() => {
+    if (initialTaskId) {
+      const target = tasks.find((t) => t.id === initialTaskId)
+      if (target) {
+        setDetailTask(target)
+      }
+    }
+  }, [initialTaskId, tasks])
+
+  useEffect(() => {
+    if (initialBrandId) {
+      setFilters((prev) => ({ ...prev, brandId: initialBrandId }))
+    }
+  }, [initialBrandId])
 
   // Server revalidation sonrası seçili görevin güncel verilerini senkronize et
   useEffect(() => {
@@ -123,7 +160,6 @@ export function TasksClientView({
     const endOfWeekStr = getLocalDateString(endOfWeek)
 
     return tasks.filter((t) => {
-      // 1. Metin Arama
       if (query) {
         const brandMatch = t.brandName.toLocaleLowerCase('tr-TR').includes(query)
         const assigneeMatch = (t.assigneeName ?? '').toLocaleLowerCase('tr-TR').includes(query)
@@ -135,12 +171,10 @@ export function TasksClientView({
         }
       }
 
-      // 2. Marka Filtresi
       if (filters.brandId && t.brandId !== filters.brandId) {
         return false
       }
 
-      // 3. Çalışan / Atama Filtresi
       if (filters.assigneeId) {
         if (filters.assigneeId === 'unassigned') {
           if (t.assigneeId !== null) return false
@@ -149,17 +183,14 @@ export function TasksClientView({
         }
       }
 
-      // 4. Platform Filtresi
       if (filters.platform && t.platform !== filters.platform) {
         return false
       }
 
-      // 5. İçerik Formatı Filtresi
       if (filters.content && t.content !== filters.content) {
         return false
       }
 
-      // 6. Zaman Filtresi (Saat dilimi kayması olmadan string bazlı kesin eşleşme)
       if (filters.timeFilter) {
         if (!t.dueDate) return false
         const dueStr = t.dueDate.slice(0, 10)
@@ -178,7 +209,6 @@ export function TasksClientView({
 
   return (
     <div className="space-y-6">
-      {/* 1. Üst Başlık & Görünüm Değiştirici */}
       <TasksHeader
         agencyName={agencyName}
         viewMode={viewMode}
@@ -186,10 +216,8 @@ export function TasksClientView({
         onNewTaskClick={() => setIsCreateOpen(true)}
       />
 
-      {/* 2. Dörtlü Metrik Kartları */}
       <TasksMetricsRow {...metrics} />
 
-      {/* 3. Filtreleme & Arama Çubuğu */}
       <TasksFilterBar
         filters={filters}
         onFilterChange={setFilters}
@@ -200,7 +228,6 @@ export function TasksClientView({
         filteredCount={filteredTasks.length}
       />
 
-      {/* 4. Görünüm Alanı (Kanban veya Liste) */}
       {viewMode === 'kanban' ? (
         <TasksKanbanView
           tasks={filteredTasks}
@@ -219,7 +246,6 @@ export function TasksClientView({
         />
       )}
 
-      {/* 5. Modallar */}
       <CreateTaskModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}

@@ -34,6 +34,7 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
     { label: 'Çalışanlar', href: '/agency/employees', icon: UserCheck },
     { label: 'Görev Yönetimi', href: '/agency/tasks', icon: CheckSquare },
     { label: 'İçerik Planı', href: '/agency/content', icon: Calendar },
+    { label: 'Ajans & Finans', href: '/agency/organization', icon: Building2 },
     { label: 'Mesajlar', href: '/agency/messages', icon: MessageSquare },
     { label: 'Toplantılar', href: '/agency/meetings', icon: Video },
   ],
@@ -141,7 +142,7 @@ export function Sidebar({ role }: SidebarProps) {
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href !== '/agency' && pathname.startsWith(item.href))
+            (item.href !== '/agency' && item.href !== '/employee' && item.href !== '/customer' && pathname.startsWith(item.href))
           const Icon = item.icon
 
           return (
@@ -187,7 +188,6 @@ export function Sidebar({ role }: SidebarProps) {
           title="SMAUP"
           className="relative flex h-8 items-center overflow-hidden"
         >
-          {/* Daraltılmış durum: Ortalanmış 'S' */}
           <div
             className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out ${
               isCollapsed
@@ -200,7 +200,6 @@ export function Sidebar({ role }: SidebarProps) {
             </span>
           </div>
 
-          {/* Genişletilmiş durum: Birleşik ve hizalı 'SMAUP' */}
           <div
             className={`flex items-center px-4 transition-all duration-300 ease-in-out ${
               isCollapsed
